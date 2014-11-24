@@ -12,25 +12,51 @@ var Monster = (function(){
 
     deployQueue: function(){
       // create queue to load all files, set local vars, call all charts
+      // queue().defer(d3.filetype, filename)
+      //        .await(Monster.chart);
     },
 
-    constants: {
-      width:          this.parsed.width || 900,
-      height:         this.parsed.height || 900,
-      filename:       this.parsed.filename,
-      filetype:       transform.filename(this.filename)
 
-    },
-
-    chart: function(){
+    chart: function(data){
+      
 
     },
 
     transform: {
       filename: function(name){
         var arr = name.split('');
-        return arr.split('.');
-      }
+        return arr[-1];
+      },
+
+      xScale: function(type, rangeLow, rangeHigh){
+        if (type === 'time') {
+          return d3.scale.time().range([rangeLow || 0, rangeHigh || this.width]);
+        } else {
+          return d3.scale[type]().range([rangeLow || 0, rangeHigh || this.width]);
+        }
+      },
+
+      yScale: function(type, rangeLow, rangeHigh){
+        if (type === 'time') {
+          return d3.scale.time().range([rangeHigh || this.width, rangeLow || 0]);
+        } else {
+          return d3.scale[type]().range([rangeHigh || this.width, rangeLow || 0]);
+        }
+      },
+
+    },
+
+    consts: {
+      width:          this.parsed.width || 900,
+      height:         this.parsed.height || 900,
+      marginkey:      this.parsed.margin || {top: 20, right: 20, bottom: 30, left: 40},
+      filename:       this.parsed.filename,
+      filetype:       this.transform.filename(this.filename),
+
+      color:          this.parsed.color || d3.scale.category20()
+      xScale:         this.parsed.xScale ? transform.xScale(this.parsed.xScale, this.parsed.rangeLow, this.parsed.rangeHigh) : basicxScale = d3.scale.linear().range([0, this.width]),
+      yScale:         this.parsed.yScale ? transform.yScale(this.parsed.yScale, this.parsed.rangeLow, this.parsed.rangeHigh) : basicxScale = d3.scale.linear().range([this.height, 0]),
+
     }
 
 
