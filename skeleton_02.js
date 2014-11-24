@@ -1,3 +1,46 @@
+var Monster = (function(){
+
+  var parsed = {
+      // actual object returned from the parser, MUST have fields: xValue, yValue, filename, 
+    }
+
+  return {
+
+    compile: function(){
+      // deployQueue();
+    },
+
+    deployQueue: function(){
+      // create queue to load all files, set local vars, call all charts
+    },
+
+    constants: {
+      width:          this.parsed.width || 900,
+      height:         this.parsed.height || 900,
+      filename:       this.parsed.filename,
+      filetype:       transform.filename(this.filename)
+
+    },
+
+    chart: function(){
+
+    },
+
+    transform: {
+      filename: function(name){
+        var arr = name.split('');
+        return arr.split('.');
+      }
+    }
+
+
+  };
+
+
+})();
+
+
+
 // Canvas variables: width, height, margins
 
 var margin = {top: 20, right: 20, bottom: 30, left: 40},
