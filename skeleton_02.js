@@ -1,13 +1,33 @@
 var Monster = (function(){
 
   var parsed = {
-      // actual object returned from the parser, MUST have fields: xValue, yValue, filename, 
+      // actual object returned from the parser 
+      shape: { shape: undefined, // expect svg shapes: circle, rect, path
+               attr: undefined,  // expect object
+               style: { }
+             } 
     }
+
+  var mouseover = function(d){
+    var xPosition = event.clientX + scrollX < width - 200 ? event.clientX + scrollX : event.clientX + scrollX - 200,
+        yPosition = event.clientY + scrollY + 100 > height ? event.clientY + scrollY - 25 : event.clientY + scrollY + 5,
+        text = '' + parsed.xValue + ': ' + d[parsed.xValue] + '; ' + parsed.yValue + ': '+ d[parsed.yValue];
+    d3.select('#tooltip')
+      .style('left', xPosition + 'px')
+      .style('top', yPosition + 'px')
+      .select('#values')
+      .text(text);
+    d3.select('#tooltip').classed('hidden', false);
+  }
+
+  var mouseout = function(){
+    d3.select('#tooltip').classed('hidden', true);
+  }
 
   return {
 
     compile: function(){
-      // deployQueue();
+      // call deployQueue(), spit out text, in another file;
     },
 
     deployQueue: function(){
@@ -18,19 +38,68 @@ var Monster = (function(){
 
 
     chart: function(data){
+      // Clean data
       
+      data.forEach(function(element){
+        // Cleaning equations
+      });
 
+      // Find max / extent, add scale domain
+
+      var maxX = d3.max(data, function(d){ return d[parsed.xValue]; }),
+          maxY = d3.max(data, function(d){ return d[parsed.yValue]; }),
+
+      xScale.domain([0, maxX]);
+      yScale.domain([0, maxY + (maxY * .15)]);
+
+
+      // Draw
+
+      var svg = d3.select(parsed.div)
+        .append('svg')
+          .attr('width', this.consts.width + this.consts.margin.left + this.consts.margin.right)
+          .attr('height', this.consts.height + this.consts.margin.top + this.consts.margin.bottom)
+        .append('g')
+          .attr('transform', 'translate(' + this.consts.margin.left + ',' + this.consts.margin.top + ')');;
+
+
+      svg.selectAll(parsed.shape.shape)
+            .data(data)
+          .enter()
+            .append(parsed.shape.shape)
+              .attr(parsed.shape.attr)
+              .style(parsed.shape.style)
+            .on('mouseover', this.helper.mouseover);
+            .on('mouseout', this.helper.mouseout);
+      //Axes
+      var xAxis = d3.svg.axis()
+          .scale(xScale)
+          .orient('bottom');
+
+      var yAxis = d3.svg.axis()
+          .scale(yScale)
+          .orient('left')
+          .tickFormat(formatDollars);
+
+      svg.append('g')
+            .attr('class', 'x axis')
+            .attr('transform', 'translate(0,' + height + ')')
+            .call(xAxis);
+
+      svg.append('g')
+          .attr('class', 'y axis')
+              .call(yAxis); 
     },
 
     transform: {
       filename: function(name){
-        var arr = name.split('');
+        var arr = name.split('.');
         return arr[-1];
       },
 
       xScale: function(type, rangeLow, rangeHigh){
         if (type === 'time') {
-          return d3.scale.time().range([rangeLow || 0, rangeHigh || this.width]);
+          return d3.time.scale().range([rangeLow || 0, rangeHigh || this.width]);
         } else {
           return d3.scale[type]().range([rangeLow || 0, rangeHigh || this.width]);
         }
@@ -38,25 +107,30 @@ var Monster = (function(){
 
       yScale: function(type, rangeLow, rangeHigh){
         if (type === 'time') {
-          return d3.scale.time().range([rangeHigh || this.width, rangeLow || 0]);
+          return d3.time.scale().range([rangeHigh || this.width, rangeLow || 0]);
         } else {
           return d3.scale[type]().range([rangeHigh || this.width, rangeLow || 0]);
         }
-      },
+      }
 
     },
 
     consts: {
-      width:          this.parsed.width || 900,
-      height:         this.parsed.height || 900,
-      marginkey:      this.parsed.margin || {top: 20, right: 20, bottom: 30, left: 40},
-      filename:       this.parsed.filename,
-      filetype:       this.transform.filename(this.filename),
+      width:          parsed.width || 900,
+      height:         parsed.height || 600,
+      marginkey:      parsed.margin || {top: 20, right: 20, bottom: 30, left: 40},
+      filename:       parsed.filename,
+      filetype:       transform.filename(this.filename),
 
-      color:          this.parsed.color || d3.scale.category20()
-      xScale:         this.parsed.xScale ? transform.xScale(this.parsed.xScale, this.parsed.rangeLow, this.parsed.rangeHigh) : basicxScale = d3.scale.linear().range([0, this.width]),
-      yScale:         this.parsed.yScale ? transform.yScale(this.parsed.yScale, this.parsed.rangeLow, this.parsed.rangeHigh) : basicxScale = d3.scale.linear().range([this.height, 0]),
+      color:          parsed.color || d3.scale.category20()
+      xScale:         parsed.xScale ? transform.xScale(parsed.xScale, parsed.rangeLow, parsed.rangeHigh) : basicxScale = d3.scale.linear().range([0, this.width]),
+      yScale:         parsed.yScale ? transform.yScale(parsed.yScale, parsed.rangeLow, parsed.rangeHigh) : basicxScale = d3.scale.linear().range([this.height, 0]),
 
+    },
+
+    helper: {
+      mouseover:      parsed.mouseover || mouseover;
+      mouseout:       parsed.mouseout || mouseout;
     }
 
 
@@ -66,100 +140,4 @@ var Monster = (function(){
 })();
 
 
-
-// Canvas variables: width, height, margins
-
-var margin = {top: 20, right: 20, bottom: 30, left: 40},
-  width = 1200 - margin.left - margin.right,
-  height = 400 - margin.top - margin.bottom;
-
-var color = d3.scale.category20();
-
-// Scale variables: scale type, default linear, height reversed
-
-var lineScale = d3.scale.linear()
-  .range([0, width]),
-
-  basicYScale = d3.scale.linear()
-    .range([height, 0]);
-
-
-// Utiility functions: formats, 
-
-var formatPercent = d3.format('.1%'),
-    formatPercentPrecise = d3.format('.2%'),
-    formatDollars = d3.format('$sk');
-
-
-drawMedian: function(filename, div) {
-
-  // Invoke draw function [will eventually be factored out in order to use queue, in _02]
-  d3.json(filename, function(error, data){
-
-    // Clean data
-    
-    data.forEach(function(element){
-      // Cleaning equations
-    });
-
-    // Find max / extent, add scale domain
-
-    var maxX = d3.max(data, function(d){ return d.xValue; }),
-        maxY = d3.max(data, function(d){ return d.yValue; }),
-
-    xScale.domain([0, maxX]);
-    yScale.domain([0, maxY + (maxY * .15)]);
-
-
-    // Draw
-
-    var svg = d3.select(div)
-      .append('svg')
-        .attr('width', width + margin.left + margin.right)
-        .attr('height', height + margin.top + margin.bottom)
-      .append('g')
-        .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');;
-
-
-    svg.selectAll('________')
-          .data(data)
-        .enter()
-          .append('________')
-            .attr({ ...: ...,
-                    ...: ...,
-                    ..., ... })
-          .on('mouseover', function(d){
-            var xPosition = event.clientX + scrollX < width - 200 ? event.clientX + scrollX : event.clientX + scrollX - 200,
-                yPosition = event.clientY + scrollY + 100 > height ? event.clientY + scrollY - 25 : event.clientY + scrollY + 5,
-                text = d.Major + ' -- shareWomen: ' + formatPercentPrecise(d.ShareWomen) + ' Median pay: ' + formatDollars(d.Median);
-            d3.select('#tooltip')
-              .style('left', xPosition + 'px')
-              .style('top', yPosition + 'px')
-              .select('#values')
-              .text(text);
-            d3.select('#tooltip').classed('hidden', false);
-          })
-          .on('mouseout', function(){
-            d3.select('#tooltip').classed('hidden', true);
-          });
-    //Axes
-    var xAxis = d3.svg.axis()
-        .scale(xScale)
-        .orient('bottom');
-
-    var yAxis = d3.svg.axis()
-        .scale(yScale)
-        .orient('left')
-        .tickFormat(formatDollars);
-
-    svg.append('g')
-          .attr('class', 'x axis')
-          .attr('transform', 'translate(0,' + height + ')')
-          .call(xAxis);
-
-    svg.append('g')
-        .attr('class', 'y axis')
-            .call(yAxis); 
-  })
-}
 
