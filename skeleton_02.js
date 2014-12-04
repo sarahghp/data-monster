@@ -2,10 +2,13 @@ var Monster = (function(){
 
   var parsed = {
       // actual object returned from the parser 
-      shape: { shape: undefined, // expect svg shapes: circle, rect, path
-               attr: undefined,  // expect object
-               style: { }
-             } 
+      // shape: { shape: undefined, // expect svg shapes: circle, rect, path
+      //          mandatoryAttr: undefined,  // expect object, inject xScale, yScale around values here
+      //          optionalAttr: { },
+      //          style: { },
+      //          html: { },
+      //          text: { }
+      //        } 
     }
 
   var mouseover = function(d){
@@ -27,13 +30,13 @@ var Monster = (function(){
   return {
 
     compile: function(){
-      // call deployQueue(), spit out text, in another file;
+      // spit out text, in another file, by calling chart() &  deployQueue();
     },
 
     deployQueue: function(){
       // create queue to load all files, set local vars, call all charts
-      // queue().defer(d3.filetype, filename)
-      //        .await(Monster.chart);
+      // queue().defer(d3[filetype], filename)
+      //        .awaitAll(Monster.chart);
     },
 
 
@@ -42,9 +45,7 @@ var Monster = (function(){
     chart: function(data){
       // Clean data
       
-      data.forEach(function(element){
-        // Cleaning equations
-      });
+      var data = cleanData(data);
 
       // Find max / extent, add scale domain
 
@@ -64,13 +65,13 @@ var Monster = (function(){
         .append('g')
           .attr('transform', 'translate(' + this.consts.margin.left + ',' + this.consts.margin.top + ')');;
 
+      // Right now this just works for the mandatory attr; need to generate a version that works with optional style, etc.
 
       svg.selectAll(parsed.shape.shape)
             .data(data)
           .enter()
             .append(parsed.shape.shape)
               .attr(parsed.shape.attr)
-              .style(parsed.shape.style)
             .on('mouseover', this.helper.mouseover);
             .on('mouseout', this.helper.mouseout);
       
@@ -86,13 +87,12 @@ var Monster = (function(){
     // Needs to be abstracted, just plopped in for now
     axes: function(){
       var xAxis = d3.svg.axis()
-          .scale(xScale)
+          .scale(this.consts.xScale)
           .orient('bottom');
 
       var yAxis = d3.svg.axis()
-          .scale(yScale)
-          .orient('left')
-          .tickFormat(formatDollars);
+          .scale(this.consts.yScale)
+          .orient('left');
 
           return {
             xAxis: function(){ 
@@ -108,6 +108,14 @@ var Monster = (function(){
                 .call(yAxis); 
              }
           }
+    },
+
+    cleanData: function(data){
+      data.forEach(function(){
+        for (var i = 0, l = parsed.clean.length; i < l; i++){
+          parsed.clean[i];
+        }
+      })
     },
 
     transform: {
@@ -147,6 +155,9 @@ var Monster = (function(){
 
       xAxis:          parsed.xAxis || true,
       yAxis:          parsed.yAxis || true,
+
+      xValue:         this.xScale(d[parsed.xValue]),
+      yValue:         this.yScale(d[parsed.yValue])
     },
 
     helper: {
