@@ -37,6 +37,8 @@ var Monster = (function(){
     },
 
 
+    // Should this be abstracted more and just call functions? 
+
     chart: function(data){
       // Clean data
       
@@ -71,7 +73,18 @@ var Monster = (function(){
               .style(parsed.shape.style)
             .on('mouseover', this.helper.mouseover);
             .on('mouseout', this.helper.mouseout);
+      
       //Axes
+
+      this.consts.xAxis && this.axes.xAxis();
+      this.consts.yAxis && this.axes.yAxis();      
+
+      
+    },
+
+    
+    // Needs to be abstracted, just plopped in for now
+    axes: function(){
       var xAxis = d3.svg.axis()
           .scale(xScale)
           .orient('bottom');
@@ -81,14 +94,20 @@ var Monster = (function(){
           .orient('left')
           .tickFormat(formatDollars);
 
-      svg.append('g')
-            .attr('class', 'x axis')
-            .attr('transform', 'translate(0,' + height + ')')
-            .call(xAxis);
+          return {
+            xAxis: function(){ 
+              return svg.append('g')
+                .attr('class', 'x axis')
+                .attr('transform', 'translate(0,' + height + ')')
+                .call(xAxis);
+             },
 
-      svg.append('g')
-          .attr('class', 'y axis')
-              .call(yAxis); 
+             yAxis: function(){
+              return svg.append('g')
+                .attr('class', 'y axis')
+                .call(yAxis); 
+             }
+          }
     },
 
     transform: {
@@ -122,15 +141,17 @@ var Monster = (function(){
       filename:       parsed.filename,
       filetype:       transform.filename(this.filename),
 
-      color:          parsed.color || d3.scale.category20()
+      color:          parsed.color || d3.scale.category20(),
       xScale:         parsed.xScale ? transform.xScale(parsed.xScale, parsed.rangeLow, parsed.rangeHigh) : basicxScale = d3.scale.linear().range([0, this.width]),
       yScale:         parsed.yScale ? transform.yScale(parsed.yScale, parsed.rangeLow, parsed.rangeHigh) : basicxScale = d3.scale.linear().range([this.height, 0]),
 
+      xAxis:          parsed.xAxis || true,
+      yAxis:          parsed.yAxis || true,
     },
 
     helper: {
-      mouseover:      parsed.mouseover || mouseover;
-      mouseout:       parsed.mouseout || mouseout;
+      mouseover:      parsed.mouseover || mouseover,
+      mouseout:       parsed.mouseout || mouseout,
     }
 
 
