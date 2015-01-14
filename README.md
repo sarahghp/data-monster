@@ -1,7 +1,9 @@
 data-monster
 ============
 
-Seekrit girl repo for emitting d3
+Repo for emitting d3
+
+See `ent-ex` for possible use syntax.
 
 Next steps: 
 * ~~make the scaffold for w/ data and without~~
