@@ -21,7 +21,7 @@ var xScale = d3.scale.linear()
 
 // Draw scatterplot
 
-d3.tsv('van_gogh_additional_measurements.tsv', function(error, data){
+function draw (error, data){
 
   // Prepare the data by changing label and making sure numbers are numbers
 
@@ -109,4 +109,7 @@ d3.tsv('van_gogh_additional_measurements.tsv', function(error, data){
         .style('text-anchor', 'end')
         .text('Num Shapes');
 
-})
+}
+
+queue().defer(d3.tsv, 'van_gogh_additional_measurements.tsv').
+       .await(draw);
