@@ -1,6 +1,7 @@
 data-monster
 ============
 
+<<<<<<< HEAD
 Eventually this will be a domain-specific language that will transpile to d3.js.
 
 Input like this:
