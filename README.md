@@ -14,7 +14,7 @@ Input like this:
     (color: category10)
     (circle: { cx: 'ratio', cy: 'Shape_Count', r: 4, fill: 'year' } 
        attr: { 'class': 'dot' }
-       tooltips: true // default behavior, doesn't need to be included
+       tooltips: true
        click:  function(d) { window.open('https://www.google.com/search?site=imghp&tbm=isch&q=van+gogh+'+d.Title); })
     (axis-x: attr: { 'class': 'label', 'x': width, 'y': 50 }
              style: { 'text-anchor': 'end' }
