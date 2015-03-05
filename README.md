@@ -145,3 +145,11 @@ function draw (error, data){
 queue().defer(d3.tsv, 'van_gogh_additional_measurements.tsv').
        .await(draw);
 ```
+
+### Chomping (aka compiling) the file
+
+To compile a data-monster `.dm` file to js, run
+
+```
+node chomp <filename0> ... <filenameN> [optional output directory] 
+```
