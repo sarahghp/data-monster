@@ -9,5 +9,8 @@
     "karma-jasmine": "^0.3.5",
     "karma-nyan-reporter": "0.0.50",
     "karma-phantomjs-launcher": "^0.1.4"
+  },
+  "dependencies": {
+    "lodash": "^3.3.1"
   }
 }
