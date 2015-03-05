@@ -11,12 +11,11 @@ function compile(){
       lastFile = inputs[iL - 1],
       outDir;
 
-  // Check if last arg passed is a directory <- change to use filter
+  // Check if last arg passed is a directory
 
   if (path.extname(lastFile) === '') {
     outDir = lastFile;
     files.pop()
-    console.log('Files after pop:', files);
   } else {
     outDir = 'monster-files'
   }
@@ -30,9 +29,10 @@ function compile(){
   });
 
 
-  // Now process ALL the files
+  // Process ALL the files once the event loop has cleared
 
-  _.forEach(files, function mapper(file){
+  var changes =  function(){
+    return _.forEach(files, function mapper(file){
 
     // Check that the file is type data-monster
 
@@ -58,19 +58,17 @@ function compile(){
 
       // Then write out js file(s) to output directory
 
-      console.log(outDir, path.basename(process.cwd()) , (process.cwd() !== outDir))
       path.basename(process.cwd()) !== outDir && process.chdir(outDir);
 
       fs.writeFile(outputTitle, output, function(err){
         if(err) throw err;
         console.log(' Nom nom the data monster has chomped ' + file + '\n\n v   V  \n  ^ ^ \n\n');
       });
-
     });
+    });
+  }
 
-  });
-
-
+  _.defer(changes);
 }
 
 
