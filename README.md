@@ -148,8 +148,10 @@ queue().defer(d3.tsv, 'van_gogh_additional_measurements.tsv').
 
 ### Chomping (aka compiling) the file
 
-To compile a data-monster `.dm` file to js, run
+To compile a data-monster `.dm` file to javascript, run
 
 ```
 node chomp <filename0> ... <filenameN> [optional output directory] 
 ```
+
+The `-a` flag can also be used to chomp all the files in the current directory
