@@ -55,7 +55,7 @@ function compile(){
     }
   }
 
-  // Processes ALL the files
+  // What it is we want to do to the files — this is where the interpreter will be called eventaully
 
   var changes =  function(files){
     return _.forEach(files, function mapper(file){
@@ -98,7 +98,6 @@ function compile(){
   // Call all the processes, including final compilation once the event loop has cleared
 
   createDirectory(lastFile);
-
   _.defer(changes, genFileCollection(process.cwd()));
 }
 
