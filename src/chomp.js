@@ -15,7 +15,7 @@ function compile(){
 
   function createDirectory(check){ 
     if (path.extname(check) === '' && path.basename(check) !== '-a') {
-      outDir = lastFile;
+      outDir = check;
       files.pop();
     } else {
       outDir = 'monster-files';
@@ -48,8 +48,7 @@ function compile(){
 
   function genFileCollection(dir){
     if (files[0] === '-a'){
-      var list = fs.readdirSync(dir);
-      return buildFileArray('.dm', list);
+      return buildFileArray('.dm', fs.readdirSync(dir));
     } else {
       return files;
     }
