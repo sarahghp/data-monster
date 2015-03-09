@@ -27,6 +27,8 @@ function compile(){
     fs.mkdir(outDir, function(err){
       if (err && err.code == 'EEXIST'){
         return;
+      } else if (err) {
+        console.log(err);
       }
     });
   }
