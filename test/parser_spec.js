@@ -29,7 +29,7 @@ describe('parser', function(){
   it('comrehends a spec with a bare word', function(){
     var ast = parser.parse("(color: category10)");
     // console.log(ast);
-    expect(ast).toEqual({ exp: { color: [ { variable: category10 } ] } });
+    expect(ast).toEqual({ exp: { color: [ { variable: 'category10' } ] } });
   });
 
   it('comrehends a spec with a boolean', function(){
