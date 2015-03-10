@@ -1,4 +1,4 @@
-  start             = string
+  start             = entry
 
   entry             = space '(' space p:program+ space ')' space 
                     { return { 
@@ -14,11 +14,11 @@
 
   program           = entry / spec
 
-  spec              = w:bare_word space colon space ind:string
+  spec              = w:bare_word space colon space ind:(entry / spec / param_hash / boolean / string / number)+
                       { return {op: w, exp: ind } }
 
   param_hash        = space '{' space pa:params+ space '}' { return pa  }
-  params            = ba:bare_word space colon space arg:(number) comma* space { return [ ba, arg ] }
+  params            = ba:bare_word space colon space arg:(string/number) comma* space { return [ ba, arg ] }
 
   boolean           = b:('true'/'false') { return b }
 

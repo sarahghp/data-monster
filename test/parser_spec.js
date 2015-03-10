@@ -3,13 +3,10 @@
 var parser = require('../src/parser.js');
 
 describe('parser', function(){
+  
   it('makes a parser', function(){
     expect(parser.parse).toBeDefined();
   });
-
- it('parses a string', function(){
-   expect(parser.parse("'data'")).toEqual('data');
- }); 
 
   it('comrehends a spec with a number', function(){
     var ast = parser.parse("(data: 15)");
@@ -38,7 +35,7 @@ describe('parser', function(){
   it('comrehends a spec with a boolean', function(){
     var ast = parser.parse("(tooltip: true)");
     // console.log(ast);
-    expect(ast).toEqual({ exp: { tooltip: 'true' } });
+    expect(ast).toEqual({ exp: { tooltip: ['true'] } });
   });
 
   it('comrehends a spec with multiple entries of one type', function(){
@@ -56,13 +53,7 @@ describe('parser', function(){
   it('comrehends a spec with a full hash', function(){
     var ast = parser.parse("(circle: { cx: 'ratio', cy: 'Shape_Count', r: 4, fill: 'year' })");
     // console.log(ast);
-    expect(ast).toEqual({ exp: { circle: [['cx', 'ratio'], ['cy', 'Shape_Count'], ['r', 4], ['fill', 'year']]  } } );
-  });
-
-    it('comrehends a spec with a full hash, num only', function(){
-    var ast = parser.parse("(circle: { r: 4, r: 10 })");
-    // console.log(ast);
-    expect(ast).toEqual({ exp: { circle: [['r', 4], ['r', 10]] } });
+    expect(ast).toEqual({ exp: { circle: [[['cx', 'ratio'], ['cy', 'Shape_Count'], ['r', 4], ['fill', 'year']]]  } } );
   });
 
   it('comrehends a spec with one other spec', function(){
