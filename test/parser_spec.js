@@ -53,13 +53,13 @@ describe('parser', function(){
   it('comrehends a spec with a full hash', function(){
     var ast = parser.parse("(circle: { cx: 'ratio', cy: 'Shape_Count', r: 4, fill: 'year' })");
     // console.log(ast);
-    expect(ast).toEqual({ exp: { circle: [[['cx', 'ratio'], ['cy', 'Shape_Count'], ['r', 4], ['fill', 'year']]]  } } );
+    expect(ast).toEqual({ exp: { circle: [['cx', 'ratio'], ['cy', 'Shape_Count'], ['r', 4], ['fill', 'year']]  } } );
   });
 
   it('comrehends a spec with one other spec, alternative', function(){
     var ast = parser.parse("(circle: attr: { 'class': 'dot' })");
     // console.log(ast);
-    expect(ast).toEqual({ exp: { circle: [ { op : 'attr', exp : [ [ [ 'class', 'dot' ] ] ] } ] } });
+    expect(ast).toEqual({ exp: { circle: [ { op : 'attr', exp : [ [ 'class', 'dot' ] ] } ] } });
   });
 
   it('comrehends a spec with multiple oher specs', function(){
