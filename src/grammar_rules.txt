@@ -1,6 +1,6 @@
-  start             = entry
+  start             = string
 
-  entry             = space '(' space p:program+ ')' space 
+  entry             = space '(' space p:program+ space ')' space 
                     { return { 
 
                       exp: p.reduce(function(e, s){ 
@@ -14,17 +14,16 @@
 
   program           = entry / spec
 
-  spec              = w:(special / bare_word) space colon space ind:(spec / param_hash / boolean / string / number)+ 
-                      { return {op: w, exp: ind} }
+  spec              = w:bare_word space colon space ind:string
+                      { return {op: w, exp: ind } }
 
-  param_hash        = space '{' space params+ space '}'
-  params            = bare_word space colon space string/number comma
+  param_hash        = space '{' space pa:params+ space '}' { return pa  }
+  params            = ba:bare_word space colon space arg:(number) comma* space { return [ ba, arg ] }
 
   boolean           = b:('true'/'false') { return b }
-  special           = s:('tooltip'/'clean'/'canvas') { return {op: 'special', exp: s} }
 
-  string            = space quote str:(mandatory_space/letter)+ quote space { return str.join("") ; }
-  letter            = [^" \n]
+  string            = space quote str:(mandatory_space/letter)+ quote space { return str.join(""); }
+  letter            = [^"' \n]
 
   bare_word         = t:text+ { return t.join(""); }
   text              = [a-zA-Z0-9-]

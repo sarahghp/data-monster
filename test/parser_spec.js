@@ -7,6 +7,10 @@ describe('parser', function(){
     expect(parser.parse).toBeDefined();
   });
 
+ it('parses a string', function(){
+   expect(parser.parse("'data'")).toEqual('data');
+ }); 
+
   it('comrehends a spec with a number', function(){
     var ast = parser.parse("(data: 15)");
     // console.log(ast);
@@ -34,42 +38,48 @@ describe('parser', function(){
   it('comrehends a spec with a boolean', function(){
     var ast = parser.parse("(tooltip: true)");
     // console.log(ast);
-    expect(ast).toEqual({ exp: { tooltip: [ 'true' ] } });
+    expect(ast).toEqual({ exp: { tooltip: 'true' } });
   });
 
   it('comrehends a spec with multiple entries of one type', function(){
     var ast = parser.parse("(canvas: 1000 600)");
     // console.log(ast);
-    expect(ast).toEqual({ exp: { data: [1000, 600] } });
+    expect(ast).toEqual({ exp: { canvas: [1000, 600] } });
   });
 
   it('comrehends a spec with multiple entries of multiple types, excluding specs & short-hash', function(){
-    var ast = parser.parse("canvas: 1000 600 '#scatterplot'");
+    var ast = parser.parse("(canvas: 1000 600 '#scatterplot')");
     // console.log(ast);
     expect(ast).toEqual({ exp: { canvas: [ 1000, 600, '#scatterplot'] } });
   });
 
   it('comrehends a spec with a full hash', function(){
-    var ast = parser.parse("circle: { cx: 'ratio', cy: 'Shape_Count', r: 4, fill: 'year' } ");
+    var ast = parser.parse("(circle: { cx: 'ratio', cy: 'Shape_Count', r: 4, fill: 'year' })");
     // console.log(ast);
-    expect(ast).toEqual({ exp: { circle: { cx: 'ratio', cy: 'Shape_Count', r: 4, fill: 'year' } } });
+    expect(ast).toEqual({ exp: { circle: [['cx', 'ratio'], ['cy', 'Shape_Count'], ['r', 4], ['fill', 'year']]  } } );
+  });
+
+    it('comrehends a spec with a full hash, num only', function(){
+    var ast = parser.parse("(circle: { r: 4, r: 10 })");
+    // console.log(ast);
+    expect(ast).toEqual({ exp: { circle: [['r', 4], ['r', 10]] } });
   });
 
   it('comrehends a spec with one other spec', function(){
-    var ast = parser.parse("circle: attr: { 'class': 'dot' }");
+    var ast = parser.parse("(circle: attr: { 'class': 'dot' })");
     // console.log(ast);
     // Is this one stupid? Should I not have a full expression and instead just have it be inside?
     expect(ast).toEqual({ exp: { circle: { exp: { attr:  { 'class': 'dot' } } } } });
   });
 
   it('comrehends a spec with one other spec, alternative', function(){
-    var ast = parser.parse("circle: attr: { 'class': 'dot' }");
+    var ast = parser.parse("(circle: attr: { 'class': 'dot' })");
     // console.log(ast);
     expect(ast).toEqual({ exp: { circle: { attr:  { 'class': 'dot' } } } });
   });
 
   it('comrehends a spec with multiple oher specs', function(){
-    var ast = parser.parse("circle: attr: { 'class': 'dot' } tooltips: true");
+    var ast = parser.parse("(circle: attr: { 'class': 'dot' } tooltips: true)");
     // console.log(ast);
     expect(ast).toEqual({ exp: { circle: [ { attr: { 'class': 'dot' } }, { tooltips: true }] } });
   });
