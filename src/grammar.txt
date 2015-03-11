@@ -12,10 +12,13 @@
 
                     }
 
-  program           = entry / spec / signifier
+  program           = entry / clean_spec / spec / signifier
 
   spec              = w:signifier space ind:(entry/spec/signified/variable)+ space
                       { return {op: w, exp:[].concat.apply([], ind) } }
+
+  clean_spec        = ('clean' colon)? space '((' space cf:function+ space '))' 
+                      { return { op: 'clean', exp: cf[0].split(',').map(function(el){ return el.trim(); }) } }
 
 
   param_hash        = space '{' space pa:params+ space '}' { return pa;  }
@@ -28,6 +31,9 @@
 
   string            = space quote str:(mandatory_space/letter)+ quote space { return str.join(""); }
   letter            = [^"' \n]
+
+  function          = f:ftext+ { return (f.join('')); }
+  ftext             = [a-zA-Z0-9-.&'||'_=+-/* ] / '[' / ']'
 
   variable          = v:bare_word { return { variable: v } }
   bare_word         = t:text+ { return t.join(""); }

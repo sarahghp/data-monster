@@ -2,9 +2,9 @@
 
 (data: 'van_gogh_additional_measurements.tsv'
   // change array to obj for consitency? is easier to iterate on array
-  (clean: [ d.Shape_Count = +d.Shape_Count,
+  (clean: (( d.Shape_Count = +d.Shape_Count,
             d.ratio = +d["Image_Height/Image_Width "]                    
-          ]
+          ))
   )
   (canvas: 1000 600 {20 20 60 60} '#scatterplot'
     (color: category10)
