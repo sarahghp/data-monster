@@ -14,7 +14,7 @@
 
   program           = entry / spec / signifier
 
-  spec              = w:signifier space ind:(entry/spec/signified/variable)+
+  spec              = w:signifier space ind:(entry/spec/signified/variable)+ space
                       { return {op: w, exp:[].concat.apply([], ind) } }
 
 
