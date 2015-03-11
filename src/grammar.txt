@@ -1,14 +1,14 @@
   start             = entry
 
   entry             = space '(' space p:program+ space ')' space 
-                    { return { 
+                    { return [ 
 
-                      exp: p.reduce(function(e, s){ 
+                      p.reduce(function(e, s){ 
 
                         e[s.op] = s.exp;
                         return e;
 
-                      },{ }) }
+                      },{ }) ];
 
                     }
 

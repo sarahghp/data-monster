@@ -61,16 +61,26 @@ describe('parser', function(){
   it('comprehends the clean spec', function(){
     var ast = parser.parse("(clean: (( d.Shape_Count = +d.Shape_Count, d.ratio = +d['Image_Height/Image_Width '] )))");
     expect(ast).toEqual({ exp : { clean : [ "d.Shape_Count = +d.Shape_Count", "d.ratio = +d['Image_Height/Image_Width ']" ] } });
-  })
+  });
 
   it('comprehends the short-form clean spec', function(){
     var ast = parser.parse("((( d.Shape_Count = +d.Shape_Count, d.ratio = +d['Image_Height/Image_Width '] )))");
     expect(ast).toEqual({ exp : { clean : [ "d.Shape_Count = +d.Shape_Count", "d.ratio = +d['Image_Height/Image_Width ']" ] } });
-  })
+  });
 
   it('comprehends a function as a spec argument', function(){
     var ast = parser.parse("(clean: (( d.Shape_Count = +d.Shape_Count, d.ratio = +d['Image_Height/Image_Width '] )))");
     expect(ast).toEqual({ exp : { clean : [ "d.Shape_Count = +d.Shape_Count", "d.ratio = +d['Image_Height/Image_Width ']" ] } });
-  })
+  });
+
+  it('comprehends an entry with multiple parallel specs', function(){
+    var ast = parser.parse("(data: 'van_gogh_additional_measurements.tsv') (canvas: 1000 600)");
+    expect(ast).toEqual([{ data: [ 'van_gogh_additional_measurements.tsv' ]},  { canvas: [1000, 600] } ]);
+  });
+
+  it('comprehends an entry with multiple nested specs', function(){
+    var ast = parser.parse("(data: 'van_gogh_additional_measurements.tsv' (canvas: 1000 600))");
+    expect(ast).toEqual([{ data: [ 'van_gogh_additional_measurements.tsv', { canvas: [1000, 600] } ]} ]);
+  });
 
 });
