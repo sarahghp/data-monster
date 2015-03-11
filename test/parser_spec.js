@@ -68,4 +68,9 @@ describe('parser', function(){
     expect(ast).toEqual({ exp : { clean : [ "d.Shape_Count = +d.Shape_Count", "d.ratio = +d['Image_Height/Image_Width ']" ] } });
   })
 
+  it('comprehends a function as a spec argument', function(){
+    var ast = parser.parse("(clean: (( d.Shape_Count = +d.Shape_Count, d.ratio = +d['Image_Height/Image_Width '] )))");
+    expect(ast).toEqual({ exp : { clean : [ "d.Shape_Count = +d.Shape_Count", "d.ratio = +d['Image_Height/Image_Width ']" ] } });
+  })
+
 });
