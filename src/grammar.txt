@@ -1,9 +1,7 @@
   start             = entry+
 
   entry             = space '(' space p:program+ space ')' space 
-                    { console.log(p); return p;
-
-                    }
+                    { return p; }
 
   program           = entry / clean_spec / spec / signifier
 

@@ -69,7 +69,7 @@ describe('parser', function(){
   });
 
   it('comprehends a function as a spec argument', function(){
-    var ast = parser.parse("(clean: (( d.Shape_Count = +d.Shape_Count, d.ratio = +d['Image_Height/Image_Width '] )))");
+    var ast = parser.parse("click: function(d) { window.open('https://www.google.com/search?site=imghp&tbm=isch&q=van+gogh+'+d.Title);");
     expect(ast).toEqual({ exp : { clean : [ "d.Shape_Count = +d.Shape_Count", "d.ratio = +d['Image_Height/Image_Width ']" ] } });
   });
 
