@@ -72,7 +72,7 @@ describe('parser', function(){
   });
 
   it('comprehends a function as a spec argument', function(){
-    var ast = parser.parse("click: function(d) { window.open('https://www.google.com/search?site=imghp&tbm=isch&q=van+gogh+'+d.Title);");
+    var ast = parser.parse("(click: #{ function(d) { window.open('https://www.google.com/search?site=imghp&tbm=isch&q=van+gogh+'+d.Title);}})");
     expect(ast).toEqual();
   });
 
