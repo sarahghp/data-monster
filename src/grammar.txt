@@ -3,7 +3,7 @@
   entry             = space '(' space p:program+ space ')' space 
                     { return p; }
 
-  program           = entry / func_spec / clean_spec / spec / signifier
+  program           = entry / func_spec / spec / signifier
 
   spec              = w:signifier space ind:(entry/spec/signified/variable)+ space
                       { return {op: w, exp:[].concat.apply([], ind) } }
@@ -26,7 +26,7 @@
   letter            = [^"' \n]
 
 
-  full_func         = '#' space cu:curly { return cu.join('') }
+  full_func         = '#' space cu:curly { return [ cu.join('').trim() ] }
   curly             = '{' c:([^{}]/curly)* '}' { return [].concat.apply([], c)}
 
 
