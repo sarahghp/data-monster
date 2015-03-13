@@ -4,3 +4,4 @@ src/*.dm
 */monster-files
 upfiles/*
 REPL
+planning-docs/*

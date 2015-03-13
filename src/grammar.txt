@@ -25,7 +25,6 @@
   string            = space quote str:(mandatory_space/letter)+ quote space { return str.join(""); }
   letter            = [^"' \n]
 
-
   function          = '#' space cu:curly { return [ cu.join('').trim() ] }
   curly             = '{' c:([^{}]/curly)* '}' { return [].concat.apply([], c)}
 

@@ -3,4 +3,4 @@ var PEG = require('pegjs'),
 
 var grammar = fs.readFileSync(__dirname + '/grammar.txt').toString();
 
-module.exports = PEG.buildParser(grammar);
+exports.test = PEG.buildParser(grammar);

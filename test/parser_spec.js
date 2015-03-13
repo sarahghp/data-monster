@@ -1,6 +1,6 @@
 //TODO: Figure out function, clean
 
-var parser = require('../src/parser.js');
+var parser = require('../src/parser.js').test;
 
 describe('parser', function(){
   
