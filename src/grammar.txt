@@ -3,15 +3,15 @@
   entry             = space '(' space p:program+ space ')' space 
                     { return p; }
 
-  program           = entry / func_spec / spec / signifier
+  program           = entry / clean_spec / func_spec / spec / signifier
 
   spec              = w:signifier space ind:(entry/spec/signified/variable)+ space
                       { return {op: w, exp:[].concat.apply([], ind) } }
 
-  clean_spec        = ('clean' colon)? space '((' space cf:function+ space '))' 
-                      { return { op: 'clean', exp: cf[0].split(',').map(function(el){ return el.trim(); }) } }
+  clean_spec        = ('clean' colon)? cf:function 
+                      { return { op: 'clean', exp: cf } }
 
-  func_spec         =  sign:signifier space func:full_func { return {op: sign, exp:func } }
+  func_spec         =  sign:signifier space func:function { return {op: sign, exp:func } }
 
 
   param_hash        = space '{' space pa:params+ space '}' { return pa;  }
@@ -26,12 +26,8 @@
   letter            = [^"' \n]
 
 
-  full_func         = '#' space cu:curly { return [ cu.join('').trim() ] }
+  function          = '#' space cu:curly { return [ cu.join('').trim() ] }
   curly             = '{' c:([^{}]/curly)* '}' { return [].concat.apply([], c)}
-
-
-  function          = f:ftext+ { return (f.join('')); }
-  ftext             = [a-zA-Z0-9-.&'||'_=+-/* ] / '[' / ']'
 
   variable          = v:bare_word { return { variable: v } }
   bare_word         = t:text+ { return t.join(""); }

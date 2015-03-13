@@ -62,13 +62,13 @@ describe('parser', function(){
   });
 
   it('comprehends the clean spec', function(){
-    var ast = parser.parse("(clean: #{ d.Shape_Count = +d.Shape_Count, d.ratio = +d['Image_Height/Image_Width '] })");
-    expect(ast).toEqual([ [ { op : 'clean', exp : [ 'd.Shape_Count = +d.Shape_Count', "d.ratio = +d['Image_Height/Image_Width ']" ] } ] ]);
+    var ast = parser.parse('(clean: #{ d.Shape_Count = +d.Shape_Count, d.ratio = +d["Image_Height/Image_Width "] })');
+    expect(ast).toEqual([ [ { op : 'clean', exp : [ 'd.Shape_Count = +d.Shape_Count, d.ratio = +d["Image_Height/Image_Width "]' ] } ] ]);
   });
 
   it('comprehends the short-form clean spec', function(){
-    var ast = parser.parse("(#{ d.Shape_Count = +d.Shape_Count, d.ratio = +d['Image_Height/Image_Width '] })");
-    expect(ast).toEqual([ [ { op : 'clean', exp : [ 'd.Shape_Count = +d.Shape_Count', "d.ratio = +d['Image_Height/Image_Width ']" ] } ] ]);
+    var ast = parser.parse('( #{ d.Shape_Count = +d.Shape_Count, d.ratio = +d["Image_Height/Image_Width "] })');
+    expect(ast).toEqual([ [ { op : 'clean', exp : [ 'd.Shape_Count = +d.Shape_Count, d.ratio = +d["Image_Height/Image_Width "]' ] } ] ]);
   });
 
   it('comprehends a function as a spec argument', function(){
