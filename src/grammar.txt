@@ -11,25 +11,26 @@
   clean_spec        = ('clean' colon)? cf:function 
                       { return { op: 'clean', exp: cf } }
 
-  func_spec         =  sign:signifier space func:function { return {op: sign, exp:func } }
+  func_spec         = sign:signifier space func:function { return {op: sign, exp:func } }
 
-
-  param_hash        = space '{' space pa:params+ space '}' { return pa;  }
+  short_hash        = space '{' space sp:bare_word+ space '}' { return { short_params: sp } ; }
+  param_hash        = space '{' space pa:params+ space '}' { return pa; }
   params            = bs:(bare_word/string) space colon space arg:(string/number) comma* space { return [ bs, arg ] }
 
   signifier         = si:(string/bare_word) space colon space { return si }
-  signified         = sd:(param_hash/boolean/string/number) { return sd }
+  signified         = sd:(param_hash/short_hash/boolean/string/number) { return sd }
 
   boolean           = b:('true'/'false') { return b }
 
   string            = space quote str:(mandatory_space/letter)+ quote space { return str.join(""); }
   letter            = [^"' \n]
 
+
   function          = '#' space cu:curly { return [ cu.join('').trim() ] }
   curly             = '{' c:([^{}]/curly)* '}' { return [].concat.apply([], c)}
 
   variable          = v:bare_word { return { variable: v } }
-  bare_word         = t:text+ { return t.join(""); }
+  bare_word         = t:text+ space { return t.join(""); }
   text              = [a-zA-Z0-9-]
 
   number            = d:digit+ space { return +(d.join(''));  }
