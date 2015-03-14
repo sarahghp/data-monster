@@ -26,8 +26,8 @@ function draw (error, data){
   // Prepare the data by changing label and making sure numbers are numbers
 
   data.forEach(function(d) {
-    d.Shape_Count = +d.Shape_Count
-    d.ratio = +d["Image_Height/Image_Width "]
+    d.Shape_Count = +d.Shape_Count;
+    d.ratio = +d["Image_Height/Image_Width "];
   })
 
   // Add in scale domain now that we have the data

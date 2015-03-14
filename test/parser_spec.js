@@ -1,6 +1,6 @@
 //TODO: Figure out function, clean
 
-var parser = require('../src/parser.js').test;
+var parser = require('../src/parser.js').parser;
 
 describe('parser', function(){
   
@@ -40,8 +40,12 @@ describe('parser', function(){
 
   it('comprehends a spec with multiple entries of multiple types, excluding specs & short-hash', function(){
     var ast = parser.parse("(canvas: 1000 600 '#scatterplot')");
-    expect(ast).toEqual([ [ { op : 'canvas', exp : [ 1000, 600, '#scatterplot' ] } ] ]
-);
+    expect(ast).toEqual([ [ { op : 'canvas', exp : [ 1000, 600, '#scatterplot' ] } ] ]);
+  });
+
+  it('comprehends a spec with multiple entries of multiple types, including short-hash', function(){
+    var ast = parser.parse("(canvas: 1000 600 {20 20 60 60} '#scatterplot')");
+    expect(ast).toEqual([ [ { op : 'canvas', exp : [ 1000, 600, { short_params : [ '20', '20', '60', '60' ] }, '#scatterplot' ] } ] ]);
   });
 
   it('comprehends a spec with a full hash', function(){
