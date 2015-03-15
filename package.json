@@ -12,7 +12,9 @@
     "karma-phantomjs-launcher": "^0.1.4"
   },
   "dependencies": {
-    "lodash": "^3.3.1",
-    "pegjs": "^0.8.0"
+    "crypto": "0.0.3",
+    "lodash": "^3.5.0",
+    "pegjs": "^0.8.0",
+    "uuid-v4": "^0.1.0"
   }
 }
