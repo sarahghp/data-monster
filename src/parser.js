@@ -8,7 +8,7 @@ var grammar = fs.readFileSync(__dirname + '/grammar.txt').toString(),
     parser  = PEG.buildParser(grammar),
     ast     = parser.parse(dmCodes);
 
-    console.log(util.inspect(ast, false, null, true));
+    // console.log(util.inspect(ast, false, null, true));
 
 function chomp(ast){
   return chomper(ast);

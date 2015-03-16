@@ -6,23 +6,24 @@
   program           = entry / clean_spec / func_spec / spec / signifier
 
   spec              = w:signifier space ind:(entry/spec/signified/variable)+ space
-                      { return {op: w, exp:[].concat.apply([], ind) } }
+                      { return { op: w, exp:[].concat.apply([], ind) } }
 
   clean_spec        = ('clean' colon)? cf:function 
                       { return { op: 'clean', exp: cf } }
 
-  func_spec         = sign:signifier space func:function { return {op: sign, exp:func } }
+  func_spec         = sign:signifier space func:function { return { op: sign, exp:func } }
 
   short_hash        = space '{' space sp:bare_word+ space '}' { return { short_params: sp } ; }
   param_hash        = space '{' space pa:params+ space '}' { return pa; }
-  params            = bs:(bare_word/string) space colon space arg:(string/number/variable) comma* space { return [ bs, arg ] }
+  params            = bs:(bare_word/string) space colon space arg:(string/number/variable) comma* space 
+                      { return [ bs, arg ] }
 
   signifier         = si:(string/bare_word) space colon space { return si }
   signified         = sd:(param_hash/short_hash/boolean/string/number) { return sd }
 
   boolean           = b:('true'/'false') { return b }
 
-  string            = space quote str:(mandatory_space/letter)+ quote space { return str.join(""); }
+  string            = space quote str:(mandatory_space/letter)+ quote space { return str.join(''); }
   letter            = [^"' \n]
 
 
