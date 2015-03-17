@@ -54,6 +54,11 @@ consts: {
       exist:
       text:
       parent: 
-    }]
+    }],
+    // Move variables to interpretation
+    variables: {
+      d3: [category10, category20, category20b, category20c],
+      dm: [width, height, ]
+    }
   }
 }

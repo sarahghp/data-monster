@@ -3,22 +3,22 @@ var _    = require('lodash'),
     uuid = require('uuid-v4');
 
 function chomper(ast){
-  
+
   var structure = { }; 
 
   var nodes = {
     'data':     dataGen, 
     'canvas':   canvasGen,
     'elem':     svgGen,
-    'axis-x':
-    'axis-y':
-    'scale-x':
-    'scale-y':
+    // 'axis-x':
+    // 'axis-y':
+    // 'scale-x':
+    // 'scale-y':
   };
 
   var special = {
-    'tooltips': ,
-    'variable': lookup;
+    // 'tooltips': ,
+    // 'variable': lookup;
   };
 
   // Utility functions
@@ -32,27 +32,28 @@ function chomper(ast){
       (structure[parent]['children'] = [child]) ;
   }
 
-  function handleSiblings(ast){
+  function handleSiblings(ast, parent){
     var consumed = _.drop(ast);
-    (consumed.length) && generate(consumed); 
+    (consumed.length) && generate(consumed, parent); 
   }
 
   function assign(ast, parent){
     parent[ast[0].op] = ast[0].exp;
-    generate(_.drop(exp), parent); // parent passes through because assign cannot create a new scope 
+    // console.log('in assign', structure);
+    generate(_.drop(ast), parent); // parent passes through because assign cannot create a new scope 
   }
 
   function createNode(ast, parent){
 
     // create unique id for node and add it to the structure object
-    var id = uuid();
+    var id = ast[0].op + '-' + uuid();
     structure[id] = Object.create(Object.prototype);
 
-    // call the right generation function on child exp
+    // call the appropriate generation function on child exp
     nodes[ast[0].op](id, ast[0].exp, parent, ast[0].op); 
 
     // and also call sibling generate
-    handleSiblings(ast);
+    handleSiblings(ast, parent);
 
   }
 
@@ -60,8 +61,10 @@ function chomper(ast){
 
   function dataGen(id, exp){ 
     var leaf      = structure[id],
-        file      = file,                 // the first argument to a data call is the data itself or filename
+        file      = exp[0],                 // the first argument to a data call is the data itself or filename
         extension = path.extname(file);
+
+        console.log('leaf', leaf)
     
     leaf['file'] = file;
 
@@ -93,7 +96,7 @@ function chomper(ast){
     leaf['height'] = exp[1];
 
     // check for optional margins and assign selector & margins based on result
-    if (typeof exp[2] === 'object' && !exp[2]) {
+    if (typeof exp[2] === 'object' && exp[2]) {
       leaf['margins'] = exp[2];
       leaf['selector'] = exp[3];
       newExp = _.drop(exp, 4);
@@ -129,8 +132,6 @@ function chomper(ast){
     // (rect, circle, ellipse, line, polyline, polygon, path)
     // if yes, call a parent creator
 
-   (nodes[ast[0].op]) && createNode(ast, parent);
-
 
     // is it special (tooltips) -> variables will be stored as their own object and replaced in
     // interpretation step 2; a list is in the data-struct-ref,js file
@@ -139,7 +140,22 @@ function chomper(ast){
 
     // if no, call assigner
 
-    assign(ast, parent);
+    if(!ast.length){
+      console.log('finished!');
+      return
+    }
+
+    if (ast[0].hasOwnProperty('op') && (nodes[ast[0].op])) {
+      createNode(ast, parent);
+    } else {
+      assign(ast, parent);
+    } 
+
+
+
+
+
+    
 
 
   }
@@ -147,9 +163,11 @@ function chomper(ast){
   // ast comes as an array of arrays, each inner array mapping to a full spec expression,
   // therefore we must apply the assignment function to each
 
-  // _.forEach(ast, function(el){
-  //   return generate(el);
-  // });
+  _.forEach(ast, function(el){
+    return generate(el);
+  });
+
+  console.log(structure);
 
   return structure;
 
