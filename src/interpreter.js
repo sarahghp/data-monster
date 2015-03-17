@@ -38,8 +38,7 @@ function chomper(ast){
   }
 
   function assign(ast, parent){
-    parent[ast[0].op] = ast[0].exp;
-    // console.log('in assign', structure);
+    structure[parent][ast[0].op] = ast[0].exp;
     generate(_.drop(ast), parent); // parent passes through because assign cannot create a new scope 
   }
 
@@ -50,7 +49,7 @@ function chomper(ast){
     structure[id] = Object.create(Object.prototype);
 
     // call the appropriate generation function on child exp
-    nodes[ast[0].op](id, ast[0].exp, parent, ast[0].op); 
+    nodes[ast[0].op](id, ast[0].exp, parent); 
 
     // and also call sibling generate
     handleSiblings(ast, parent);
@@ -63,8 +62,6 @@ function chomper(ast){
     var leaf      = structure[id],
         file      = exp[0],                 // the first argument to a data call is the data itself or filename
         extension = path.extname(file);
-
-        console.log('leaf', leaf)
     
     leaf['file'] = file;
 
@@ -109,7 +106,7 @@ function chomper(ast){
 
   }
 
-  function svgGen(id, exp, parent, op){
+  function svgGen(id, exp, parent){
     addChildren(parent, id);
 
     var leaf = structure[id];
@@ -119,13 +116,16 @@ function chomper(ast){
     leaf['req_specs'] = Object.create(Object.prototype);
 
     _.forEach(exp[0].exp, function(el){
-      console.log('in svg gen:', el);
       leaf['req_specs'][el[0]] = el[1]; // return array pairs to hash pairs
-    })
+    });
+
+    handleSiblings(exp, id);
   }
 
 
   function generate(ast, parent){
+
+    // console.log('generate called', ast);
 
     var parent = parent || undefined;
 
@@ -151,14 +151,6 @@ function chomper(ast){
     } else {
       assign(ast, parent);
     } 
-
-
-
-
-
-    
-
-
   }
 
   // ast comes as an array of arrays, each inner array mapping to a full spec expression,

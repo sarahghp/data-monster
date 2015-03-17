@@ -42,7 +42,7 @@ consts: {
   // generate name based on selected node // clashes throw errors
     type:
     req_specs: { } // an object with the required svg properties, eg {'cx': 'ratio', 'cy': 'Shape_Count' }
-    opt_specs: { } // attr, style, &c.
+    opt_specs: [ ] // attr, style, &c.
     events: { } // populate with functions that match mouse events or are indicated otherwise
     parent: // is a canvas, named
     children: [ ] // refs to children
@@ -55,7 +55,7 @@ consts: {
       text:
       parent: 
     }],
-    // Move variables to interpretation
+    // Move variables to interpretation II? and just store in obj?
     variables: {
       d3: [category10, category20, category20b, category20c],
       dm: [width, height, ]
