@@ -115,11 +115,11 @@ function chomper(ast){
     var leaf = structure[id];
     
     leaf['parent']    = parent;
-    leaf['type']      = op;
+    leaf['type']      = exp[0].op;
     leaf['req_specs'] = Object.create(Object.prototype);
 
-    _.forEach(exp, function(el){
-      console.log('in svg gen': el);
+    _.forEach(exp[0].exp, function(el){
+      console.log('in svg gen:', el);
       leaf['req_specs'][el[0]] = el[1]; // return array pairs to hash pairs
     })
   }
