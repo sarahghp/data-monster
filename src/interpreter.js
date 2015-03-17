@@ -17,8 +17,8 @@ function chomper(ast){
 
   var special = {
     'tooltips': tooltipPop,
-    // 'axis-x':
-    // 'axis-y':
+    'axis-x': axisPop,
+    'axis-y': axisPop
     // 'scale-x':
     // 'scale-y':
   };
@@ -125,13 +125,37 @@ function chomper(ast){
     handleSiblings(exp, id);
   }
 
+  // Population Functions
+
   function tooltipPop (ast, parent){
-    // console.log('tooltip', ast);
-    var tooltip = { };
+    var tooltip    = Object.create(Object.prototype);
     tooltip.text   = ast[0][1] || 'default';
     tooltip.parent = parent;
     
     structure.special.tooltips.push(tooltip);
+
+    handleSiblings(ast, parent);
+  }
+
+  function axisPop(ast, parent){
+    console.log('axis!', ast);
+    var type    = ast[0].op.split('-')[1],
+        axisObj = (structure[parent][(type + 'Axis')] = Object.create(Object.prototype));
+
+        _.forEach(ast[0].exp, function(el){
+          axisObj[el.op] = _.map(el.exp, function(inside_el){
+
+            var inside_obj = Object.create(Object.prototype);
+            
+            if (typeof inside_el === 'string'){
+              inside_obj = inside_el;                   // strings pass through
+            } else {
+              inside_obj[inside_el[0]] = inside_el[1]; // return array pairs to hash pairs
+            }
+
+            return inside_obj;
+          })
+        });
 
     handleSiblings(ast, parent);
   }

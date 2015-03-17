@@ -25,15 +25,13 @@ consts: {
       range: 
       domain: }
     xAxis:  { 
-      scale:
-      orientation: 
-      text_specs: { }
-      opt_specs: { } }
+      scale:          // these will have defualts if not populated here
+      orientation:    // these will have defualts if not populated here
+      [other_specs] } // attr, style, &c., each is its own 
     yAxis:  { 
-      scale:
-      orientation: 
-      text_specs: { }
-      opt_specs: { } }
+      scale:          // these will have defualts if not populated here
+      orientation:    // these will have defualts if not populated here
+      [other_specs] } // attr, style, &c., each is its own 
     parent: // is a data, named
     children: [ ] // refs to children
   }
@@ -42,8 +40,8 @@ consts: {
   // generate name based on selected node // clashes throw errors
     type:
     req_specs: { } // an object with the required svg properties, eg {'cx': 'ratio', 'cy': 'Shape_Count' }
-    opt_specs: [ ] // attr, style, &c. <- just let them go in plain?
-    events: { } // populate with functions that match mouse events or are indicated otherwise
+    [opt_specs] // attr, style, &c., each is its own
+    events: { } // populate with functions that match mouse events or are indicated otherwise <- gen in interpretation
     parent: // is a canvas, named
     children: [ ] // refs to children
   }
