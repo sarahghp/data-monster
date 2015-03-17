@@ -1,24 +1,26 @@
-var _    = require('lodash'),
+var util = require('util'),
+    _    = require('lodash'),
     path = require('path'),
     uuid = require('uuid-v4');
 
 function chomper(ast){
 
-  var structure = { }; 
+  var structure = { special: {
+    tooltips: []
+  }}; 
 
   var nodes = {
     'data':     dataGen, 
     'canvas':   canvasGen,
     'elem':     svgGen,
+  };
+
+  var special = {
+    'tooltips': tooltipPop,
     // 'axis-x':
     // 'axis-y':
     // 'scale-x':
     // 'scale-y':
-  };
-
-  var special = {
-    // 'tooltips': ,
-    // 'variable': lookup;
   };
 
   // Utility functions
@@ -53,7 +55,6 @@ function chomper(ast){
 
     // and also call sibling generate
     handleSiblings(ast, parent);
-
   }
 
   // Generative functions
@@ -102,6 +103,8 @@ function chomper(ast){
       newExp = _.drop(exp, 3);
     }
 
+    // call generate on rest of the expression; doesn't use handleSiblings 
+    // since the drop is brancing / handled internally 
     generate(newExp, id); 
 
   }
@@ -122,6 +125,18 @@ function chomper(ast){
     handleSiblings(exp, id);
   }
 
+  function tooltipPop (ast, parent){
+    // console.log('tooltip', ast);
+    var tooltip = { };
+    tooltip.text   = ast[0][1] || 'default';
+    tooltip.parent = parent;
+    
+    structure.special.tooltips.push(tooltip);
+
+    handleSiblings(ast, parent);
+  }
+
+  // GENERATE FUNC — BEST FUNC
 
   function generate(ast, parent){
 
@@ -129,29 +144,35 @@ function chomper(ast){
 
     var parent = parent || undefined;
 
-    // check if it is 'data', 'canvas', or 'elem' for the svg shapes [excepting text]: 
-    // (rect, circle, ellipse, line, polyline, polygon, path)
-    // if yes, call a parent creator
-
-
-    // is it special (tooltips) -> variables will be stored as their own object and replaced in
-    // interpretation step 2; a list is in the data-struct-ref,js file
-
-    // is it an expression, call move over expression
-
-    // if no, call assigner
+    // Have we consumed everything?
 
     if(!ast.length){
       console.log('finished!');
       return
     }
 
+    // if no, check if it is 'data', 'canvas', or 'elem' for the svg shapes [excepting text]: 
+    // (rect, circle, ellipse, line, polyline, polygon, path)
+    // if yes, call a parent creator
+
     if (ast[0].hasOwnProperty('op') && (nodes[ast[0].op])) {
       createNode(ast, parent);
+
+    // is it special (tooltips, axis) -> variables will be stored as their own object and replaced in
+    // interpretation step 2; a list is in the data-struct-ref,js file
+
+    } else if (ast[0].hasOwnProperty('op') && (special[ast[0].op])) {
+      special[ast[0].op](ast, parent);
+
+    // default: call assigner
+
     } else {
       assign(ast, parent);
     } 
   }
+
+
+  // NOW LET'S GET DOWN TO BUSINESS
 
   // ast comes as an array of arrays, each inner array mapping to a full spec expression,
   // therefore we must apply the assignment function to each
@@ -160,7 +181,7 @@ function chomper(ast){
     return generate(el);
   });
 
-  console.log(structure);
+  console.log(util.inspect(structure, false, null));
 
   return structure;
 

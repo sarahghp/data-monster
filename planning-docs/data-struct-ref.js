@@ -42,7 +42,7 @@ consts: {
   // generate name based on selected node // clashes throw errors
     type:
     req_specs: { } // an object with the required svg properties, eg {'cx': 'ratio', 'cy': 'Shape_Count' }
-    opt_specs: [ ] // attr, style, &c.
+    opt_specs: [ ] // attr, style, &c. <- just let them go in plain?
     events: { } // populate with functions that match mouse events or are indicated otherwise
     parent: // is a canvas, named
     children: [ ] // refs to children
@@ -51,7 +51,6 @@ consts: {
 
   special: {
     tooltips: [{
-      exist:
       text:
       parent: 
     }],
