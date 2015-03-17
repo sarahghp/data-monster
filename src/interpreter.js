@@ -9,18 +9,16 @@ function chomper(ast){
   var nodes = {
     'data':     dataGen, 
     'canvas':   canvasGen,
-    'rect':     svgGen,
-    'circle':   svgGen,
-    'ellipse':  svgGen,
-    'line':     svgGen,
-    'polyline': svgGen,
-    'polygon':  svgGen,
-    'path':     svgGen
+    'elem':     svgGen,
+    'axis-x':
+    'axis-y':
+    'scale-x':
+    'scale-y':
   };
 
   var special = {
     'tooltips': ,
-    'variable':
+    'variable': lookup;
   };
 
   // Utility functions
@@ -34,8 +32,14 @@ function chomper(ast){
       (structure[parent]['children'] = [child]) ;
   }
 
+  function handleSiblings(ast){
+    var consumed = _.drop(ast);
+    (consumed.length) && generate(consumed); 
+  }
+
   function assign(ast, parent){
-    parent[ast.op]
+    parent[ast[0].op] = ast[0].exp;
+    generate(_.drop(exp), parent); // parent passes through because assign cannot create a new scope 
   }
 
   function createNode(ast, parent){
@@ -44,14 +48,17 @@ function chomper(ast){
     var id = uuid();
     structure[id] = Object.create(Object.prototype);
 
-    // then call the right generation function
-    nodes[ast.op](id, ast.exp, parent, ast.op);
+    // call the right generation function on child exp
+    nodes[ast[0].op](id, ast[0].exp, parent, ast[0].op); 
+
+    // and also call sibling generate
+    handleSiblings(ast);
 
   }
 
   // Generative functions
 
-  function dataGen(id, exp){
+  function dataGen(id, exp){ 
     var leaf      = structure[id],
         file      = file,                 // the first argument to a data call is the data itself or filename
         extension = path.extname(file);
@@ -68,14 +75,18 @@ function chomper(ast){
       leaf['filetype'] = extension;
     }
 
-    generate(exp.slice(1), id); // call generate on the rest of the arguments, with data as new parent    
+    // call generate on the rest of the expression, with data as new parent
+    // here we move into the data expression list and the outside object is sloughed
+
+    generate(_.drop(exp), id);    
   }
 
   function canvasGen(id, exp, parent){
 
-    addChildren(parent, id);
+    addChildren(parent, id);  // add canvas id to parent's list of children
 
-    var leaf = structure[id];
+    var leaf = structure[id],
+        newExp;
     
     leaf['parent'] = parent;
     leaf['width']  = exp[0];
@@ -85,14 +96,13 @@ function chomper(ast){
     if (typeof exp[2] === 'object' && !exp[2]) {
       leaf['margins'] = exp[2];
       leaf['selector'] = exp[3];
-      //create a remainder expression
+      newExp = _.drop(exp, 4);
     } else {
       leaf['selector'] = exp[2];
-      //create a remainder expression
+      newExp = _.drop(exp, 3);
     }
 
-    // and then recur over the remainder expression
-    // moveOverArgs()
+    generate(newExp, id); 
 
   }
 
@@ -115,19 +125,21 @@ function chomper(ast){
 
     var parent = parent || undefined;
 
-    // check if it is 'data', 'canvas', or svg shape [excepting text] (rect, circle, ellipse, line, polyline, polygon, path)
+    // check if it is 'data', 'canvas', or 'elem' for the svg shapes [excepting text]: 
+    // (rect, circle, ellipse, line, polyline, polygon, path)
     // if yes, call a parent creator
 
    (nodes[ast[0].op]) && createNode(ast, parent);
 
 
-    // is it a variable or special (tooltips)
+    // is it special (tooltips) -> variables will be stored as their own object and replaced in
+    // interpretation step 2; a list is in the data-struct-ref,js file
 
     // is it an expression, call move over expression
 
     // if no, call assigner
 
-    assign(ast[0], parent);
+    assign(ast, parent);
 
 
   }
@@ -135,7 +147,9 @@ function chomper(ast){
   // ast comes as an array of arrays, each inner array mapping to a full spec expression,
   // therefore we must apply the assignment function to each
 
-  // _.forEach(ast, generate);
+  // _.forEach(ast, function(el){
+  //   return generate(el);
+  // });
 
   return structure;
 
