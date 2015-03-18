@@ -5,9 +5,11 @@ var util = require('util'),
 
 function chomper(ast){
 
-  var structure = { special: {
-    tooltips: []
-  }}; 
+  var structure = { 
+    special: {
+      tooltips: []
+    }
+  }; 
 
   var nodes = {
     'data':     dataGen, 
@@ -48,7 +50,9 @@ function chomper(ast){
 
     // create unique id for node and add it to the structure object
     var id = ast[0].op + '-' + uuid();
+    console.log(structure);
     structure[id] = Object.create(Object.prototype);
+    console.log(structure);
 
     // call the appropriate generation function on child exp
     nodes[ast[0].op](id, ast[0].exp, parent); 
@@ -160,18 +164,13 @@ function chomper(ast){
   }
 
   function scalePop(ast, parent){
-    console.log('scale!', util.inspect(ast, false, null));
-
     var type    = ast[0].op.split('-')[1],
         scaleObj = (structure[parent][(type + 'Scale')] = Object.create(Object.prototype));
 
     _.forEach(ast[0].exp, function(el){
-      console.log('outside', el);
       if (el.hasOwnProperty('variable')){
-        console.log('variable', el);
         scaleObj['scale'] = el;
       } else {
-        console.log('else', el)
         scaleObj[el.op] = el.exp[0];
       }
     })
@@ -182,8 +181,6 @@ function chomper(ast){
   // GENERATE FUNC — BEST FUNC
 
   function generate(ast, parent){
-
-    // console.log('generate called', ast);
 
     var parent = parent || undefined;
 
@@ -224,7 +221,7 @@ function chomper(ast){
     return generate(el);
   });
 
-  console.log(util.inspect(structure, false, null));
+  console.log('final', util.inspect(structure, false, null));
 
   return structure;
 
