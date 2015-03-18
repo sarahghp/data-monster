@@ -48,9 +48,11 @@ describe('chomper', function(){
     expect(testy.length).toEqual(1);
   });
 
-  xit('can can create a canvas without a parent', function(){
-    // var JSON.stringify(dm) = ;
-    expect(JSON.stringify(dm)).toMatch();
+  it('can can create a canvas without a parent', function(){
+    var dm = chomper(parser.parse("(canvas: 100 100 '#id')"));
+    console.log(dm);
+    expect(dm).toBeDefined();
+    expect(JSON.stringify(dm)).toMatch(/canvas-/);
   });
 
   it('handles canvas siblings', function(){
@@ -64,7 +66,6 @@ describe('chomper', function(){
 
   it('handles element siblings', function(){
     var dm = chomper(parser.parse("(canvas: 100 100 '#id' (elem: circle: { cx: 'ratio'}) (elem: circle: { cx: 'ratio'}))"));
-    console.log(dm);
     var testy = _.flatten(__.walk.filter(dm, __.walk.preorder, function(value, key){
       return key === 'children';
     }));
