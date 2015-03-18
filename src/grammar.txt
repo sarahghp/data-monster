@@ -13,8 +13,6 @@
 
   func_spec         = sign:signifier space func:function { return { op: sign, exp:func } }
 
-
-
   signifier         = si:(string/bare_word) space colon space { return si }
   signified         = sd:(param_hash/short_hash/boolean/string/number) { return sd }
 
