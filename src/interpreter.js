@@ -71,8 +71,8 @@ function chomper(ast){
     if(extension === ''){
       if(file instanceof Array){
         leaf['filetype'] = 'array';
-      } else if(typeof file === 'object' && !file){
-        leaf['filetype'] = 'json';
+      } else {
+        console.log('Error: Invalid data type');
       }
     } else {
       leaf['filetype'] = extension;

@@ -39,11 +39,6 @@ describe('chomper', function(){
     expect(JSON.stringify(dm)).toMatch(/("file":"[1, 2, 4]")|("filetype":"array")/g);
   });
 
-  xit('can chomp a data spec with a json object', function(){
-    var dm = chomper(parser.parse("(data: [1, 2, 4])"));
-    expect(JSON.stringify(dm)).toMatch(/("file":"[1, 2, 4]")|("filetype":"array")/g);
-  });
-
   xit('assigns canvas children to data parent', function(){
     // var dm = ;
     expect(dm).toEqual();
