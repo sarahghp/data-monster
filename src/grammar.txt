@@ -37,9 +37,11 @@
   number            = d:digit+ space { return +(d.join(''));  }
   digit             = [0123456789.-]
 
-  space             = [ \n]* / !.
-  mandatory_space   = [ \n]+ / !.
+  space             = comment / [ \n]* / !.
+  mandatory_space   = comment / [ \n]+ / !.
 
   colon             = [:]
   comma             = [,]
   quote             = ["']
+
+  comment           = '//' [^\n]* [\n]
