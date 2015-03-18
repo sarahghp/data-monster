@@ -1,3 +1,74 @@
+// producded III
+
+[ [ { op: 'data',
+      exp:
+       [ 'van_gogh_additional_measurements.tsv',
+         { op: 'clean',
+           exp: [ 'd.Shape_Count = +d.Shape_Count,\n             d.ratio = +d["Image_Height/Image_Width "]' ] },
+         { op: 'canvas',
+           exp:
+            [ 1000,
+              600,
+              { short_params: [ '20', '20', '60', '60' ] },
+              '#scatterplot',
+              { op: 'color',
+                exp: [ { variable: 'category10' } ] },
+              { op: 'elem',
+                exp:
+                 [ { op: 'circle',
+                     exp:
+                      [ [ 'cx', 'ratio' ],
+                        [ 'cy', 'Shape_Count' ],
+                        [ 'r', 4 ],
+                        [ 'fill', 'year' ] ] },
+                   { op: 'attr',
+                     exp: [ [ 'class', 'dot' ] ] },
+                   { op: 'tooltips', exp: [ 'true' ] },
+                   { op: 'click',
+                     exp: [ 'function(d)  window.open(\'https://www.google.com/search?site=imghp&tbm=isch&q=van+gogh+\'+d.Title);' ] } ] },
+              { op: 'scale-x',
+                exp:
+                 [ 'log',
+                   { op: 'domain',
+                     exp:
+                      [ 0,
+                        { variable: 'height' },
+                        { op: 'range', exp: [ 200, 400 ] } ] } ] },
+              { op: 'axis-x',
+                exp:
+                 [ { op: 'attr',
+                     exp:
+                      [ [ 'class', 'label' ],
+                        [ 'x', { variable: 'width' } ],
+                        [ 'y', 50 ] ] },
+                   { op: 'style',
+                     exp: [ [ 'text-anchor', 'end' ] ] },
+                   { op: 'text',
+                     exp: [ 'Height: Width Ratio' ] } ] },
+              { op: 'axis-y',
+                exp:
+                 [ { op: 'attr',
+                     exp:
+                      [ [ 'class', 'label' ],
+                        [ 'y', -10 ] ] },
+                   { op: 'style',
+                     exp: [ [ 'text-anchor', 'end' ] ] },
+                   { op: 'text', exp: [ 'Num Shapes' ] } ] } ] },
+         { op: 'canvas',
+           exp:
+            [ 1000,
+              600,
+              { short_params: [ '20', '20', '60', '60' ] },
+              '#booooop',
+              { op: 'elem',
+                exp:
+                 [ { op: 'circle',
+                     exp:
+                      [ [ 'cx', 'ratio' ],
+                        [ 'cy', 'Shape_Count' ],
+                        [ 'r', 4 ],
+                        [ 'fill', 'year' ] ] } ] } ] } ] } ] ]
+
 // produced II
 
 [ [ { op: 'data',

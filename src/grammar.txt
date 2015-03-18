@@ -20,7 +20,7 @@
 
   short_hash        = space '{' space sp:bare_word+ space '}' { return { short_params: sp } ; }
   param_hash        = space '{' space pa:params+ space '}' { return pa; }
-  params            = bs:(bare_word/string) space colon space arg:(string/number/variable) comma* space 
+  params            = bs:(bare_word/string) space colon space arg:(string/number/variable) comma? space 
                       { return [ bs, arg ] }
 
   boolean           = b:('true'/'false') { return b }

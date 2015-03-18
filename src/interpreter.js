@@ -18,9 +18,9 @@ function chomper(ast){
   var special = {
     'tooltips': tooltipPop,
     'axis-x': axisPop,
-    'axis-y': axisPop
-    // 'scale-x':
-    // 'scale-y':
+    'axis-y': axisPop,
+    'scale-x': scalePop,
+    'scale-y': scalePop
   };
 
   // Utility functions
@@ -138,7 +138,6 @@ function chomper(ast){
   }
 
   function axisPop(ast, parent){
-    console.log('axis!', ast);
     var type    = ast[0].op.split('-')[1],
         axisObj = (structure[parent][(type + 'Axis')] = Object.create(Object.prototype));
 
@@ -156,6 +155,26 @@ function chomper(ast){
             return inside_obj;
           })
         });
+
+    handleSiblings(ast, parent);
+  }
+
+  function scalePop(ast, parent){
+    console.log('scale!', util.inspect(ast, false, null));
+
+    var type    = ast[0].op.split('-')[1],
+        scaleObj = (structure[parent][(type + 'Scale')] = Object.create(Object.prototype));
+
+    _.forEach(ast[0].exp, function(el){
+      console.log('outside', el);
+      if (el.hasOwnProperty('variable')){
+        console.log('variable', el);
+        scaleObj['scale'] = el;
+      } else {
+        console.log('else', el)
+        scaleObj[el.op] = el.exp[0];
+      }
+    })
 
     handleSiblings(ast, parent);
   }
