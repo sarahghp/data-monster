@@ -8,20 +8,24 @@ Input like this:
 ```
 
 (data: 'van_gogh_additional_measurements.tsv'
-  (clean: [ d.Shape_Count = +d.Shape_Count, 
-            d.ratio = +d["Image_Height/Image_Width "])
+  (clean: #{ d.Shape_Count = +d.Shape_Count,
+             d.ratio = +d["Image_Height/Image_Width "]                    
+            }
+  )
   (canvas: 1000 600 {20 20 60 60} '#scatterplot'
-    (color: category10)
-    (circle: { cx: 'ratio', cy: 'Shape_Count', r: 4, fill: 'year' } 
-       attr: { 'class': 'dot' }
-       tooltips: true
-       click:  function(d) { window.open('https://www.google.com/search?site=imghp&tbm=isch&q=van+gogh+'+d.Title); })
+    (elem: circle: { cx: 'ratio', cy: 'Shape_Count', r: 4, fill: 'year' }
+           attr: { 'class': 'dot' }
+           tooltips: true
+           click: #{ function(d) { window.open('https://www.google.com/search?site=imghp&tbm=isch&q=van+gogh+'+d.Title); }}
+           (scale-x: linear 
+                     domain: { 0 max }
+                     range:  { 0 width } ) )
     (axis-x: attr: { 'class': 'label', 'x': width, 'y': 50 }
              style: { 'text-anchor': 'end' }
-             text: { 'Height: Width Ratio' } )
+             text: 'Height: Width Ratio' )
     (axis-y: attr: { 'class': 'label', 'y': -10 }
              style: { 'text-anchor': 'end' }
-             text: { 'Num Shapes' } )
+             text: 'Num Shapes' )
   )
 )
 
