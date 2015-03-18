@@ -1,5 +1,3 @@
-//TODO: Figure out function, clean
-
 var parser = require('../src/parser.js').parser;
 
 describe('parser', function(){
