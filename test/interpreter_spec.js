@@ -39,24 +39,37 @@ describe('chomper', function(){
     expect(JSON.stringify(dm)).toMatch(/("file":"[1, 2, 4]")|("filetype":"array")/g);
   });
 
-  xit('assigns canvas children to data parent', function(){
-    // var dm = ;
-    expect(dm).toEqual();
+  it('assigns canvas children to data parent', function(){
+    var dm = chomper(parser.parse("(data: 'file.csv' (canvas: 100 100 '#id') )"));
+    var testy = _.flatten(__.walk.filter(dm, __.walk.preorder, function(value, key){
+      return key === 'children';
+    }));
+
+    expect(testy.length).toEqual(1);
   });
 
   xit('can can create a canvas without a parent', function(){
-    // var dm = ;
-    expect(dm).toEqual();
+    // var JSON.stringify(dm) = ;
+    expect(JSON.stringify(dm)).toMatch();
   });
 
-  xit('handles canvas siblings', function(){
-    // var dm = ;
-    expect(dm).toEqual();
+  it('handles canvas siblings', function(){
+    var dm = chomper(parser.parse("(data: 'file.csv' (canvas: 100 100 '#id') (canvas: 200 200 '#doubleid') )"));
+    var testy = _.flatten(__.walk.filter(dm, __.walk.preorder, function(value, key){
+      return key === 'children';
+    }));
+
+    expect(testy.length).toEqual(2);
   });
 
-  xit('handles element siblings', function(){
-    // var dm = ;
-    expect(dm).toEqual();
+  it('handles element siblings', function(){
+    var dm = chomper(parser.parse("(canvas: 100 100 '#id' (elem: circle: { cx: 'ratio'}) (elem: circle: { cx: 'ratio'}))"));
+    console.log(dm);
+    var testy = _.flatten(__.walk.filter(dm, __.walk.preorder, function(value, key){
+      return key === 'children';
+    }));
+
+    expect(testy.length).toEqual(2);
   });
 
 })

@@ -86,7 +86,7 @@ function chomper(ast){
 
   function canvasGen(id, exp, parent){
 
-    addChildren(parent, id);  // add canvas id to parent's list of children
+    parent && addChildren(parent, id);  // add canvas id to parent's list of children
 
     var leaf = structure[id],
         newExp;
