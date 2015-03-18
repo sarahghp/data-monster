@@ -65,11 +65,6 @@ describe('parser', function(){
 );
   });
 
-  it('nests svg specs to match drawn nesting', function(){
-    var ast = parser.parse("(circle: { cx: 'ratio', cy: 'Shape_Count', r: 4, fill: 'year' } attr: { 'class': 'dot' })");
-    expect(ast).toEqual([ [ { op : 'circle', exp: [[ [ 'cx', 'ratio' ], [ 'cy', 'Shape_Count' ], [ 'r', 4 ], [ 'fill', 'year' ] ], { op : 'attr', exp : [ [ 'class', 'dot' ] ] } ] } ] ])
-  });
-
   it('comprehends the clean spec', function(){
     var ast = parser.parse('(clean: #{ d.Shape_Count = +d.Shape_Count, d.ratio = +d["Image_Height/Image_Width "] })');
     expect(ast).toEqual([ [ { op : 'clean', exp : [ 'd.Shape_Count = +d.Shape_Count, d.ratio = +d["Image_Height/Image_Width "]' ] } ] ]);

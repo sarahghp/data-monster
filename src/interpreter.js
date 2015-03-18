@@ -14,15 +14,15 @@ function chomper(ast){
   var nodes = {
     'data':     dataGen, 
     'canvas':   canvasGen,
-    'elem':     svgGen,
+    'elem':     svgGen
   };
 
   var special = {
     'tooltips': tooltipPop,
-    'axis-x': axisPop,
-    'axis-y': axisPop,
-    'scale-x': scalePop,
-    'scale-y': scalePop
+    'axis-x':   axisPop,
+    'axis-y':   axisPop,
+    'scale-x':  scalePop,
+    'scale-y':  scalePop
   };
 
   // Utility functions
@@ -185,7 +185,7 @@ function chomper(ast){
     // Have we consumed everything?
 
     if(!ast.length){
-      console.log('finished!');
+      console.log('structure finished!');
       return
     }
 
@@ -219,10 +219,10 @@ function chomper(ast){
     return generate(el);
   });
 
-  console.log('final', util.inspect(structure, false, null));
+  // console.log('final', util.inspect(structure, false, null));
 
   return structure;
 
 }
 
-module.exports = chomper;
+exports.chomper = chomper;

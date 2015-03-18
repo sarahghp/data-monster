@@ -1,7 +1,7 @@
 var PEG     = require('pegjs'),
     fs      = require('fs'),
     util    = require('util'),
-    chomper = require('./interpreter.js');
+    chomper = require('./interpreter.js').chomper;
 
 var grammar = fs.readFileSync(__dirname + '/grammar.txt').toString(),
     dmCodes = fs.readFileSync(__dirname + '/ent-ex.dm').toString()
@@ -10,7 +10,7 @@ var grammar = fs.readFileSync(__dirname + '/grammar.txt').toString(),
 
     // console.log(util.inspect(ast, false, null, true));
 
-function chomp(){
+function chomp(ast){
   return chomper(ast);
 }
 

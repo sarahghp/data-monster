@@ -14,6 +14,7 @@
   "dependencies": {
     "crypto": "0.0.3",
     "lodash": "^3.5.0",
+    "lodash-contrib": "^241.4.14",
     "pegjs": "^0.8.0",
     "uuid-v4": "^0.1.0"
   }
