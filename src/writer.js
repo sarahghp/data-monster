@@ -1,9 +1,10 @@
-var structure = require('./parser.js').structure,
-    _         = require('lodash');
+var chom = require('./parser.js').structure,
+    _    = require('lodash');
 
 function buildString(){
+ 
  var output     = "",                      // this is the string that will be built
-     keys       = Object.keys(structure),  // these are the keys we need to build it
+     keys       = Object.keys(chom),  // these are the keys we need to build it
      dataKeys   = [],
      canvasKeys = [],
      elemKeys   = [];
@@ -22,7 +23,35 @@ function buildString(){
     canvasKeys = filterArr('canvas');
     elemKeys = filterArr('elem');
 
-    console.log(dataKeys, canvasKeys, elemKeys);
+  }
+
+
+  // call this for each object in elemKeys || call on children of everything in canvasKeys and eliminate elKeys?
+  function assembleFirstAtom(key){
+    var obk = chom[key],
+        str = "";
+
+    // str += "svg.selectAll(" + obk.type + ")" 
+    // str += ".data(data)" // data comes in via draw queue
+    // str += ".enter()"
+    // str += ".append('g')"
+    // str += ".attr('class', "
+    // str += obk.elemSelect || 'elements'
+    // str += ")"
+    // str += ".append('" + obk.type + "')"
+    // str += ".attr(" + obk.req_specs + ")"
+    // str +=
+    // str +=
+    // str +=
+    // str +=
+    // str +=
+    // str +=
+    // str +=
+    // str +=
+
+
+
+
   }
 
 
@@ -52,7 +81,6 @@ function buildString(){
     // return output
   }
 
-  popArrs();
   return output;  
 }
 

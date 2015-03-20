@@ -11,7 +11,7 @@
   clean_spec        = ('clean' colon)? cf:function 
                       { return { op: 'clean', exp: cf } }
 
-  func_spec         = sign:signifier space func:function { return { op: sign, exp:func } }
+  func_spec         = sign:signifier space func:function { return { op: sign, exp: {op: 'function', exp: func } } }
 
   signifier         = si:(string/bare_word) space colon space { return si }
   signified         = sd:(param_hash/short_hash/array/boolean/string/number) { return sd }
@@ -32,7 +32,7 @@
 
   variable          = v:bare_word { return { variable: v } }
   bare_word         = t:text+ space { return t.join(""); }
-  text              = [a-zA-Z0-9-]
+  text              = [a-zA-Z0-9-._]
 
   array             = '[' space nn:(number comma? space)+ space ']' {return nn}
   number            = d:digit+ space { return +(d.join(''));  }

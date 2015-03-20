@@ -121,6 +121,10 @@ function chomper(ast){
     leaf['req_specs'] = Object.create(Object.prototype);
 
     _.forEach(exp[0].exp, function(el){
+      var val = el[1];
+
+      
+      
       leaf['req_specs'][el[0]] = el[1]; // return array pairs to hash pairs
     });
 
@@ -219,7 +223,7 @@ function chomper(ast){
     return generate(el);
   });
 
-  // console.log('final', util.inspect(structure, false, null));
+  console.log('final', util.inspect(structure, false, null));
 
   return structure;
 
