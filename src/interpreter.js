@@ -14,7 +14,7 @@ function chomper(ast){
   var nodes = {
     'data':     dataGen, 
     'canvas':   canvasGen,
-    'elem':     svgGen
+    'elem':     elemGen
   };
 
   var special = {
@@ -22,7 +22,7 @@ function chomper(ast){
     'axis-x':   axisPop,
     'axis-y':   axisPop,
     'scale-x':  scalePop,
-    'scale-y':  scalePop
+    'scale-y':  scalePop,
   };
 
   // Utility functions
@@ -42,6 +42,7 @@ function chomper(ast){
   }
 
   function assign(ast, parent){
+
     structure[parent][ast[0].op] = ast[0].exp;
     generate(_.drop(ast), parent); // parent passes through because assign cannot create a new scope 
   }
@@ -111,7 +112,7 @@ function chomper(ast){
 
   }
 
-  function svgGen(id, exp, parent){
+  function elemGen(id, exp, parent){
     addChildren(parent, id);
 
     var leaf = structure[id];
@@ -122,10 +123,11 @@ function chomper(ast){
 
     _.forEach(exp[0].exp, function(el){
       var val = el[1];
+      if (val.hasOwnProperty('variable') && val.variable.match(/\bd\./)){
+        val = 'function(d){ return ' + val.variable + '}';
+      }
 
-      
-      
-      leaf['req_specs'][el[0]] = el[1]; // return array pairs to hash pairs
+      leaf['req_specs'][el[0]] = val; // return array pairs to hash pairs
     });
 
     handleSiblings(exp, id);

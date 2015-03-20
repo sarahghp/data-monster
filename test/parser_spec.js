@@ -65,7 +65,7 @@ describe('parser', function(){
 
   it('comprehends the clean spec', function(){
     var ast = parser.parse('(clean: #{ d.Shape_Count = +d.Shape_Count, d.ratio = +d["Image_Height/Image_Width "] })');
-    expect(ast).toEqual([ [ { op : 'clean', exp : { op : 'function', exp : [ 'd.Shape_Count = +d.Shape_Count, d.ratio = +d["Image_Height/Image_Width "]' ] } } ] ]);
+    expect(ast).toEqual([ [ { op : 'clean', exp : [ 'd.Shape_Count = +d.Shape_Count, d.ratio = +d["Image_Height/Image_Width "]' ] } ] ]);
   });
 
   it('comprehends the short-form clean spec', function(){
@@ -75,7 +75,7 @@ describe('parser', function(){
 
   it('comprehends a function as a spec argument', function(){
     var ast = parser.parse("(click: #{ function(d) { window.open('https://www.google.com/search?site=imghp&tbm=isch&q=van+gogh+'+d.Title);}})");
-    expect(ast).toEqual([ [ { op : 'click', exp : { op : 'function', exp : [ "function(d)  window.open('https://www.google.com/search?site=imghp&tbm=isch&q=van+gogh+'+d.Title);" ] } } ] ]);
+    expect(ast).toEqual([ [ { op : 'click', exp : [ "function(d)  window.open('https://www.google.com/search?site=imghp&tbm=isch&q=van+gogh+'+d.Title);" ] } ] ]);
   });
 
   it('comprehends an entry with multiple parallel specs', function(){
