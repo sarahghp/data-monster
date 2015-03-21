@@ -124,10 +124,13 @@ function chomper(ast){
     _.forEach(exp[0].exp, function(el){
       var val = el[1];
       if (val.hasOwnProperty('variable') && val.variable.match(/\bd\./)){
-        val = 'function(d){ return ' + val.variable + '}';
+        val = 'var moo = function(d){ return ' + val.variable + ' }';
+        eval(val);
+        leaf['req_specs'][el[0]] = moo;
+      } else {
+        leaf['req_specs'][el[0]] = val; // return array pairs to hash pairs
       }
 
-      leaf['req_specs'][el[0]] = val; // return array pairs to hash pairs
     });
 
     handleSiblings(exp, id);
@@ -225,7 +228,7 @@ function chomper(ast){
     return generate(el);
   });
 
-  console.log('final', util.inspect(structure, false, null));
+  // console.log('final', util.inspect(structure, false, null));
 
   return structure;
 
