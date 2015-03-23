@@ -23,6 +23,8 @@ function chomper(ast){
     'axis-y':   axisPop,
     'scale-x':  scalePop,
     'scale-y':  scalePop,
+    'clean':    cleanPop,
+    'function': funcPop
   };
 
   // Utility functions
@@ -36,15 +38,17 @@ function chomper(ast){
       (structure[parent]['children'] = [child]) ;
   }
 
-  function handleSiblings(ast, parent){
-    var consumed = _.drop(ast);
-    (consumed.length) && generate(consumed, parent); 
-  }
-
   function assign(ast, parent){
 
     structure[parent][ast[0].op] = ast[0].exp;
     generate(_.drop(ast), parent); // parent passes through because assign cannot create a new scope 
+  }
+
+  function convertToDFunc(toInter){
+    // this rigamarole sets the value to the actual unexecuted function
+    var val = 'var moo = function(d){ ' + toInter + ' }';
+    eval(val);
+    return moo;
   }
 
   function createNode(ast, parent){
@@ -59,6 +63,12 @@ function chomper(ast){
     // and also call sibling generate
     handleSiblings(ast, parent);
   }
+
+  function handleSiblings(ast, parent){
+    var consumed = _.drop(ast);
+    (consumed.length) && generate(consumed, parent); 
+  }
+
 
   // Generative functions
 
@@ -122,31 +132,19 @@ function chomper(ast){
     leaf['req_specs'] = Object.create(Object.prototype);
 
     _.forEach(exp[0].exp, function(el){
+      // return array pairs to hash pairs
       var val = el[1];
       if (val.hasOwnProperty('variable') && val.variable.match(/\bd\./)){
-        val = 'var moo = function(d){ return ' + val.variable + ' }';
-        eval(val);
-        leaf['req_specs'][el[0]] = moo;
+        leaf['req_specs'][el[0]] = convertToDFunc(val.variable);
       } else {
-        leaf['req_specs'][el[0]] = val; // return array pairs to hash pairs
+        leaf['req_specs'][el[0]] = val;
       }
-
     });
 
     handleSiblings(exp, id);
   }
 
   // Population Functions
-
-  function tooltipPop (ast, parent){
-    var tooltip    = Object.create(Object.prototype);
-    tooltip.text   = ast[0][1] || 'default';
-    tooltip.parent = parent;
-    
-    structure.special.tooltips.push(tooltip);
-
-    handleSiblings(ast, parent);
-  }
 
   function axisPop(ast, parent){
     var type    = ast[0].op.split('-')[1],
@@ -170,6 +168,26 @@ function chomper(ast){
     handleSiblings(ast, parent);
   }
 
+  function cleanPop(ast, parent){
+    var interStr    = "";
+    var assignments = ast[0]['exp']['exp']
+                      .split("\n")
+                      .map(function(el){
+                        return el.trim();
+                      });
+    _.forEach(assignments, function(el){
+      interStr += el;
+    })
+
+    structure[parent]['clean'] = convertToDFunc(interStr);
+
+    handleSiblings(ast, parent);
+  }
+
+  function funcPop(ast, parent){
+     handleSiblings(ast, parent);
+  }
+
   function scalePop(ast, parent){
     var type    = ast[0].op.split('-')[1],
         scaleObj = (structure[parent][(type + 'Scale')] = Object.create(Object.prototype));
@@ -181,6 +199,16 @@ function chomper(ast){
         scaleObj[el.op] = el.exp[0];
       }
     })
+
+    handleSiblings(ast, parent);
+  }
+
+  function tooltipPop (ast, parent){
+    var tooltip    = Object.create(Object.prototype);
+    tooltip.text   = ast[0][1] || 'default';
+    tooltip.parent = parent;
+    
+    structure.special.tooltips.push(tooltip);
 
     handleSiblings(ast, parent);
   }
