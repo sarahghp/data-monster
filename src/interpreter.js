@@ -148,7 +148,7 @@ function chomper(ast){
 
   function assign(ast, parent){
     // find functions and dispatch them 
-    if (typeof ast[0].exp === 'object' && !(ast[0].exp instanceof Array) && ast[0].exp.op === 'function'){
+    if (typeof ast[0].exp[0] === 'object' && !(ast[0].exp[0] instanceof Array) && ast[0].exp[0].op === 'function'){
       funcPop(ast, parent);
     } else {
       structure[parent][ast[0].op] = ast[0].exp;
@@ -180,7 +180,7 @@ function chomper(ast){
 
   function cleanPop(ast, parent){
     var interStr    = "";
-    var assignments = ast[0].exp.exp
+    var assignments = ast[0].exp[0].exp
                       .split("\n")
                       .map(function(el){
                         return el.trim();
@@ -195,8 +195,16 @@ function chomper(ast){
   }
 
   function funcPop(ast, parent){
-     console.log('func pop:', ast[0].exp.exp);
-     structure[parent][ast[0].op] = convertToFunc(ast[0].exp.exp);
+     if (ast[0].op === 'funcs'){
+      _.forEach(ast[0].exp, function(el){
+        structure[parent]['funcs'] ? 
+          structure[parent]['funcs'].push(convertToFunc(el.exp)) :
+          (structure[parent]['funcs'] = [convertToFunc(el.exp)]) ;
+      } )
+     } else {
+      structure[parent][ast[0].op] = convertToFunc(ast[0].exp[0].exp);
+     }
+
      handleSiblings(ast, parent);
   }
 
