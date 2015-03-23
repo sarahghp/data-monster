@@ -134,7 +134,7 @@ function chomper(ast){
     _.forEach(exp[0].exp, function(el){
       // return array pairs to hash pairs
       var val = el[1];
-      if (val.hasOwnProperty('variable') && val.variable.match(/\bd\./)){
+      if ((typeof val === 'object') && val.hasOwnProperty('variable') && val.variable.match(/\bd\./)){
         leaf['req_specs'][el[0]] = convertToDFunc(val.variable);
       } else {
         leaf['req_specs'][el[0]] = val;
@@ -237,6 +237,8 @@ function chomper(ast){
 
   function generate(ast, parent){
 
+    // console.log('gen ast:', util.inspect(ast, false, null));
+
     var parent = parent || undefined;
 
     // Have we consumed everything?
@@ -276,7 +278,7 @@ function chomper(ast){
     return generate(el);
   });
 
-  // console.log('final', util.inspect(structure, false, null));
+  console.log('final', util.inspect(structure, false, null));
 
   return structure;
 
