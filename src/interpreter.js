@@ -38,10 +38,10 @@ function chomper(ast){
       (structure[parent]['children'] = [child]) ;
   }
 
-  function assign(ast, parent){
-
-    structure[parent][ast[0].op] = ast[0].exp;
-    generate(_.drop(ast), parent); // parent passes through because assign cannot create a new scope 
+  function convertToFunc(func){
+    var val = 'var moo = ' + func;
+    eval(val);
+    return moo;
   }
 
   function convertToDFunc(toInter){
@@ -146,6 +146,16 @@ function chomper(ast){
 
   // Population Functions
 
+  function assign(ast, parent){
+    // find functions and dispatch them 
+    if (typeof ast[0].exp === 'object' && !(ast[0].exp instanceof Array) && ast[0].exp.op === 'function'){
+      funcPop(ast, parent);
+    } else {
+      structure[parent][ast[0].op] = ast[0].exp;
+      handleSiblings(ast, parent);
+    }
+  }
+
   function axisPop(ast, parent){
     var type    = ast[0].op.split('-')[1],
         axisObj = (structure[parent][(type + 'Axis')] = Object.create(Object.prototype));
@@ -170,7 +180,7 @@ function chomper(ast){
 
   function cleanPop(ast, parent){
     var interStr    = "";
-    var assignments = ast[0]['exp']['exp']
+    var assignments = ast[0].exp.exp
                       .split("\n")
                       .map(function(el){
                         return el.trim();
@@ -185,6 +195,8 @@ function chomper(ast){
   }
 
   function funcPop(ast, parent){
+     console.log('func pop:', ast[0].exp.exp);
+     structure[parent][ast[0].op] = convertToFunc(ast[0].exp.exp);
      handleSiblings(ast, parent);
   }
 

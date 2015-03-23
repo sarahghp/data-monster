@@ -28,7 +28,8 @@
 
 
   function          = '#' space cu:curly { return { op: 'function', exp: cu.join('').trim() } }
-  curly             = '{' c:([^{}]/curly)* '}' { return [].concat.apply([], c)}
+  curly             = '{' c:([^{}]/ic)* '}' { return [].concat.apply([], c) }
+  ic                = ic:('{' [^{}]* '}') { return [].concat.apply([], ic) }
 
   variable          = v:bare_word { return { variable: v } }
   bare_word         = t:text+ space { return t.join(""); }
