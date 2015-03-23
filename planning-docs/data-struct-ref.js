@@ -58,22 +58,23 @@
 { special:
    { tooltips:
       [ { text: 'default',
-          parent: 'elem-bb871e85-574a-4eb4-ada6-fa7e42b20148' } ] },
-  'data-b970f456-2d80-465b-a9a3-61764f75a782':
+          parent: 'elem-86723ad1-6f66-4d42-a09e-ea2a99ddf42b' } ] },
+  'data-c1267098-35b2-4b3b-9930-80e2f6e1291e':
    { file: 'van_gogh_additional_measurements.tsv',
      filetype: '.tsv',
-     clean: [ 'd.Shape_Count = +d.Shape_Count,\n             d.ratio = +d["Image_Height/Image_Width "]' ],
+     clean: [Function],
+     funcs: [ [Function: tiger], [Function: kitty] ],
      children:
-      [ 'canvas-223d14f9-cbc8-46f9-b7c7-015fbff4aac9',
-        'canvas-dd7e6b3c-5f48-4801-94d9-119f199ad4b5' ] },
-  'canvas-223d14f9-cbc8-46f9-b7c7-015fbff4aac9':
-   { parent: 'data-b970f456-2d80-465b-a9a3-61764f75a782',
+      [ 'canvas-afe71b79-6cbf-4a3c-8b3a-282aae453e1a',
+        'canvas-7e281257-41ef-427b-92a8-c2208b3e845c' ] },
+  'canvas-afe71b79-6cbf-4a3c-8b3a-282aae453e1a':
+   { parent: 'data-c1267098-35b2-4b3b-9930-80e2f6e1291e',
      width: 1000,
      height: 600,
      margins: { short_params: [ '20', '20', '60', '60' ] },
      selector: '#scatterplot',
      color: [ { variable: 'category10' } ],
-     children: [ 'elem-bb871e85-574a-4eb4-ada6-fa7e42b20148' ],
+     children: [ 'elem-86723ad1-6f66-4d42-a09e-ea2a99ddf42b' ],
      xAxis:
       { attr: [ { class: 'label' }, { x: { variable: 'width' } }, { y: 50 } ],
         style: [ { 'text-anchor': 'end' } ],
@@ -82,29 +83,24 @@
       { attr: [ { class: 'label' }, { y: -10 } ],
         style: [ { 'text-anchor': 'end' } ],
         text: [ 'Num Shapes' ] } },
-  'elem-bb871e85-574a-4eb4-ada6-fa7e42b20148':
-   { parent: 'canvas-223d14f9-cbc8-46f9-b7c7-015fbff4aac9',
+  'elem-86723ad1-6f66-4d42-a09e-ea2a99ddf42b':
+   { parent: 'canvas-afe71b79-6cbf-4a3c-8b3a-282aae453e1a',
      type: 'circle',
-     req_specs:
-      { cx: 'function(d){ return d.ratio}',
-        cy: 'function(d){ return d.Shape_Count}',
-        r: 4,
-        fill: 'function(d){ return d.year}' },
+     req_specs: { cx: [Function], cy: [Function], r: 4, fill: [Function] },
      attr: [ [ 'class', 'dot' ] ],
-     click: [ 'function(d)  window.open(\'https://www.google.com/search?site=imghp&tbm=isch&q=van+gogh+\'+d.Title);' ],
+     click: [Function],
      xScale:
       { scale: { variable: 'log' },
         domain: { short_params: [ '0', 'height' ] },
         range: { short_params: [ '200', '400' ] } } },
-  'canvas-dd7e6b3c-5f48-4801-94d9-119f199ad4b5':
-   { parent: 'data-b970f456-2d80-465b-a9a3-61764f75a782',
+  'canvas-7e281257-41ef-427b-92a8-c2208b3e845c':
+   { parent: 'data-c1267098-35b2-4b3b-9930-80e2f6e1291e',
      width: 1000,
      height: 600,
      margins: { short_params: [ '20', '20', '60', '60' ] },
      selector: '#booooop',
-     children: [ 'elem-44652704-4e82-4f52-a99b-d537b32f5478' ] },
-  'elem-44652704-4e82-4f52-a99b-d537b32f5478':
-   { parent: 'canvas-dd7e6b3c-5f48-4801-94d9-119f199ad4b5',
+     children: [ 'elem-6d83cb5d-03bc-403e-8b75-ddb6b5fa26c7' ] },
+  'elem-6d83cb5d-03bc-403e-8b75-ddb6b5fa26c7':
+   { parent: 'canvas-7e281257-41ef-427b-92a8-c2208b3e845c',
      type: 'circle',
-     req_specs: { cx: 'ratio', cy: 'Shape_Count', r: 4, fill: 'year' },
-     color: [ 'own_func' ] } }
+     req_specs: { cx: 'ratio', cy: 'Shape_Count', r: 4, fill: 'year' } } }

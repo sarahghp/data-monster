@@ -35,8 +35,8 @@
   bare_word         = t:text+ space { return t.join(""); }
   text              = [a-zA-Z0-9-._]
 
-  array             = '[' space nn:(number comma? space)+ space ']' {return nn}
-  number            = d:digit+ space { return +(d.join(''));  }
+  array             = '[' space nn:number+ ']' { return [nn] }
+  number            = d:digit+ comma? space { return +(d.join(''));  }
   digit             = [0123456789.-]
 
   space             = comment / [ \n]* / !.
