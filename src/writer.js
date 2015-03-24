@@ -78,6 +78,8 @@ function buildString(){
     return ""
   }
 
+  // Assemblers
+
 
   // call this for each object in elemKeys || call on children of everything in canvasKeys and eliminate elKeys?
   function assembleFirstAtom(key){
@@ -110,17 +112,60 @@ function buildString(){
 
 
   // call this for each object in canvasKeys
-  function assembleDrawFuncs(){
-    // var str = "";
+  function assembleDrawFuncs(key){
+    var str     = "",
+        obk     = choms[key],
+        obl     = Object.create(Object.prototype),
+        margins = obk.margins.short_params;
 
-    // str += "function draw" + i + "(){"
+    // process margins
+    if (margins.length === 4){
+      console.log('called');
+      obl.top     = +margins[0];
+      obl.right   = +margins[1];
+      obl.bottom  = +margins[2];
+      obl.left    = +margins[3];
+      console.log(margins);
+    } else if (margins.length === 3){
+      obl.top     = +margins[0];
+      obl.right   = +margins[1];
+      obl.bottom  = +margins[2];
+      obl.left    = +margins[1];
+    } else if (margins.length === 2){
+      obl.top     = +margins[0];
+      obl.right   = +margins[1];
+      obl.bottom  = +margins[0];
+      obl.left    = +margins[1];
+    } else if (margins.length === 1){
+      obl.top     = +margins[0];
+      obl.right   = +margins[0];
+      obl.bottom  = +margins[0];
+      obl.left    = +margins[0];
+    } else {
+      throw('Error: Incorrect margin arity');
+    }
+
+    // open func
+    str += "function draw-" + key + "(data){ \n"
+
+    // canvas vars
+    str += "var margin = " + pretty(obl) + ", \n"
+    str += "width = " + obk.width + " - margin.left - margin.right, \n"
+    str += "height = " + obk.height + " - margin.top - margin.bottom; \n"
+    // str +=
+    // str +=
+    // str +=
+    // str +=
+    // str +=
+    // str +=
 
 
 
 
 
-    // str += "};"
-    // return str;
+
+    str += "};"
+    return str;
   }
 
   // call this for each object in dataKeys
@@ -150,7 +195,8 @@ function buildString(){
 
   popArrs();
   // output += assembleFirstAtom(elemKeys[0]);
-  output += assembleQueues(dataKeys[0]);
+  // output += assembleQueues(dataKeys[0]);
+  output += assembleDrawFuncs(canvasKeys[0]);
   fs.writeFile('output.txt', output);
   // console.log(util.inspect(output, false, null));
   return output;  
