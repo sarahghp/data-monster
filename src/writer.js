@@ -120,12 +120,10 @@ function buildString(){
 
     // process margins
     if (margins.length === 4){
-      console.log('called');
       obl.top     = +margins[0];
       obl.right   = +margins[1];
       obl.bottom  = +margins[2];
       obl.left    = +margins[3];
-      console.log(margins);
     } else if (margins.length === 3){
       obl.top     = +margins[0];
       obl.right   = +margins[1];
@@ -152,12 +150,15 @@ function buildString(){
     str += "var margin = " + pretty(obl) + ", \n"
     str += "width = " + obk.width + " - margin.left - margin.right, \n"
     str += "height = " + obk.height + " - margin.top - margin.bottom; \n"
-    // str +=
-    // str +=
-    // str +=
-    // str +=
-    // str +=
-    // str +=
+
+
+    // add in svg
+    str += "d3.select('" + obk.selector + ")"
+    str += ".append('svg')"
+    str += ".attr('width', width  + margin.left + margin.right)"
+    str += ".attr('height', height + margin.top + margin.bottom)"
+    str += ".append('g')"
+    str += ".attr('transform', 'translate(' + margin.left + ', ' + margin.top ')');"
 
 
 
@@ -202,8 +203,8 @@ function buildString(){
 
   popArrs();
   // output += assembleFirstAtom(elemKeys[0]);
-  output += assembleQueues(dataKeys[0]);
-  // output += assembleDrawFuncs(canvasKeys[0]);
+  // output += assembleQueues(dataKeys[0]);
+  output += assembleDrawFuncs(canvasKeys[0]);
   fs.writeFile('output.txt', output);
   // console.log(util.inspect(output, false, null));
   return output;  
