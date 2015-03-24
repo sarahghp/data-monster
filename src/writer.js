@@ -6,26 +6,14 @@ var fs    = require('fs'),
 
 function buildString(){
  
- var output     = "",                      // this is the string that will be built
+ var output     = "",                   // this is the string that will be built
      keys       = Object.keys(choms),  // these are the keys we need to build it
      dataKeys   = [],
      canvasKeys = [],
      elemKeys   = [];
 
 
-  // Utilty funcs
-  function filterArr(type){
-    return _.filter(keys, function(el){
-      return el.match('' + type + '');
-    });
-  }
-
-  // let's make more tables of contents over which to iterate!
-  function popArrs(){
-    dataKeys = filterArr('data');
-    canvasKeys = filterArr('canvas');
-    elemKeys = filterArr('elem');
-  }
+  // Utilty funcs (order: alpha)
 
   function biteBiteBite(toc, contents, str){
     var str      = str || "",
@@ -39,6 +27,30 @@ function buildString(){
     } else {
       return str;
     }
+  }
+
+  function eatVars(collection, parent){
+    var collect = collection;
+    _.forEach(collect, function(val, key){
+      if (typeof val === 'object' && !(val instanceof Array) && val.hasOwnProperty('variable')){
+        collect[key] = choms[parent][val.variable];
+      }
+    });
+    // iterate on collection and if a val is an object with property variable, replace that with the value in variable
+    return collect;
+  }
+
+  function filterArr(type){
+    return _.filter(keys, function(el){
+      return el.match('' + type + '');
+    });
+  }
+
+  // let's make more tables of contents over which to iterate!
+  function popArrs(){
+    dataKeys = filterArr('data');
+    canvasKeys = filterArr('canvas');
+    elemKeys = filterArr('elem');
   }
 
   function stringifyList(list, prepend, append, punc){
@@ -95,7 +107,7 @@ function buildString(){
     str += obk.elemSelect || "'elements'";
     str += ")";
     str += ".append('" + obk.type + "')";
-    str += ".attr(" + pretty(obk.req_specs, 4, 'PRINT', true) + ")";
+    str += ".attr(" + pretty(eatVars(obk.req_specs, obk.parent), 4, 'PRINT', true) + ")";
 
     // remove 'parent', 'type', 'req_specs' from inkey
 
@@ -122,7 +134,7 @@ function buildString(){
       str += ".attr('class', "
       str += (obk.elemSelect || "'elements'") + ")"
       str += ".append('" + obk.type + "')"
-      str += ".attr(" + pretty(obk.req_specs, 4, 'PRINT', true) + ")"
+      str += ".attr(" + pretty(eatVars(obk.req_specs, obk.parent), 4, 'PRINT', true) + ")"
 
       inkey = _.pull(inkey, 'parent', 'type', 'req_specs');
 
@@ -169,6 +181,12 @@ function buildString(){
     } else {
       throw('Error: Incorrect margin arity');
     }
+
+    // set data width & height to calculated versions for use in eatVars 
+    // someday I'd like to come up with a better approach || maybe just push all user-defined vars into obj?
+    
+    obk.width   = obk.width - obl.left - obl.right;
+    obk.height  = obk.height - obl.top - obl.bottom;
 
     // open func
     str += "function draw-" + key + "(data){ \n"
