@@ -110,6 +110,33 @@ function buildString(){
 
   }
 
+  function assembleRestAtoms(keyArray){
+    var str = "",
+        arr = _.drop(keyArray);
+
+    _.forEach(arr, function(el){
+      var obk = choms[el],
+          inkey = Object.keys(obk);
+
+      str += "svg.append('g')"
+      str += ".attr('class', "
+      str += (obk.elemSelect || "'elements'") + ")"
+      str += ".append('" + obk.type + "')"
+      str += ".attr(" + pretty(obk.req_specs, 4, 'PRINT', true) + ")"
+
+      inkey = _.pull(inkey, 'parent', 'type', 'req_specs');
+
+      // check if inkey still has length
+      // if so str += results of biteBiteBite
+
+      inkey.length && (str += biteBiteBite(inkey, obk));
+
+    });
+
+    return str;
+
+  }
+
 
   // call this for each object in canvasKeys
   function assembleDrawFuncs(key){
@@ -160,9 +187,11 @@ function buildString(){
     str += ".append('g')"
     str += ".attr('transform', 'translate(' + margin.left + ', ' + margin.top ')');"
 
+    // first element
+    obk.children.length && (str += assembleFirstAtom(obk.children[0]));
 
-
-
+    // any other elements
+    (obk.children.length) > 1 && (str += assembleRestAtoms(obk.children));
 
 
     str += "};"
