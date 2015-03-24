@@ -173,7 +173,14 @@ function buildString(){
     var str = "",
         obk = choms[key];
 
-    str += 'function draw-' + key + '(rawData){'
+    str += "function draw-" + key + "(rawData){\n"
+
+    // do data cleaning
+
+    str += "rawData.forEach(" + obk.clean + ");\n\n"
+
+    // call child canvases
+
     str += stringifyList(obk.children, 'draw-', '(rawData)', '; ') + '}'
     str += "\n\n"
     str += "queue().defer(d3" + obk.filetype + ", '"
@@ -195,8 +202,8 @@ function buildString(){
 
   popArrs();
   // output += assembleFirstAtom(elemKeys[0]);
-  // output += assembleQueues(dataKeys[0]);
-  output += assembleDrawFuncs(canvasKeys[0]);
+  output += assembleQueues(dataKeys[0]);
+  // output += assembleDrawFuncs(canvasKeys[0]);
   fs.writeFile('output.txt', output);
   // console.log(util.inspect(output, false, null));
   return output;  
