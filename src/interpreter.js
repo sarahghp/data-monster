@@ -278,7 +278,7 @@ function chomper(ast){
     return generate(el);
   });
 
-  console.log('final', util.inspect(structure, false, null));
+  // console.log('final', util.inspect(structure, false, null));
 
   return structure;
 

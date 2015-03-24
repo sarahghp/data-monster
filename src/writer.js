@@ -20,6 +20,37 @@ function buildString(){
     });
   }
 
+  // let's make more tables of contents over which to iterate!
+  function popArrs(){
+    dataKeys = filterArr('data');
+    canvasKeys = filterArr('canvas');
+    elemKeys = filterArr('elem');
+  }
+
+  function biteBiteBite(toc, contents, str){
+    var str      = str || "",
+        biteName = toc.shift()
+        bite     = contents[biteName]; 
+
+    str += noms[biteName](bite);
+
+    if (toc.length) { 
+      return biteBiteBite(toc, contents, str);  
+    } else {
+      return str;
+    }
+  }
+
+  function stringifyList(list, prepend, append, punc){
+    var ministr = "";
+
+    _.forEach(list, function(el){
+      ministr += prepend + el + append + punc;
+    });
+
+    return ministr;
+  }
+
   // Noms & funcs
 
   var noms = {
@@ -47,27 +78,6 @@ function buildString(){
     return ""
   }
 
-
-  // let's make more tables of contents over which to iterate!
-  function popArrs(){
-    dataKeys = filterArr('data');
-    canvasKeys = filterArr('canvas');
-    elemKeys = filterArr('elem');
-  }
-
-  function biteBiteBite(toc, contents, str){
-    var str      = str || "",
-        biteName = toc.shift()
-        bite     = contents[biteName]; 
-
-    str += noms[biteName](bite);
-
-    if (toc.length) { 
-      return biteBiteBite(toc, contents, str);  
-    } else {
-      return str;
-    }
-  }
 
   // call this for each object in elemKeys || call on children of everything in canvasKeys and eliminate elKeys?
   function assembleFirstAtom(key){
@@ -114,7 +124,20 @@ function buildString(){
   }
 
   // call this for each object in dataKeys
-  function assembleQueues(){
+  function assembleQueues(key){
+    var str = "",
+        obk = choms[key];
+
+    str += 'function draw-' + key + '(rawData){'
+    str += stringifyList(obk.children, 'draw-', '(rawData)', '; ') + '}'
+    str += "\n\n"
+    str += "queue().defer(d3" + obk.filetype + ", '"
+    str += obk.file + "')"
+    str += ".await( function(err, data) { \n"
+    str += "if(err){ console.log(err) } \n"
+    str += "draw-" + key + "(data); } );"
+
+    return str;  
 
   }
 
@@ -126,7 +149,8 @@ function buildString(){
   }
 
   popArrs();
-  output += assembleFirstAtom(elemKeys[0]);
+  // output += assembleFirstAtom(elemKeys[0]);
+  output += assembleQueues(dataKeys[0]);
   fs.writeFile('output.txt', output);
   // console.log(util.inspect(output, false, null));
   return output;  
