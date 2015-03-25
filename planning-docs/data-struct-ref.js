@@ -55,26 +55,32 @@
 
 // Example
 
-{ special:
+final { special:
    { tooltips:
       [ { text: 'default',
-          parent: 'elem-86723ad1-6f66-4d42-a09e-ea2a99ddf42b' } ] },
-  'data-c1267098-35b2-4b3b-9930-80e2f6e1291e':
+          parent: 'elem-74f88a57-7c5d-4bed-8660-1ff245107f39' } ] },
+  'data-7ee58d6c-b724-45bc-855f-af0ce483dc48':
    { file: 'van_gogh_additional_measurements.tsv',
      filetype: '.tsv',
      clean: [Function],
      funcs: [ [Function: tiger], [Function: kitty] ],
      children:
-      [ 'canvas-afe71b79-6cbf-4a3c-8b3a-282aae453e1a',
-        'canvas-7e281257-41ef-427b-92a8-c2208b3e845c' ] },
-  'canvas-afe71b79-6cbf-4a3c-8b3a-282aae453e1a':
-   { parent: 'data-c1267098-35b2-4b3b-9930-80e2f6e1291e',
+      [ 'canvas-f49afc70-27ef-42aa-82bb-3143b7d97327',
+        'canvas-1ee69fe5-5e80-407d-8523-f4f1b077015a' ] },
+  'canvas-f49afc70-27ef-42aa-82bb-3143b7d97327':
+   { parent: 'data-7ee58d6c-b724-45bc-855f-af0ce483dc48',
      width: 1000,
      height: 600,
      margins: { short_params: [ '20', '20', '60', '60' ] },
      selector: '#scatterplot',
      color: [ { variable: 'category10' } ],
-     children: [ 'elem-86723ad1-6f66-4d42-a09e-ea2a99ddf42b' ],
+     xScale:
+      { scale: { variable: 'log' },
+        domain: { short_params: [ '0', 'height' ] },
+        range: { short_params: [ '200', '400' ] } },
+     children:
+      [ 'elem-74f88a57-7c5d-4bed-8660-1ff245107f39',
+        'elem-8ebd1da3-d143-435b-a193-2bbebdb5a5be' ],
      xAxis:
       { attr: [ { class: 'label' }, { x: { variable: 'width' } }, { y: 50 } ],
         style: [ { 'text-anchor': 'end' } ],
@@ -83,24 +89,24 @@
       { attr: [ { class: 'label' }, { y: -10 } ],
         style: [ { 'text-anchor': 'end' } ],
         text: [ 'Num Shapes' ] } },
-  'elem-86723ad1-6f66-4d42-a09e-ea2a99ddf42b':
-   { parent: 'canvas-afe71b79-6cbf-4a3c-8b3a-282aae453e1a',
+  'elem-74f88a57-7c5d-4bed-8660-1ff245107f39':
+   { parent: 'canvas-f49afc70-27ef-42aa-82bb-3143b7d97327',
      type: 'circle',
      req_specs: { cx: [Function], cy: [Function], r: 4, fill: [Function] },
      attr: [ [ 'class', 'dot' ] ],
-     click: [Function],
-     xScale:
-      { scale: { variable: 'log' },
-        domain: { short_params: [ '0', 'height' ] },
-        range: { short_params: [ '200', '400' ] } } },
-  'canvas-7e281257-41ef-427b-92a8-c2208b3e845c':
-   { parent: 'data-c1267098-35b2-4b3b-9930-80e2f6e1291e',
+     click: [Function] },
+  'elem-8ebd1da3-d143-435b-a193-2bbebdb5a5be':
+   { parent: 'canvas-f49afc70-27ef-42aa-82bb-3143b7d97327',
+     type: 'line',
+     req_specs: { x1: 0, y1: 100, x2: { variable: 'width' }, y2: 100 } },
+  'canvas-1ee69fe5-5e80-407d-8523-f4f1b077015a':
+   { parent: 'data-7ee58d6c-b724-45bc-855f-af0ce483dc48',
      width: 1000,
      height: 600,
      margins: { short_params: [ '20', '20', '60', '60' ] },
      selector: '#booooop',
-     children: [ 'elem-6d83cb5d-03bc-403e-8b75-ddb6b5fa26c7' ] },
-  'elem-6d83cb5d-03bc-403e-8b75-ddb6b5fa26c7':
-   { parent: 'canvas-7e281257-41ef-427b-92a8-c2208b3e845c',
+     children: [ 'elem-6b6eab57-4c27-4c38-9ebd-bab2042cdf0b' ] },
+  'elem-6b6eab57-4c27-4c38-9ebd-bab2042cdf0b':
+   { parent: 'canvas-1ee69fe5-5e80-407d-8523-f4f1b077015a',
      type: 'circle',
      req_specs: { cx: 'ratio', cy: 'Shape_Count', r: 4, fill: 'year' } } }

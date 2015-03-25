@@ -44,9 +44,11 @@ function buildString(){
   function eatVars(collection, parent){
     var collect = collection;
     _.forEach(collect, function(val, key){
+      // iterate on collection and if a val is an object with property variable, replace that with the value in variable
       if (typeof val === 'object' && !(val instanceof Array) && val.hasOwnProperty('variable')){
         if (d3things[val.variable]) {
-          collect[key] = assembled3things(val.variable, d3things[val.variable]); // pass pre or post as arg
+          console.log('d3 things called: ', collect);
+          collect[key] = assembled3things(d3things[val.variable], val.variable); // pass pre or post as arg
         } else if (choms[parent][val.variable]) {
           collect[key] = choms[parent][val.variable];
         } else {
@@ -54,7 +56,6 @@ function buildString(){
         }
       }
     });
-    // iterate on collection and if a val is an object with property variable, replace that with the value in variable
     return collect;
   }
 
@@ -144,18 +145,47 @@ function buildString(){
   function defaultBite(bite){
     return "";
   }
+ 
 
-  // Assemblers
+  // Mini Assemblers
 
-  function assembled3things(itself, director, inter){
+  function assembled3things(director, itself, inter){ // expect to use inter later
     if(director === 'pre'){
       return 'd3.scale.' + itself;
     } else if (director === 'post'){
       return 'd3.' + itself + '.scale'
     } else {
-      console.log('Cannot assemble d3things; unknown director');
+      console.log('Cannot assemble d3things; unknown director.\n');
     }
   }
+
+  function assembleScale(director, type, itself){
+    var ministr = "";
+    
+
+    if(director === 'user'){
+      var obn = itself[type + "Scale"];
+      
+      ministr += eatVars([obn.scale]) + "()"
+      ministr += ".domain([" + obn.domain.short_params[0] + ", " + obn.domain.short_params[1] + "])"
+      ministr += ".range([" + obn.range.short_params[0] + ", " + obn.range.short_params[1] + "])";
+      
+      (type === 'x') && (ministr += ", \n")
+    
+    } else if (director === 'default'){
+      (type === 'x') && (ministr += "d3.scale.linear().domain([0, maxX]).range([0, width])");
+      (type === 'y') && (ministr += "d3.scale.linear().domain([0, maxY]).range([height, 0])");  
+    
+    } else {
+      console.log('Cannot assemble scale; unknown director.\n');
+    }
+
+    return ministr;
+
+  }
+
+
+  // Main Assmemblers
 
   // call this for each object in elemKeys || call on children of everything in canvasKeys and eliminate elKeys?
   function assembleFirstAtom(key){
@@ -260,8 +290,12 @@ function buildString(){
     str += "width = " + obk.width +  "\n"
     str += "height = " + obk.height + "\n"
 
-    // color
-    // obk.hasOwnProperty('color') && (str+=eatVars(obk.color));
+    // scales & maxFuncs
+    str += "var xScale = "
+    str += obk.hasOwnProperty('xScale') ? assembleScale('user', 'x', obk) : assembleScale('default', 'x') + ", \n"
+    str += "yScale = "
+    str += obk.hasOwnProperty('yScale') ? assembleScale('user', 'y', obk) : assembleScale('default', 'y')
+    str += obk.hasOwnProperty('color') ? (", \n color = " + eatVars(obk.color) + "(); \n") : ";\n"
 
     // add in svg
     str += "d3.select('" + obk.selector + "')"
