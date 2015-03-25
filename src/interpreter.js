@@ -6,9 +6,7 @@ var util = require('util'),
 function chomper(ast){
 
   var structure = { 
-    special: {
-      tooltips: []
-    }
+
   }; 
 
   var nodes = {
@@ -228,7 +226,7 @@ function chomper(ast){
     tooltip.text   = ast[0][1] || 'default';
     tooltip.parent = parent;
     
-    structure.special.tooltips.push(tooltip);
+    structure[parent].tooltip = tooltip;
 
     handleSiblings(ast, parent);
   }

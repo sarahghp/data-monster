@@ -86,6 +86,7 @@ function buildString(){
   var noms = {
    'attr':    attrBite,
    'xScale':  scaleBite,
+   'tooltip': ttBite,
 
    // events <- add more, consider method to take other DOM methods
     'click'     :   function(args){ return eventBite(args)('click')},
@@ -114,6 +115,30 @@ function buildString(){
 
   function scaleBite(bite){
     return "";
+  }
+
+  function ttBite (bite){
+
+    var ministr = "";
+
+    ministr+= ".on('mouseover', function(d){"
+    ministr+= "var xPosition = event.clientX + scrollX < width - 200 ? event.clientX + scrollX : event.clientX + scrollX - 200,\n"
+    ministr+= "yPosition = event.clientY + scrollY + 100 > height ? event.clientY + scrollY - 25 : event.clientY + scrollY + 5,\n"
+    ministr+= "text = " 
+    ministr+= (bite.text === 'default') ? "'default in quotes'" : bite.text; /* <-- x & y vals go in here */ 
+    ministr+= ";\n"
+    ministr+= "d3.select('#tooltip')\n"
+    ministr+= ".style('left', xPosition + 'px')\n"
+    ministr+= ".style('top', yPosition + 'px')\n"
+    ministr+= ".select('#values')\n"
+    ministr+= ".text(text);\n"
+    ministr+= "d3.select('#tooltip').classed('hidden', false); })\n"
+    ministr+= ".on('mouseout', function(){\n"
+    ministr+= "d3.select('#tooltip').classed('hidden', true); })\n"
+
+    // call html & css file generation functions <-- put in another file & just call from here
+
+    return ministr;
   }
 
   function defaultBite(bite){
@@ -236,10 +261,10 @@ function buildString(){
     str += "height = " + obk.height + "\n"
 
     // color
-    obk.hasOwnProperty('color') && (str+=eatVars(obk.color));
+    // obk.hasOwnProperty('color') && (str+=eatVars(obk.color));
 
     // add in svg
-    str += "d3.select('" + obk.selector + ")"
+    str += "d3.select('" + obk.selector + "')"
     str += ".append('svg')"
     str += ".attr('width', width  + margin.left + margin.right)"
     str += ".attr('height', height + margin.top + margin.bottom)"
