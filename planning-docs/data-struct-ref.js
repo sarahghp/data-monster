@@ -14,7 +14,7 @@
     height:
     width:
     margins:
-    color
+    color:
     xAxis:  { 
       scale:          // these will have defualts if not populated here
       orientation:    // these will have defualts if not populated here

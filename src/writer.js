@@ -1,8 +1,8 @@
-var fs    = require('fs'),
-    util  = require('util'),
-    _     = require('lodash'),
-    pretty = require('js-object-pretty-print').pretty,    
-    choms = require('./parser.js').structure;
+var fs      = require('fs'),
+    util    = require('util'),
+    _       = require('lodash'),
+    pretty  = require('js-object-pretty-print').pretty,    
+    choms   = require('./parser.js').structure;
 
 function buildString(){
  
@@ -11,6 +11,18 @@ function buildString(){
      dataKeys   = [],
      canvasKeys = [],
      elemKeys   = [];
+
+  var d3things = {
+    // colors
+    'category10'  : 'pre',
+    'category20'  : 'pre',
+    'category20b' : 'pre',
+    'category20c' : 'pre',
+
+    //axes
+    'linear'      : 'pre',
+    'log'         : 'pre',  
+  };
 
 
   // Utilty funcs (order: alpha)
@@ -33,7 +45,13 @@ function buildString(){
     var collect = collection;
     _.forEach(collect, function(val, key){
       if (typeof val === 'object' && !(val instanceof Array) && val.hasOwnProperty('variable')){
-        collect[key] = choms[parent][val.variable];
+        if (d3things[val.variable]) {
+          collect[key] = assembled3things(val.variable, d3things[val.variable]); // pass pre or post as arg
+        } else if (choms[parent][val.variable]) {
+          collect[key] = choms[parent][val.variable];
+        } else {
+          console.log(val.variable + ' is not defined.')
+        }
       }
     });
     // iterate on collection and if a val is an object with property variable, replace that with the value in variable
@@ -67,8 +85,14 @@ function buildString(){
 
   var noms = {
    'attr':    attrBite,
-   'click':   clickBite,
-   'xScale':  scaleBite
+   'xScale':  scaleBite,
+
+   // events <- add more, consider method to take other DOM methods
+    'click'     :   function(args){ return eventBite(args)('click')},
+    'mouseover' :   function(args){ return eventBite(args)('mouseover')},
+    'mouseenter':   function(args){ return eventBite(args)('mouseenter')},
+    'mouseleave':   function(args){ return eventBite(args)('mouseleave')},
+    'hover'     :   function(args){ return eventBite(args)('hover')},
   }
 
   function attrBite(bite){
@@ -82,16 +106,31 @@ function buildString(){
     return ".attr(" + pretty(miniobj) + ")"; 
   }
 
-  function clickBite(bite){
-    return ""
+  function eventBite(bite){
+    return function(type){
+      return ".on('" + type + "', " + bite + ")";
+    }
   }
 
   function scaleBite(bite){
-    return ""
+    return "";
+  }
+
+  function defaultBite(bite){
+    return "";
   }
 
   // Assemblers
 
+  function assembled3things(itself, director, inter){
+    if(director === 'pre'){
+      return 'd3.scale.' + itself;
+    } else if (director === 'post'){
+      return 'd3.' + itself + '.scale'
+    } else {
+      console.log('Cannot assemble d3things; unknown director');
+    }
+  }
 
   // call this for each object in elemKeys || call on children of everything in canvasKeys and eliminate elKeys?
   function assembleFirstAtom(key){
@@ -179,7 +218,7 @@ function buildString(){
       obl.bottom  = +margins[0];
       obl.left    = +margins[0];
     } else {
-      throw('Error: Incorrect margin arity');
+      console.log('Error: Incorrect margin arity');
     }
 
     // set data width & height to calculated versions for use in eatVars 
@@ -191,11 +230,13 @@ function buildString(){
     // open func
     str += "function draw-" + key + "(data){ \n"
 
-    // canvas vars
+    // canvas vars — width & height are less idiomatic / precalculated for use throughout
     str += "var margin = " + pretty(obl) + ", \n"
-    str += "width = " + obk.width + " - margin.left - margin.right, \n"
-    str += "height = " + obk.height + " - margin.top - margin.bottom; \n"
+    str += "width = " + obk.width +  "\n"
+    str += "height = " + obk.height + "\n"
 
+    // color
+    obk.hasOwnProperty('color') && (str+=eatVars(obk.color));
 
     // add in svg
     str += "d3.select('" + obk.selector + ")"
