@@ -42,9 +42,16 @@ function chomper(ast){
     return moo;
   }
 
-  function convertToDFunc(toInter){
+  function convertToDFunc(toInter, wrapper){
     // this rigamarole sets the value to the actual unexecuted function
-    var val = 'var moo = function(d){ ' + toInter + ' }';
+    var val;
+
+    if (wrapper){
+      val = 'var moo = function(d){ ' + wrapper + '(' + toInter + ') }';
+    } else {
+      val = 'var moo = function(d){ ' + toInter + ' }';
+    }
+    
     eval(val);
     return moo;
   }
@@ -132,11 +139,20 @@ function chomper(ast){
     _.forEach(exp[0].exp, function(el){
       // return array pairs to hash pairs
       var val = el[1];
-      if ((typeof val === 'object') && val.hasOwnProperty('variable') && val.variable.match(/\bd\./)){
-        // console.log("el0:", el[0]);
-        leaf['req_specs'][el[0]] = convertToDFunc(val.variable);
-        (el[0].match(/x/)) && (structure[parent]['xPrim'] = val.variable );
-        (el[0].match(/y/)) && (structure[parent]['yPrim'] = val.variable );
+      if ((typeof val === 'object') && val.hasOwnProperty('variable') && val.variable.match(/fill|\bd\./)){
+        
+        if (el[0].match(/x/)) { 
+          structure[parent]['xPrim'] = val.variable;
+          leaf['req_specs'][el[0]] = convertToDFunc(val.variable, 'xScale');
+        } else if (el[0].match(/y/)){
+          structure[parent]['yPrim'] = val.variable;
+          leaf['req_specs'][el[0]] = convertToDFunc(val.variable, 'yScale');
+        } else if (el[0].match(/fill/)){
+          leaf['req_specs'][el[0]] = convertToDFunc(val.variable, 'color');
+        } else {
+          leaf['req_specs'][el[0]] = convertToDFunc(val.variable);
+        }
+ 
 
       } else {
         leaf['req_specs'][el[0]] = val;
