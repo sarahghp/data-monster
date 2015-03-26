@@ -1,9 +1,12 @@
-var fs   = require('fs'),
-    path = require('path'),
-    _    = require('lodash');;
+var fs      = require('fs'),
+    path    = require('path'),
+    _       = require('lodash'),
+    ttFiles  = require('../src/writer.js').ttFiles;
 
 
 function compile(){
+
+  console.log(ttFiles);
 
   var inputs   = process.argv,
       iL       = inputs.length,
@@ -100,6 +103,16 @@ function compile(){
 
   createDirectory(lastFile);
   _.defer(changes, genFileCollection(process.cwd()));
+
+  // Finally add in HTML & CSS helper files if necessary
+  _.defer(function(){
+    if (ttFiles){
+      console.log('tt called');
+      fs.createReadStream('tt.html').pipe(fs.createWriteStream(outDir+'/tt.html'));
+      fs.createReadStream('tt.css').pipe(fs.createWriteStream(outDir+'/tt.css'));
+    }
+  })
+
 }
 
 

@@ -4,6 +4,8 @@ var fs      = require('fs'),
     pretty  = require('js-object-pretty-print').pretty,    
     choms   = require('./parser.js').structure;
 
+var ttBool  = false;
+
 function buildString(){
  
  var output     = "",                   // this is the string that will be built
@@ -118,6 +120,8 @@ function buildString(){
   }
 
   function ttBite (bite, parent){
+
+    ttBool = true;
 
     var grandparent = choms[parent.parent],
         ministr = "";
@@ -378,4 +382,5 @@ function buildString(){
   return output;  
 }
 
-module.exports = buildString();
+exports.string  = buildString();
+exports.ttFiles = ttBool; 
