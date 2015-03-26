@@ -33,11 +33,12 @@ function draw (error, data){
   // Add in scale domain now that we have the data
 
   var maxShapes = d3.max(data, function(d){return d.Shape_Count}),
-      maxShapes = maxShapes + (maxShapes * .25) // Make it a little taller
       maxRatio = d3.max(data, function(d){return d.ratio});
 
-    xScale.domain([0, maxRatio]);
-    yScale.domain([0, maxShapes]);
+  maxShapes = maxShapes + (maxShapes * .25) // Make it a little taller
+
+  xScale.domain([0, maxRatio]);
+  yScale.domain([0, maxShapes]);
 
   // Checking to see what the data looks like
   

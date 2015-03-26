@@ -158,6 +158,15 @@ function buildString(){
     }
   }
 
+  function assembleMaxes(itself){
+    var ministr = "";
+    ministr+= "var maxY = d3.max(data, function(d){return " +  itself.yPrim + " }),\n"
+    ministr+= "maxX = d3.max(data, function(d){return " + itself.xPrim + "});\n\n" 
+    ministr+= "maxY = maxShapes + (maxShapes * .25) // Make it a little taller\n"
+
+    return ministr;
+  }
+
   function assembleScale(director, type, itself){
     var ministr = "";
     
@@ -204,7 +213,7 @@ function buildString(){
 
     // remove 'parent', 'type', 'req_specs' from inkey
 
-    inkey = _.pull(inkey, 'parent', 'type', 'req_specs', 'xPrim', 'yPrim');
+    inkey = _.pull(inkey, 'parent', 'type', 'req_specs');
 
     // check if inkey still has length
     // if so str += results of biteBiteBite
@@ -286,10 +295,16 @@ function buildString(){
 
     // canvas vars — width & height are less idiomatic / precalculated for use throughout
     str += "var margin = " + pretty(obl) + ", \n"
-    str += "width = " + obk.width +  "\n"
-    str += "height = " + obk.height + "\n"
+    str += "width = " + obk.width +  ", \n"
+    str += "height = " + obk.height + ";\n"
 
-    // scales & maxFuncs
+    // scales & maxFuncs <-  will have to be updated to account for lines || just write own scale
+
+    if(!(obk.hasOwnProperty('xScale') && obk.xScale.hasOwnProperty('domain')) || 
+       !(obk.hasOwnProperty('yScale') && obk.yScale.hasOwnProperty('domain'))) {
+      str += assembleMaxes(obk);
+    }
+
     str += "var xScale = "
     str += obk.hasOwnProperty('xScale') ? assembleScale('user', 'x', obk) : assembleScale('default', 'x') + ", \n"
     str += "yScale = "
