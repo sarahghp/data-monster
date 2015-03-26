@@ -32,7 +32,7 @@ function buildString(){
         biteName = toc.shift()
         bite     = contents[biteName]; 
 
-    str += noms[biteName](bite);
+    str += noms[biteName](bite, contents);
 
     if (toc.length) { 
       return biteBiteBite(toc, contents, str);  
@@ -117,15 +117,22 @@ function buildString(){
     return "";
   }
 
-  function ttBite (bite){
+  function ttBite (bite, parent){
 
-    var ministr = "";
+    var grandparent = choms[parent.parent],
+        ministr = "";
 
     ministr+= ".on('mouseover', function(d){"
     ministr+= "var xPosition = event.clientX + scrollX < width - 200 ? event.clientX + scrollX : event.clientX + scrollX - 200,\n"
     ministr+= "yPosition = event.clientY + scrollY + 100 > height ? event.clientY + scrollY - 25 : event.clientY + scrollY + 5,\n"
     ministr+= "text = " 
-    ministr+= (bite.text === 'default') ? "'default in quotes'" : bite.text; /* <-- x & y vals go in here */ 
+
+    if (bite.text === 'default') {
+      ministr += grandparent.xPrim + " + '; ' + " + grandparent.yPrim;
+    } else {
+      ministr += bite.text;
+    }
+
     ministr+= ";\n"
     ministr+= "d3.select('#tooltip')\n"
     ministr+= ".style('left', xPosition + 'px')\n"
