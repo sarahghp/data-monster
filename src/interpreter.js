@@ -90,7 +90,7 @@ function chomper(ast){
     // call generate on the rest of the expression, with data as new parent
     // here we move into the data expression list and the outside object is sloughed
 
-    generate(_.drop(exp), id);    
+    handleSiblings(exp, id);   
   }
 
   function canvasGen(id, exp, parent){
@@ -133,7 +133,11 @@ function chomper(ast){
       // return array pairs to hash pairs
       var val = el[1];
       if ((typeof val === 'object') && val.hasOwnProperty('variable') && val.variable.match(/\bd\./)){
+        // console.log("el0:", el[0]);
         leaf['req_specs'][el[0]] = convertToDFunc(val.variable);
+        (el[0].match(/x/)) && (structure[parent]['xPrim'] = val.variable );
+        (el[0].match(/y/)) && (structure[parent]['yPrim'] = val.variable );
+
       } else {
         leaf['req_specs'][el[0]] = val;
       }
@@ -276,7 +280,7 @@ function chomper(ast){
     return generate(el);
   });
 
-  // console.log('final', util.inspect(structure, false, null));
+  console.log('final', util.inspect(structure, false, null));
 
   return structure;
 

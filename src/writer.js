@@ -47,7 +47,6 @@ function buildString(){
       // iterate on collection and if a val is an object with property variable, replace that with the value in variable
       if (typeof val === 'object' && !(val instanceof Array) && val.hasOwnProperty('variable')){
         if (d3things[val.variable]) {
-          console.log('d3 things called: ', collect);
           collect[key] = assembled3things(d3things[val.variable], val.variable); // pass pre or post as arg
         } else if (choms[parent][val.variable]) {
           collect[key] = choms[parent][val.variable];
@@ -205,7 +204,7 @@ function buildString(){
 
     // remove 'parent', 'type', 'req_specs' from inkey
 
-    inkey = _.pull(inkey, 'parent', 'type', 'req_specs');
+    inkey = _.pull(inkey, 'parent', 'type', 'req_specs', 'xPrim', 'yPrim');
 
     // check if inkey still has length
     // if so str += results of biteBiteBite
