@@ -15,6 +15,14 @@
     width:
     margins:
     color:
+    xScale: { 
+      scale:
+      range: 
+      domain: }
+    yScale: { 
+      scale:
+      range: 
+      domain: }
     xAxis:  { 
       scale:          // these will have defualts if not populated here
       orientation:    // these will have defualts if not populated here
@@ -31,14 +39,6 @@
   // generate name based on selected node // clashes throw errors
     type:
     req_specs: { } // an object with the required svg properties, eg {'cx': 'ratio', 'cy': 'Shape_Count' }
-    xScale: { 
-      scale:
-      range: 
-      domain: }
-    yScale: { 
-      scale:
-      range: 
-      domain: }
     [opt_specs] // attr, style, &c., each is its own
     parent: // is a canvas, named
     children: [ ] // refs to children

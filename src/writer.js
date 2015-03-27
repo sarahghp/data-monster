@@ -4,7 +4,7 @@ var fs      = require('fs'),
     pretty  = require('js-object-pretty-print').pretty,    
     choms   = require('./parser.js').structure;
 
-var ttBool  = false;
+var ttBool  = false; // is set to true by tooltips, to output companion files
 
 function buildString(){
  
@@ -87,7 +87,6 @@ function buildString(){
 
   var noms = {
    'attr':    attrBite,
-   'xScale':  scaleBite,
    'tooltip': ttBite,
 
    // events <- add more, consider method to take other DOM methods
@@ -113,10 +112,6 @@ function buildString(){
     return function(type){
       return ".on('" + type + "', " + bite + ")";
     }
-  }
-
-  function scaleBite(bite){
-    return "";
   }
 
   function ttBite (bite, parent){
@@ -157,7 +152,30 @@ function buildString(){
   }
  
 
-  // Mini Assemblers
+  // Mini Assemblers (listed alpha)
+
+  function assembleAxes(type, itself){
+    var ministr   = "",
+        minitype  = type.slice(0,1);
+
+    function innerAssemble(type, content){
+      var tinystr   = "",
+          defOrient = { x: 'left', y: 'bottom' };
+      
+      (type === 'scale') && (tinystr += "." + type + "(" + (content || (minitype + _.capitalize(type))) + ")");
+      (type === 'orient') && (tinystr += "." + type + "('" + (content || defOrient[minitype]) + "')");
+      
+      return tinystr;
+    }
+
+    ministr += "var " + type + " = d3.svg.axis()"
+    ministr += itself[type].hasOwnProperty('scale') ? innerAssemble('scale', itself[type].scale) : innerAssemble('scale');
+    ministr += itself[type].hasOwnProperty('orient') ? innerAssemble('orient', itself[type].orient) : innerAssemble('orient');
+    ministr += ";\n"
+
+    return ministr;
+  }
+
 
   function assembled3things(director, itself, inter){ // expect to use inter later
     if(director === 'pre'){
@@ -204,7 +222,7 @@ function buildString(){
   }
 
 
-  // Main Assmemblers
+  // Main Assmemblers (listed bottom to top)
 
   // call this for each object in elemKeys || call on children of everything in canvasKeys and eliminate elKeys?
   function assembleFirstAtom(key){
@@ -334,9 +352,14 @@ function buildString(){
     obk.children.length && (str += assembleFirstAtom(obk.children[0]));
 
     // any other elements
-    (obk.children.length) > 1 && (str += assembleRestAtoms(obk.children));
+    (obk.children.length) > 1 && (str += assembleRestAtoms(obk.children) + ';\n');
 
+    // add in axes, if they exist
 
+    (obk.hasOwnProperty('xAxis')) && (str += assembleAxes('xAxis', obk));
+    (obk.hasOwnProperty('yAxis')) && (str += assembleAxes('yAxis', obk));    
+
+    // close it up!
     str += "};"
     return str;
   }
