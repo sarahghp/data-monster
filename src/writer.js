@@ -86,8 +86,10 @@ function buildString(){
   // Noms & funcs
 
   var noms = {
-   'attr':    attrBite,
+   'attr'   : attrBite,
    'tooltip': ttBite,
+   'style'  : defaultBite,
+   'text'   : defaultBite,
 
    // events <- add more, consider method to take other DOM methods
     'click'     :   function(args){ return eventBite(args)('click')},
@@ -156,14 +158,15 @@ function buildString(){
 
   function assembleAxes(type, itself){
     var ministr   = "",
-        minitype  = type.slice(0,1);
+        minitype  = type.slice(0,1),  
+        inkey     = Object.keys(itself[type]);
 
-    function innerAssemble(type, content){
+    function innerAssemble(kind, content){
       var tinystr   = "",
           defOrient = { x: 'left', y: 'bottom' };
       
-      (type === 'scale') && (tinystr += "." + type + "(" + (content || (minitype + _.capitalize(type))) + ")");
-      (type === 'orient') && (tinystr += "." + type + "('" + (content || defOrient[minitype]) + "')");
+      (kind === 'scale') && (tinystr += "." + kind + "(" + (content || (minitype + _.capitalize(kind))) + ")");
+      (kind === 'orient') && (tinystr += "." + kind + "('" + (content || defOrient[minitype]) + "')");
       
       return tinystr;
     }
@@ -172,6 +175,18 @@ function buildString(){
     ministr += itself[type].hasOwnProperty('scale') ? innerAssemble('scale', itself[type].scale) : innerAssemble('scale');
     ministr += itself[type].hasOwnProperty('orient') ? innerAssemble('orient', itself[type].orient) : innerAssemble('orient');
     ministr += ";\n"
+
+    ministr += "svg.append('g')"
+    ministr += ".attr('class','" + minitype + "axis')"
+    ministr += ".attr('transform', 'translate(0,' + height + ')')"
+    ministr += ".append('text')"
+
+    inkey = _.pull(inkey, 'scale', 'orient');
+    console.log(inkey);
+    ministr += (biteBiteBite(inkey, itself[type]));
+    
+
+        
 
     return ministr;
   }
