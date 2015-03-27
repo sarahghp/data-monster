@@ -55,16 +55,16 @@
 
 // Example
 
-{ 'data-20d59c0f-076d-4387-9438-81bfe905c468':
+{ 'data-eb544ee9-5824-4725-8e18-dc88d39fa109':
    { file: 'van_gogh_additional_measurements.tsv',
      filetype: '.tsv',
      clean: [Function],
      funcs: [ [Function: tiger], [Function: kitty] ],
      children:
-      [ 'canvas-a15d977b-0123-418d-8b1e-973c27c21036',
-        'canvas-13da326e-8ea2-4704-a87d-efb8290c9693' ] },
-  'canvas-a15d977b-0123-418d-8b1e-973c27c21036':
-   { parent: 'data-20d59c0f-076d-4387-9438-81bfe905c468',
+      [ 'canvas-8818f339-43eb-438c-9d82-3fc3a940abba',
+        'canvas-ea8ea461-989c-4826-8ff7-e80d156d1e7c' ] },
+  'canvas-8818f339-43eb-438c-9d82-3fc3a940abba':
+   { parent: 'data-eb544ee9-5824-4725-8e18-dc88d39fa109',
      width: 1000,
      height: 600,
      margins: { short_params: [ '20', '20', '60', '60' ] },
@@ -75,41 +75,44 @@
         domain: { short_params: [ '0', 'height' ] },
         range: { short_params: [ '200', '400' ] } },
      children:
-      [ 'elem-97f7dc7b-ced1-47e5-a864-a9305afd158e',
-        'elem-df2a35cd-5b0f-4892-b7e4-9e2142d71c89' ],
+      [ 'elem-47dacdf9-6ad6-44a8-9c69-de845166a891',
+        'elem-047d1ef3-92ce-4679-a377-ec4378ac4e9d' ],
      xPrim: 'd.ratio',
      yPrim: 'd.Shape_Count',
      xAxis:
-      { attr: [ { class: 'label' }, { x: { variable: 'width' } }, { y: 50 } ],
-        style: [ { 'text-anchor': 'end' } ],
+      { attr:
+         [ [ 'class', 'label' ],
+           [ 'x', { variable: 'width' } ],
+           [ 'y', 50 ] ],
+        style: [ [ 'text-anchor', 'end' ] ],
         text: [ 'Height: Width Ratio' ] },
      yAxis:
-      { attr: [ { class: 'label' }, { y: -10 } ],
-        style: [ { 'text-anchor': 'end' } ],
+      { attr: [ [ 'class', 'label' ], [ 'y', -10 ] ],
+        style: [ [ 'text-anchor', 'end' ] ],
         text: [ 'Num Shapes' ] } },
-  'elem-97f7dc7b-ced1-47e5-a864-a9305afd158e':
-   { parent: 'canvas-a15d977b-0123-418d-8b1e-973c27c21036',
+  'elem-47dacdf9-6ad6-44a8-9c69-de845166a891':
+   { parent: 'canvas-8818f339-43eb-438c-9d82-3fc3a940abba',
      type: 'circle',
      req_specs: { cx: [Function], cy: [Function], r: 4, fill: [Function] },
      attr: [ [ 'class', 'dot' ] ],
      tooltip:
       { text: 'default',
-        parent: 'elem-97f7dc7b-ced1-47e5-a864-a9305afd158e' },
+        parent: 'elem-47dacdf9-6ad6-44a8-9c69-de845166a891' },
      click: [Function] },
-  'elem-df2a35cd-5b0f-4892-b7e4-9e2142d71c89':
-   { parent: 'canvas-a15d977b-0123-418d-8b1e-973c27c21036',
+  'elem-047d1ef3-92ce-4679-a377-ec4378ac4e9d':
+   { parent: 'canvas-8818f339-43eb-438c-9d82-3fc3a940abba',
      type: 'line',
      req_specs: { x1: 0, y1: 100, x2: { variable: 'width' }, y2: 100 } },
-  'canvas-13da326e-8ea2-4704-a87d-efb8290c9693':
-   { parent: 'data-20d59c0f-076d-4387-9438-81bfe905c468',
+  'canvas-ea8ea461-989c-4826-8ff7-e80d156d1e7c':
+   { parent: 'data-eb544ee9-5824-4725-8e18-dc88d39fa109',
      width: 100,
      height: 60,
      margins: { short_params: [ '20', '20', '60', '60' ] },
      selector: '#booooop',
-     children: [ 'elem-2f9509c6-3d78-419f-974c-9f0a8f909117' ],
+     children: [ 'elem-08b6b0fe-3c07-46cf-a194-a2fe23c2aa9d' ],
      xPrim: 'd.ratio',
      yPrim: 'd.Shape_Count' },
-  'elem-2f9509c6-3d78-419f-974c-9f0a8f909117':
-   { parent: 'canvas-13da326e-8ea2-4704-a87d-efb8290c9693',
+  'elem-08b6b0fe-3c07-46cf-a194-a2fe23c2aa9d':
+   { parent: 'canvas-ea8ea461-989c-4826-8ff7-e80d156d1e7c',
      type: 'circle',
      req_specs: { cx: [Function], cy: [Function], r: 4, fill: [Function] } } }

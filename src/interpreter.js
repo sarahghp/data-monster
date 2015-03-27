@@ -179,25 +179,8 @@ function chomper(ast){
         axisObj = (structure[parent][(type + 'Axis')] = Object.create(Object.prototype));
 
         _.forEach(ast[0].exp, function(el){
-          var valArr     = el.exp,
-              val;
 
-          if (valArr.length === 1 && (typeof valArr[0] === 'string')){
-            val = valArr[0] // strings pass through
-          } else if (Array.isArray(valArr[0])){
-            var inside_obj = Object.create(Object.prototype);
-
-            _.forEach(valArr, function(inside_el){
-              inside_obj[inside_el[0]] = inside_el[1];
-            });
-
-            val = inside_obj;
-
-          } else {
-            console.log('Unexpected input to axis.');
-          }
-
-          axisObj[el.op] = val;
+          axisObj[el.op] = el.exp;
 
         });
 
