@@ -178,6 +178,8 @@ function chomper(ast){
     var type    = ast[0].op.split('-')[1],
         axisObj = (structure[parent][(type + 'Axis')] = Object.create(Object.prototype));
 
+        axisObj.parent = parent;
+
         _.forEach(ast[0].exp, function(el){
 
           axisObj[el.op] = el.exp;
@@ -287,7 +289,7 @@ function chomper(ast){
     return generate(el);
   });
 
-  console.log('final', util.inspect(structure, false, null));
+  // console.log('final', util.inspect(structure, false, null));
 
   return structure;
 

@@ -34,7 +34,7 @@ function buildString(){
         biteName = toc.shift()
         bite     = contents[biteName]; 
 
-    str += noms[biteName](bite, contents);
+    str += noms[biteName](bite, contents.parent);
 
     if (toc.length) { 
       return biteBiteBite(toc, contents, str);  
@@ -45,15 +45,20 @@ function buildString(){
 
   function eatVars(collection, parent){
     var collect = collection;
-    _.forEach(collect, function(val, key){
+
+    _.forEach(collect, function(val, key, cl){
       // iterate on collection and if a val is an object with property variable, replace that with the value in variable
-      if (typeof val === 'object' && !(val instanceof Array) && val.hasOwnProperty('variable')){
-        if (d3things[val.variable]) {
-          collect[key] = assembled3things(d3things[val.variable], val.variable); // pass pre or post as arg
-        } else if (choms[parent][val.variable]) {
-          collect[key] = choms[parent][val.variable];
+      if(key === 'variable'){
+        if (d3things[val]){
+          collect = assembled3things(d3things[val], val); 
         } else {
-          console.log(val.variable + ' is not defined.')
+          collect = lookup(val, parent);
+        }
+      } else if (typeof val === 'object' && val.hasOwnProperty('variable')){
+        if (d3things[val.variable]) {
+          collect[key] = assembled3things(d3things[val.variable], val.variable); // passes pre or post as arg
+        } else {
+          collect[key] = lookup(val.variable, parent);
         }
       }
     });
@@ -64,6 +69,20 @@ function buildString(){
     return _.filter(keys, function(el){
       return el.match('' + type + '');
     });
+  }
+
+  function lookup(toFind, scope){
+
+    if (choms[scope].hasOwnProperty('parent')){
+      if (choms[scope].hasOwnProperty(toFind)){
+        return choms[scope][toFind];
+      } else {
+        lookup(toFind, choms[parent]);
+      }
+    } else {
+      console.log(toFind + ' is not defined.')
+    }
+
   }
 
   // let's make more tables of contents over which to iterate!
@@ -99,12 +118,12 @@ function buildString(){
     'hover'     :   function(args){ return eventBite(args)('hover')},
   }
 
-  function attrBite(bite){
+  function attrBite(bite, parent){
     var ministr = "",
         miniobj = Object.create(Object.prototype);
 
     _.forEach(bite, function(el){
-      miniobj[el[0]] = el[1];
+      miniobj[el[0]] = eatVars(el[1], parent); // removed arary wrapper here
     })
 
     return ".attr(" + pretty(miniobj) + ")"; 
@@ -120,8 +139,9 @@ function buildString(){
 
     ttBool = true;
 
-    var grandparent = choms[parent.parent],
+    var pobj    = choms[parent],
         ministr = "";
+
 
     ministr+= ".on('mouseover', function(d){"
     ministr+= "var xPosition = event.clientX + scrollX < width - 200 ? event.clientX + scrollX : event.clientX + scrollX - 200,\n"
@@ -129,7 +149,7 @@ function buildString(){
     ministr+= "text = " 
 
     if (bite.text === 'default') {
-      ministr += grandparent.xPrim + " + '; ' + " + grandparent.yPrim;
+      ministr += pobj.xPrim + " + '; ' + " + pobj.yPrim;
     } else {
       ministr += bite.text;
     }
@@ -181,12 +201,10 @@ function buildString(){
     ministr += ".attr('transform', 'translate(0,' + height + ')')"
     ministr += ".append('text')"
 
-    inkey = _.pull(inkey, 'scale', 'orient');
-    console.log(inkey);
+    inkey = _.pull(inkey, 'scale', 'orient', 'parent');
+    
     ministr += (biteBiteBite(inkey, itself[type]));
     
-
-        
 
     return ministr;
   }
@@ -218,7 +236,7 @@ function buildString(){
     if(director === 'user'){
       var obn = itself[type + "Scale"];
       
-      ministr += eatVars([obn.scale]) + "()"
+      ministr += eatVars(obn.scale) + "()"
       ministr += ".domain([" + obn.domain.short_params[0] + ", " + obn.domain.short_params[1] + "])"
       ministr += ".range([" + obn.range.short_params[0] + ", " + obn.range.short_params[1] + "])";
       
