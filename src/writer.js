@@ -34,7 +34,11 @@ function buildString(){
         biteName = toc.shift()
         bite     = contents[biteName]; 
 
-    str += noms[biteName](bite, contents.parent);
+    if(noms[biteName]){
+      str += noms[biteName](bite, contents.parent);
+    } else {
+      str += defaultBite(bite, biteName);
+    }
 
     if (toc.length) { 
       return biteBiteBite(toc, contents, str);  
@@ -46,7 +50,14 @@ function buildString(){
   function eatVars(collection, parent){
     var collect = collection;
 
-    _.forEach(collect, function(val, key, cl){
+    // console.log('collect', collect)
+
+    if (_.isArray(collect) && _.isString(collect[0])){
+      console.log('if called', collect[0])
+      return '"' +  collect[0] + '"';
+    }
+
+    _.forEach(collect, function(val, key){
       // iterate on collection and if a val is an object with property variable, replace that with the value in variable
       if(key === 'variable'){
         if (d3things[val]){
@@ -106,9 +117,8 @@ function buildString(){
 
   var noms = {
    'attr'   : attrBite,
+   'style'  : styleBite,
    'tooltip': ttBite,
-   'style'  : defaultBite,
-   'text'   : defaultBite,
 
    // events <- add more, consider method to take other DOM methods
     'click'     :   function(args){ return eventBite(args)('click')},
@@ -127,6 +137,22 @@ function buildString(){
     })
 
     return ".attr(" + pretty(miniobj) + ")"; 
+  }
+
+  function styleBite(bite, parent){
+    var ministr = "",
+        miniobj = Object.create(Object.prototype);
+
+    _.forEach(bite, function(el){
+      miniobj[el[0]] = eatVars(el[1], parent); // removed arary wrapper here
+    })
+
+    return ".style(" + pretty(miniobj) + ")"; 
+  }
+
+  function defaultBite(bite, biteName){
+    console.log('default', bite, biteName)
+    return "." + biteName + "(" + eatVars(bite) + ")";
   }
 
   function eventBite(bite){
@@ -169,9 +195,6 @@ function buildString(){
     return ministr;
   }
 
-  function defaultBite(bite){
-    return "";
-  }
  
 
   // Mini Assemblers (listed alpha)
