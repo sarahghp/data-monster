@@ -454,7 +454,7 @@ function buildString(){
         output +=  assembleQueues(el);
       });
 
-      fs.writeFile('output.txt', output);
+      fs.writeFile('output.js', output);
       return output; 
 
     })();

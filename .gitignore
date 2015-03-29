@@ -4,4 +4,5 @@ src/*.dm
 */monster-files
 upfiles/*
 REPL
-output.txt
+output.*
+web_test/*
