@@ -203,7 +203,7 @@ function buildString(){
 
     function innerAssemble(kind, content){
       var tinystr   = "",
-          defOrient = { x: 'left', y: 'bottom' };
+          defOrient = { x: 'bottom', y: 'left' };
       
       (kind === 'scale') && (tinystr += "." + kind + "(" + (content || (minitype + _.capitalize(kind))) + ")");
       (kind === 'orient') && (tinystr += "." + kind + "('" + (content || defOrient[minitype]) + "')");
@@ -217,8 +217,11 @@ function buildString(){
     ministr += ";\n"
 
     ministr += "svg.append('g')"
-    ministr += ".attr('class','" + minitype + "axis')"
-    ministr += ".attr('transform', 'translate(0,' + height + ')')"
+    ministr += ".attr('class','" + minitype + " axis')";
+    
+    (minitype === 'x') && (ministr += ".attr('transform', 'translate(0,' + height + ')')")
+
+    ministr += ".call(" + type + ")"
     ministr += ".append('text')"
 
     inkey = _.pull(inkey, 'scale', 'orient', 'parent');
