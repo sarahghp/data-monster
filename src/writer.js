@@ -373,7 +373,7 @@ function buildString(){
     obk.height  = obk.height - obl.top - obl.bottom;
 
     // open func
-    str += "function draw-" + key + "(data){ \n"
+    str += "function draw_" + key + "(data){ \n"
 
     // canvas vars — width & height are less idiomatic / precalculated for use throughout
     str += "var margin = " + pretty(obl) + ", \n"
@@ -422,7 +422,7 @@ function buildString(){
     var str = "",
         obk = choms[key];
 
-    str += "function draw-" + key + "(rawData){\n"
+    str += "function draw_" + key + "(rawData){\n"
 
     // do data cleaning
 
@@ -430,13 +430,13 @@ function buildString(){
 
     // call child canvases
 
-    str += stringifyList(obk.children, 'draw-', '(rawData)', '; ') + '}'
+    str += stringifyList(obk.children, 'draw_', '(rawData)', '; ') + '}'
     str += "\n\n"
     str += "queue().defer(d3" + obk.filetype + ", '"
     str += obk.file + "')"
     str += ".await( function(err, data) { \n"
     str += "if(err){ console.log(err) } \n"
-    str += "draw-" + key + "(data); } );"
+    str += "draw_" + key + "(data); } );"
 
     return str;  
 
@@ -458,11 +458,6 @@ function buildString(){
       return output; 
 
     })();
-
-  // popArrs();
-  // output += assembleFirstAtom(elemKeys[0]);
-  // output += assembleQueues(dataKeys[0]);
-  // output += assembleDrawFuncs(canvasKeys[0]);
   
   // console.log(util.inspect(output, false, null));
    

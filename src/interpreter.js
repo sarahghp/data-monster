@@ -59,7 +59,7 @@ function chomper(ast){
   function createNode(ast, parent){
 
     // create unique id for node and add it to the structure object
-    var id = ast[0].op + '-' + uuid();
+    var id = ast[0].op + '_' + uuid().split('-').join('_');
     structure[id] = Object.create(Object.prototype);
 
     // call the appropriate generation function on child exp
