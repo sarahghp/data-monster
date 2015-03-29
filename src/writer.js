@@ -442,20 +442,30 @@ function buildString(){
 
   }
 
-  // once I have a bunch of strings populate output in the right order
-  function metaAssemble(){
-    // output += all the draw functions <- reduce
-    // output += the queue functions
-    // return output
-  }
+  // populate output in the right order
+  (function metaAssemble(){
+      popArrs();
 
-  popArrs();
+      _.forEach(canvasKeys, function(el){
+        output += assembleDrawFuncs(el) + "\n";
+      });
+
+      _.forEach(dataKeys, function(el){
+        output +=  assembleQueues(el);
+      });
+
+      fs.writeFile('output.txt', output);
+      return output; 
+
+    })();
+
+  // popArrs();
   // output += assembleFirstAtom(elemKeys[0]);
   // output += assembleQueues(dataKeys[0]);
-  output += assembleDrawFuncs(canvasKeys[0]);
-  fs.writeFile('output.txt', output);
+  // output += assembleDrawFuncs(canvasKeys[0]);
+  
   // console.log(util.inspect(output, false, null));
-  return output;  
+   
 }
 
 exports.string  = buildString();
