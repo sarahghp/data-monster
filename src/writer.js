@@ -43,6 +43,7 @@ function buildString(){
     if (toc.length) { 
       return biteBiteBite(toc, contents, str);  
     } else {
+      str += ";\n"
       return str;
     }
   }
@@ -50,10 +51,7 @@ function buildString(){
   function eatVars(collection, parent){
     var collect = collection;
 
-    // console.log('collect', collect)
-
     if (_.isArray(collect) && _.isString(collect[0])){
-      console.log('if called', collect[0])
       return '"' +  collect[0] + '"';
     }
 
@@ -151,7 +149,6 @@ function buildString(){
   }
 
   function defaultBite(bite, biteName){
-    console.log('default', bite, biteName)
     return "." + biteName + "(" + eatVars(bite) + ")";
   }
 
