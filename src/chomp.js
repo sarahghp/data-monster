@@ -1,12 +1,14 @@
-var fs      = require('fs'),
-    path    = require('path'),
-    _       = require('lodash'),
-    ttFiles  = require('../src/writer.js').ttFiles;
+var fs       = require('fs'),
+    path     = require('path'),
+    _        = require('lodash'),
+    parser   = require('../src/parser.js'),
+    writer   = require('../src/writer.js'),
+    flags    = writer.flags;
 
 
 function compile(){
 
-  console.log(ttFiles);
+  console.log('flags', flags);
 
   var inputs   = process.argv,
       iL       = inputs.length,
@@ -62,29 +64,14 @@ function compile(){
   // What it is we want to do to the files — this is where the interpreter will be called eventaully
 
   var changes =  function(files){
-    return _.forEach(files, function mapper(file){
+    // call grammar gen once, then 
+    parser.build();
 
-      // Check that the file is type data-monster
-
-      if (path.extname(file) !== '.dm'){
-        throw "I'm sorry but I can only chomp data-monster (.dm) files";
-      }
-
-      // otherwise remove .dm, add .js
-
-      var title = file.slice(0, -3),   
-        outputTitle = title + '.js'; 
-
-
-      // Then do things to file
-
-      fs.readFile(file, function wordBack(err, data){
-        
-        if (err) throw err;
-
-        var output = (function addCat(word){
-          return word + 'Cat';
-        })(data);
+    _.forEach(files, function interpret(file){
+      var structure   = parser.structure(file),
+          output      = writer.string(structure),
+          title       = file.slice(0, -3),
+          outputTitle = title + '.js';
 
         // Then write out js file(s) to output directory
 
@@ -95,7 +82,6 @@ function compile(){
           console.log(' Nom nom the data monster has chomped ' + file + '\n\n v   V  \n  ^ ^ \n\n');
         });
       });
-    });
   }
 
 
@@ -106,10 +92,10 @@ function compile(){
 
   // Finally add in HTML & CSS helper files if necessary
   _.defer(function(){
-    if (ttFiles){
-      console.log('tt called');
-      fs.createReadStream('tt.html').pipe(fs.createWriteStream(outDir+'/tt.html'));
-      fs.createReadStream('tt.css').pipe(fs.createWriteStream(outDir+'/tt.css'));
+    if (flags.ttBool){
+      // console.log('tt called', __dirname);
+      fs.createReadStream( __dirname + '/tt.html').pipe(fs.createWriteStream(outDir + '/tt.html'));
+      fs.createReadStream(__dirname + '/tt.css').pipe(fs.createWriteStream('/Users/breakers/Sites/data-monster/src/monster-files/tt.css'));
     }
   })
 

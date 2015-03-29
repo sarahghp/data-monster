@@ -1,14 +1,16 @@
 var fs      = require('fs'),
     util    = require('util'),
     _       = require('lodash'),
-    pretty  = require('js-object-pretty-print').pretty,    
-    choms   = require('./parser.js').structure;
+    pretty  = require('js-object-pretty-print').pretty;    
 
-var ttBool  = false; // is set to true by tooltips, to output companion files
+var flags = { ttBool: false }; // is set to true by tooltips, to output companion files
 
-function buildString(){
+function buildString(structure){
+
+  // console.log('in writer', structure);
  
- var output     = "",                   // this is the string that will be built
+ var choms      = structure,
+     output     = "",                   // this is the string that will be built
      keys       = Object.keys(choms),  // these are the keys we need to build it
      dataKeys   = [],
      canvasKeys = [],
@@ -160,7 +162,7 @@ function buildString(){
 
   function ttBite (bite, parent){
 
-    ttBool = true;
+    flags.ttBool = true;
 
     var pobj    = choms[parent],
         ministr = "";
@@ -458,13 +460,13 @@ function buildString(){
       });
 
       fs.writeFile('output.js', output);
-      return output; 
 
     })();
   
+  return output; 
   // console.log(util.inspect(output, false, null));
    
 }
 
-exports.string  = buildString();
-exports.ttFiles = ttBool; 
+exports.string  = buildString;
+exports.flags   = flags;
