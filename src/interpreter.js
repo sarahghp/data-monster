@@ -47,9 +47,9 @@ function chomper(ast){
     var val;
 
     if (wrapper){
-      val = 'var moo = function(d){ ' + wrapper + '(' + toInter + ') }';
+      val = 'var moo = function(d){ return ' + wrapper + '(' + toInter + ') }';
     } else {
-      val = 'var moo = function(d){ ' + toInter + ' }';
+      val = 'var moo = function(d){ return ' + toInter + ' }';
     }
     
     eval(val);

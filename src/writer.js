@@ -134,7 +134,7 @@ function buildString(){
       miniobj[el[0]] = eatVars(el[1], parent); // removed arary wrapper here
     })
 
-    return ".attr(" + pretty(miniobj) + ")"; 
+    return ".attr(" + pretty(miniobj, 4, "JSON") + ")"; 
   }
 
   function styleBite(bite, parent){
@@ -145,7 +145,7 @@ function buildString(){
       miniobj[el[0]] = eatVars(el[1], parent); // removed arary wrapper here
     })
 
-    return ".style(" + pretty(miniobj) + ")"; 
+    return ".style(" + pretty(miniobj, 4, "JSON") + ")"; 
   }
 
   function defaultBite(bite, biteName){
@@ -244,7 +244,7 @@ function buildString(){
     var ministr = "";
     ministr+= "var maxY = d3.max(data, function(d){return " +  itself.yPrim + " }),\n"
     ministr+= "maxX = d3.max(data, function(d){return " + itself.xPrim + "});\n\n" 
-    ministr+= "maxY = maxShapes + (maxShapes * .25) // Make it a little taller\n"
+    ministr+= "maxY = maxY + (maxY * .25) // Make it a little taller\n"
 
     return ministr;
   }
@@ -394,12 +394,12 @@ function buildString(){
     str += obk.hasOwnProperty('color') ? (", \n color = " + eatVars(obk.color) + "(); \n") : ";\n"
 
     // add in svg
-    str += "d3.select('" + obk.selector + "')"
+    str += "var svg = d3.select('" + obk.selector + "')"
     str += ".append('svg')"
     str += ".attr('width', width  + margin.left + margin.right)"
     str += ".attr('height', height + margin.top + margin.bottom)"
     str += ".append('g')"
-    str += ".attr('transform', 'translate(' + margin.left + ', ' + margin.top ')');"
+    str += ".attr('transform', 'translate(' + margin.left + ', ' + margin.top + ')');"
 
     // first element
     obk.children.length && (str += assembleFirstAtom(obk.children[0]));
