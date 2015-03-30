@@ -7,8 +7,6 @@ var fs      = require('fs'),
 var flags = { ttBool: false }; // is set to true by tooltips, to output companion files
 
 function buildString(structure){
-
-  // console.log('in writer', structure);
  
  var choms      = structure,
      output     = "",                   // this is the string that will be built
@@ -46,7 +44,7 @@ function buildString(structure){
     if (toc.length) { 
       return biteBiteBite(toc, contents, str);  
     } else {
-      str += ";\n"
+      str += "; \n"
       return str;
     }
   }
@@ -134,7 +132,7 @@ function buildString(structure){
         miniobj = Object.create(Object.prototype);
 
     _.forEach(bite, function(el){
-      miniobj[el[0]] = eatVars(el[1], parent); // removed arary wrapper here
+      miniobj[el[0]] = eatVars(el[1], parent);
     })
 
     return ".attr(" + pretty(miniobj, 4, "JSON") + ")"; 
@@ -145,7 +143,7 @@ function buildString(structure){
         miniobj = Object.create(Object.prototype);
 
     _.forEach(bite, function(el){
-      miniobj[el[0]] = eatVars(el[1], parent); // removed arary wrapper here
+      miniobj[el[0]] = eatVars(el[1], parent);
     })
 
     return ".style(" + pretty(miniobj, 4, "JSON") + ")"; 
@@ -169,10 +167,10 @@ function buildString(structure){
         ministr = "";
 
 
-    ministr+= ".on('mouseover', function(d){"
-    ministr+= "var xPosition = event.clientX + scrollX < width - 200 ? event.clientX + scrollX : event.clientX + scrollX - 200,\n"
-    ministr+= "yPosition = event.clientY + scrollY + 100 > height ? event.clientY + scrollY - 25 : event.clientY + scrollY + 5,\n"
-    ministr+= "text = " 
+    ministr+= ".on('mouseover', function(d){";
+    ministr+= "var xPosition = event.clientX + scrollX < width - 200 ? event.clientX + scrollX : event.clientX + scrollX - 200,";
+    ministr+= "yPosition = event.clientY + scrollY + 100 > height ? event.clientY + scrollY - 25 : event.clientY + scrollY + 5,";
+    ministr+= "text = ";
 
     if (bite.text === 'default') {
       ministr += pobj.xPrim + " + '; ' + " + pobj.yPrim;
@@ -180,17 +178,15 @@ function buildString(structure){
       ministr += bite.text;
     }
 
-    ministr+= ";\n"
-    ministr+= "d3.select('#tooltip')\n"
-    ministr+= ".style('left', xPosition + 'px')\n"
-    ministr+= ".style('top', yPosition + 'px')\n"
-    ministr+= ".select('#values')\n"
-    ministr+= ".text(text);\n"
-    ministr+= "d3.select('#tooltip').classed('hidden', false); })\n"
-    ministr+= ".on('mouseout', function(){\n"
-    ministr+= "d3.select('#tooltip').classed('hidden', true); })\n"
-
-    // call html & css file generation functions <-- put in another file & just call from here
+    ministr+= ";";
+    ministr+= "d3.select('#tooltip')";
+    ministr+= ".style('left', xPosition + 'px')";
+    ministr+= ".style('top', yPosition + 'px')";
+    ministr+= ".select('#values')";
+    ministr+= ".text(text);";
+    ministr+= "d3.select('#tooltip').classed('hidden', false); })";
+    ministr+= ".on('mouseout', function(){";
+    ministr+= "d3.select('#tooltip').classed('hidden', true); })";
 
     return ministr;
   }
@@ -214,18 +210,18 @@ function buildString(structure){
       return tinystr;
     }
 
-    ministr += "var " + type + " = d3.svg.axis()"
+    ministr += "var " + type + " = d3.svg.axis()";
     ministr += itself[type].hasOwnProperty('scale') ? innerAssemble('scale', itself[type].scale) : innerAssemble('scale');
     ministr += itself[type].hasOwnProperty('orient') ? innerAssemble('orient', itself[type].orient) : innerAssemble('orient');
-    ministr += ";\n"
+    ministr += ";";
 
-    ministr += "svg.append('g')"
+    ministr += "svg.append('g')";
     ministr += ".attr('class','" + minitype + " axis')";
     
-    (minitype === 'x') && (ministr += ".attr('transform', 'translate(0,' + height + ')')")
+    (minitype === 'x') && (ministr += ".attr('transform', 'translate(0,' + height + ')')");
 
-    ministr += ".call(" + type + ")"
-    ministr += ".append('text')"
+    ministr += ".call(" + type + ")";
+    ministr += ".append('text')";
 
     inkey = _.pull(inkey, 'scale', 'orient', 'parent');
     
@@ -242,15 +238,15 @@ function buildString(structure){
     } else if (director === 'post'){
       return 'd3.' + itself + '.scale'
     } else {
-      console.log('Cannot assemble d3things; unknown director.\n');
+      console.log('Cannot assemble d3things; unknown director.');
     }
   }
 
   function assembleMaxes(itself){
     var ministr = "";
-    ministr+= "var maxY = d3.max(data, function(d){return " +  itself.yPrim + " }),\n"
-    ministr+= "maxX = d3.max(data, function(d){return " + itself.xPrim + "});\n\n" 
-    ministr+= "maxY = maxY + (maxY * .25) // Make it a little taller\n"
+    ministr+= "var maxY = d3.max(data, function(d){return " +  itself.yPrim + " }),";
+    ministr+= "maxX = d3.max(data, function(d){return " + itself.xPrim + "});"; 
+    ministr+= "maxY = maxY + (maxY * .25) // Make it a little taller \n";
 
     return ministr;
   }
@@ -262,18 +258,18 @@ function buildString(structure){
     if(director === 'user'){
       var obn = itself[type + "Scale"];
       
-      ministr += eatVars(obn.scale) + "()"
-      ministr += ".domain([" + obn.domain.short_params[0] + ", " + obn.domain.short_params[1] + "])"
+      ministr += eatVars(obn.scale) + "()";
+      ministr += ".domain([" + obn.domain.short_params[0] + ", " + obn.domain.short_params[1] + "])";
       ministr += ".range([" + obn.range.short_params[0] + ", " + obn.range.short_params[1] + "])";
       
-      (type === 'x') && (ministr += ", \n")
+      (type === 'x') && (ministr += ", ");
     
     } else if (director === 'default'){
       (type === 'x') && (ministr += "d3.scale.linear().domain([0, maxX]).range([0, width])");
       (type === 'y') && (ministr += "d3.scale.linear().domain([0, maxY]).range([height, 0])");  
     
     } else {
-      console.log('Cannot assemble scale; unknown director.\n');
+      console.log('Cannot assemble scale; unknown director.');
     }
 
     return ministr;
@@ -283,7 +279,6 @@ function buildString(structure){
 
   // Main Assmemblers (listed bottom to top)
 
-  // call this for each object in elemKeys || call on children of everything in canvasKeys and eliminate elKeys?
   function assembleFirstAtom(key){
     var obk   = choms[key],
         inkey = Object.keys(obk),
@@ -298,8 +293,6 @@ function buildString(structure){
     str += ")";
     str += ".append('" + obk.type + "')";
     str += ".attr(" + pretty(eatVars(obk.req_specs, obk.parent), 4, 'PRINT', true) + ")";
-
-    // remove 'parent', 'type', 'req_specs' from inkey
 
     inkey = _.pull(inkey, 'parent', 'type', 'req_specs');
 
@@ -320,11 +313,11 @@ function buildString(structure){
       var obk = choms[el],
           inkey = Object.keys(obk);
 
-      str += "svg.append('g')"
-      str += ".attr('class', "
-      str += (obk.elemSelect || "'elements'") + ")"
+      str += "svg.append('g')";
+      str += ".attr('class', ";
+      str += (obk.elemSelect || "'elements'") + ")";
       str += ".append('" + obk.type + "')"
-      str += ".attr(" + pretty(eatVars(obk.req_specs, obk.parent), 4, 'PRINT', true) + ")"
+      str += ".attr(" + pretty(eatVars(obk.req_specs, obk.parent), 4, 'PRINT', true) + ")";
 
       inkey = _.pull(inkey, 'parent', 'type', 'req_specs');
 
@@ -373,20 +366,17 @@ function buildString(structure){
     }
 
     // set data width & height to calculated versions for use in eatVars 
-    // someday I'd like to come up with a better approach || maybe just push all user-defined vars into obj?
     
     obk.width   = obk.width - obl.left - obl.right;
     obk.height  = obk.height - obl.top - obl.bottom;
 
     // open func
-    str += "function draw_" + key + "(data){ \n"
+    str += "function draw_" + key + "(data){ ";
 
     // canvas vars — width & height are less idiomatic / precalculated for use throughout
-    str += "var margin = " + pretty(obl) + ", \n"
-    str += "width = " + obk.width +  ", \n"
-    str += "height = " + obk.height + ";\n"
-
-    // scales & maxFuncs <-  will have to be updated to account for lines || just write own scale
+    str += "var margin = " + pretty(obl) + ", ";
+    str += "width = " + obk.width +  ", ";
+    str += "height = " + obk.height + ";";
 
     if(!(obk.hasOwnProperty('xScale') && obk.xScale.hasOwnProperty('domain')) || 
        !(obk.hasOwnProperty('yScale') && obk.yScale.hasOwnProperty('domain'))) {
@@ -394,18 +384,18 @@ function buildString(structure){
     }
 
     str += "var xScale = "
-    str += obk.hasOwnProperty('xScale') ? assembleScale('user', 'x', obk) : assembleScale('default', 'x') + ", \n"
-    str += "yScale = "
-    str += obk.hasOwnProperty('yScale') ? assembleScale('user', 'y', obk) : assembleScale('default', 'y')
-    str += obk.hasOwnProperty('color') ? (", \n color = " + eatVars(obk.color) + "(); \n") : ";\n"
+    str += obk.hasOwnProperty('xScale') ? assembleScale('user', 'x', obk) : assembleScale('default', 'x') + ", ";
+    str += "yScale = ";
+    str += obk.hasOwnProperty('yScale') ? assembleScale('user', 'y', obk) : assembleScale('default', 'y');
+    str += obk.hasOwnProperty('color') ? (", \n color = " + eatVars(obk.color) + "();") : ";";
 
     // add in svg
-    str += "var svg = d3.select('" + obk.selector + "')"
-    str += ".append('svg')"
-    str += ".attr('width', width  + margin.left + margin.right)"
-    str += ".attr('height', height + margin.top + margin.bottom)"
-    str += ".append('g')"
-    str += ".attr('transform', 'translate(' + margin.left + ', ' + margin.top + ')');"
+    str += "var svg = d3.select('" + obk.selector + "')";
+    str += ".append('svg')";
+    str += ".attr('width', width  + margin.left + margin.right)";
+    str += ".attr('height', height + margin.top + margin.bottom)";
+    str += ".append('g')";
+    str += ".attr('transform', 'translate(' + margin.left + ', ' + margin.top + ')');";
 
     // first element
     obk.children.length && (str += assembleFirstAtom(obk.children[0]));
@@ -414,7 +404,6 @@ function buildString(structure){
     (obk.children.length) > 1 && (str += assembleRestAtoms(obk.children) + ';\n');
 
     // add in axes, if they exist
-
     (obk.hasOwnProperty('xAxis')) && (str += assembleAxes('xAxis', obk));
     (obk.hasOwnProperty('yAxis')) && (str += assembleAxes('yAxis', obk));    
 
@@ -428,21 +417,20 @@ function buildString(structure){
     var str = "",
         obk = choms[key];
 
-    str += "function draw_" + key + "(rawData){\n"
+    str += "function draw_" + key + "(rawData){";
 
     // do data cleaning
 
-    str += "rawData.forEach(" + obk.clean + ");\n\n"
+    str += "rawData.forEach(" + obk.clean + ");";
 
     // call child canvases
 
-    str += stringifyList(obk.children, 'draw_', '(rawData)', '; ') + '}'
-    str += "\n\n"
-    str += "queue().defer(d3" + obk.filetype + ", '"
-    str += obk.file + "')"
-    str += ".await( function(err, data) { \n"
-    str += "if(err){ console.log(err) } \n"
-    str += "draw_" + key + "(data); } );"
+    str += stringifyList(obk.children, 'draw_', '(rawData)', '; ') + '} \n\n';
+    str += "queue().defer(d3" + obk.filetype + ", '";
+    str += obk.file + "')";
+    str += ".await( function(err, data) { ";
+    str += "if(err){ console.log(err) } ";
+    str += "draw_" + key + "(data); } );";
 
     return str;  
 
@@ -453,7 +441,7 @@ function buildString(structure){
       popArrs();
 
       _.forEach(canvasKeys, function(el){
-        output += assembleDrawFuncs(el) + "\n";
+        output += assembleDrawFuncs(el);
       });
 
       _.forEach(dataKeys, function(el){
