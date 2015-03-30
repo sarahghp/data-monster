@@ -382,8 +382,22 @@ function buildString(structure){
     obk.width   = obk.width - obl.left - obl.right;
     obk.height  = obk.height - obl.top - obl.bottom;
 
+    // check for global funcs
+    if(choms[obk.parent].hasOwnProperty('funcs')){
+      _.forEach(choms[obk.parent].funcs, function(el){
+        str += el;
+      });
+    }
+
     // open func
     str += "function draw_" + key + "(data){ ";
+
+    // check for canvas-scoped funcs
+    if(obk.hasOwnProperty('funcs')){
+      _.forEach(obk.funcs, function(el){
+        str += el;
+      });
+    }
 
     // canvas vars — width & height are less idiomatic / precalculated for use throughout
     str += "var margin = " + pretty(obl) + ", ";
