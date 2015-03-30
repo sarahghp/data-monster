@@ -1,7 +1,8 @@
 var fs      = require('fs'),
     util    = require('util'),
     _       = require('lodash'),
-    pretty  = require('js-object-pretty-print').pretty;    
+    pretty  = require('js-object-pretty-print').pretty, // unpacks objects
+    beautify = require('js-beautify').js_beautify;      // formats output
 
 var flags = { ttBool: false }; // is set to true by tooltips, to output companion files
 
@@ -463,7 +464,7 @@ function buildString(structure){
 
     })();
   
-  return output; 
+  return beautify(output, {"break_chained_methods": true}); 
   // console.log(util.inspect(output, false, null));
    
 }
