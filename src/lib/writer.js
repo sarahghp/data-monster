@@ -459,7 +459,7 @@ function buildString(structure){
         output +=  assembleQueues(el);
       });
 
-      fs.writeFile('output.js', output);
+      // fs.writeFile('output.js', output);
 
     })();
   

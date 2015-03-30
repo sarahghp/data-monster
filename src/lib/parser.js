@@ -15,8 +15,8 @@ function build(){
 }
 
 
-function chomp(file){
-  var file = fs.readFileSync(__dirname + '/' + file),
+function chomp(file, calledFrom){
+  var file = fs.readFileSync(file),
       ast  = parser.parse(file.toString());
   return chomper(ast);
 }

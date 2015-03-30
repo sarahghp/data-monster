@@ -1,8 +1,8 @@
 var fs       = require('fs'),
     path     = require('path'),
     _        = require('lodash'),
-    parser   = require('../src/parser.js'),
-    writer   = require('../src/writer.js'),
+    parser   = require('./lib/parser.js'),
+    writer   = require('./lib/writer.js'),
     flags    = writer.flags;
 
 
@@ -10,11 +10,14 @@ function compile(){
 
   console.log('flags', flags);
 
-  var inputs   = process.argv,
-      iL       = inputs.length,
-      files    = inputs.slice(2, iL),
-      lastFile = inputs[iL - 1],
+  var inputs      = process.argv,
+      iL          = inputs.length,
+      files       = inputs.slice(2, iL),
+      lastFile    = inputs[iL - 1],
+      calledFrom  = process.cwd(),
       outDir;
+
+      console.log('called from:', calledFrom);
 
   // Checks if last arg passed is a directory
 
@@ -23,7 +26,7 @@ function compile(){
       outDir = check;
       files.pop();
     } else {
-      outDir = 'monster-files';
+      outDir = calledFrom + '/monster-files';
     }
 
     // Create destination, using recommended handling of ignoring 'EEXIST' error  
@@ -68,7 +71,7 @@ function compile(){
     parser.build();
 
     _.forEach(files, function interpret(file){
-      var structure   = parser.structure(file),
+      var structure   = parser.structure(calledFrom + '/' + file),
           output      = writer.string(structure),
           title       = file.slice(0, -3),
           outputTitle = title + '.js';
@@ -93,9 +96,9 @@ function compile(){
   // Finally add in HTML & CSS helper files if necessary
   _.defer(function(){
     if (flags.ttBool){
-      // console.log('tt called', __dirname);
-      fs.createReadStream( __dirname + '/tt.html').pipe(fs.createWriteStream(outDir + '/tt.html'));
-      fs.createReadStream(__dirname + '/tt.css').pipe(fs.createWriteStream('/Users/breakers/Sites/data-monster/src/monster-files/tt.css'));
+      console.log('fs where?', __dirname);
+      fs.createReadStream(__dirname + '/lib/tt.html').pipe(fs.createWriteStream(outDir + '/tt.html'));
+      fs.createReadStream(__dirname + '/lib/tt.css').pipe(fs.createWriteStream(outDir + '/tt.css'));
     }
   })
 
