@@ -341,7 +341,8 @@ function buildString(structure){
     var str     = "",
         obk     = choms[key],
         obl     = Object.create(Object.prototype),
-        margins;
+        inkey   = Object.keys(obk),
+        margins; 
 
   if (obk.margins){
     margins = obk.margins.short_params;
@@ -429,9 +430,13 @@ function buildString(structure){
     // any other elements
     (obk.children.length) > 1 && (str += assembleRestAtoms(obk.children) + ';\n');
 
+    // bite anything not taken care of
+    inkey = _.pull(inkey, 'parent','width','height','margins','selector','color','funcs','xScale', 'yScale', 'children','xPrim','yPrim','xAxis','yAxis');  
+    inkey.length && (str += biteBiteBite(inkey, obk));
+
     // add in axes, if they exist
     (obk.hasOwnProperty('xAxis')) && (str += assembleAxes('xAxis', obk));
-    (obk.hasOwnProperty('yAxis')) && (str += assembleAxes('yAxis', obk));    
+    (obk.hasOwnProperty('yAxis')) && (str += assembleAxes('yAxis', obk));  
 
     // close it up!
     str += "};"
