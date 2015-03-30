@@ -256,7 +256,7 @@ function chomper(ast){
 
     if(!ast.length){
       // console.log('structure finished!');
-      return
+      return;
     }
 
     // if no, check if it is 'data', 'canvas', or 'elem' for the svg shapes [excepting text]: 

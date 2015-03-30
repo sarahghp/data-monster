@@ -8,16 +8,12 @@ var fs       = require('fs'),
 
 function compile(){
 
-  console.log('flags', flags);
-
   var inputs      = process.argv,
       iL          = inputs.length,
       files       = inputs.slice(2, iL),
       lastFile    = inputs[iL - 1],
       calledFrom  = process.cwd(),
       outDir;
-
-      console.log('called from:', calledFrom);
 
   // Checks if last arg passed is a directory
 
@@ -96,7 +92,6 @@ function compile(){
   // Finally add in HTML & CSS helper files if necessary
   _.defer(function(){
     if (flags.ttBool){
-      console.log('fs where?', __dirname);
       fs.createReadStream(__dirname + '/lib/tt.html').pipe(fs.createWriteStream(outDir + '/tt.html'));
       fs.createReadStream(__dirname + '/lib/tt.css').pipe(fs.createWriteStream(outDir + '/tt.css'));
     }
