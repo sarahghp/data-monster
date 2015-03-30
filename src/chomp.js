@@ -91,7 +91,7 @@ function compile(){
   // Call all the processes, including final compilation once the event loop has cleared
 
   createDirectory(lastFile);
-  _.defer(changes, genFileCollection(process.cwd()));
+  _.defer(changes, genFileCollection(calledFrom));
 
   // Finally add in HTML & CSS helper files if necessary
   _.defer(function(){

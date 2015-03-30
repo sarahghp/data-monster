@@ -1,15 +1,11 @@
 {
   "name": "data-monster",
   "scripts": {
-    "test": "./node_modules/jasmine-node/bin/jasmine-node test"
+    "test": "./node_modules/jasmine-node/bin/jasmine-node specs"
   },
   "devDependencies": {
     "jasmine-core": "^2.2.0",
-    "jasmine-node": "^1.14.5",
-    "karma": "^0.12.31",
-    "karma-jasmine": "^0.3.5",
-    "karma-nyan-reporter": "0.0.50",
-    "karma-phantomjs-launcher": "^0.1.4"
+    "jasmine-node": "^1.14.5"
   },
   "dependencies": {
     "crypto": "0.0.3",

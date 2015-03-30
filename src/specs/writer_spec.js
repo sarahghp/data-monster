@@ -1,4 +1,4 @@
-var writer = require('../src/lib/writer.js').string;
+var writer = require('../lib/writer.js').string;
 
 describe('the writer', function(){
   it('returns a string', function(){

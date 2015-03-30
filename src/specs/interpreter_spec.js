@@ -1,6 +1,6 @@
-var parser    = require('../src/lib/parser.js').parser,
-    structure = require('../src/lib/parser.js').structure,
-    chomper   = require('../src/lib/interpreter.js').chomper,
+var parser    = require('../lib/parser.js').parser,
+    structure = require('../lib/parser.js').structure,
+    chomper   = require('../lib/interpreter.js').chomper,
     _         = require('lodash'),
     __        = require('lodash-contrib');
 
