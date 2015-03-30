@@ -255,7 +255,7 @@ function chomper(ast){
     // Have we consumed everything?
 
     if(!ast.length){
-      console.log('structure finished!');
+      // console.log('structure finished!');
       return
     }
 

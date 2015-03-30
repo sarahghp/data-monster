@@ -1,25 +1,32 @@
-var parser    = require('../lib/parser.js').parser,
+var parserLib = require('../lib/parser.js');
+    parser    = parserLib.parser,
     structure = require('../lib/parser.js').structure,
     chomper   = require('../lib/interpreter.js').chomper,
     _         = require('lodash'),
     __        = require('lodash-contrib');
 
+parserLib.build();
+
+
+
 describe('structure', function(){
+  var builtStruct = structure(__dirname + '/ent-ex.dm');
+
   it('is defined', function(){
-    expect(structure).toBeDefined();
+    expect(builtStruct).toBeDefined();
   });
 
   it('is an object', function(){
-    expect(structure).toEqual(jasmine.any(Object));
+    expect(builtStruct).toEqual(jasmine.any(Object));
   });
 
   it('does not contain any undefined terms', function(){
 
     var arr = [];
 
-    __.walk.preorder(structure, function(value, key, parent){
-      (key === undefined) && arr.push(parent) && console.log('undefined parent is:', parent);
-      (value === undefined) && arr.push(parent) && console.log('undefined parent is:', parent);
+    __.walk.preorder(builtStruct, function(value, key, parent){
+      (key === undefined) && arr.push(parent);
+      (value === undefined) && arr.push(parent);
     });
 
     expect(arr.length).toEqual(1); // this is a hacky way to test, since the walk always returns 1 undefined
@@ -50,9 +57,8 @@ describe('chomper', function(){
 
   it('can can create a canvas without a parent', function(){
     var dm = chomper(parser.parse("(canvas: 100 100 '#id')"));
-    console.log(dm);
     expect(dm).toBeDefined();
-    expect(JSON.stringify(dm)).toMatch(/canvas-/);
+    expect(JSON.stringify(dm)).toMatch(/canvas_/);
   });
 
   it('handles canvas siblings', function(){

@@ -4,9 +4,7 @@ var PEG     = require('pegjs'),
     chomper = require('./interpreter.js').chomper;
 
 var grammar = fs.readFileSync(__dirname + '/grammar.txt').toString(),
-    // dmCodes = fs.readFileSync(__dirname + '/ent-ex.dm').toString(),
     parser;
-    // ast     = parser.parse(dmCodes);
 
     // console.log(util.inspect(ast, false, null, true));
 
