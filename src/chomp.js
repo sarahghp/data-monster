@@ -60,7 +60,7 @@ function compile(){
     }
   }
 
-  // What it is we want to do to the files — this is where the interpreter will be called eventaully
+  // What it is we want to do to the files
 
   var changes =  function(files){
     // call grammar gen once, then 

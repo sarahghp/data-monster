@@ -29,7 +29,6 @@ function chomper(ast){
 
   function addChildren(parent, child){
     // if child array exists, push to it, otherwise create
-    // think about creating prototypes and prepopulating empty array
 
     structure[parent]['children'] ? 
       structure[parent]['children'].push(child) :
@@ -58,9 +57,16 @@ function chomper(ast){
 
   function createNode(ast, parent){
 
-    // create unique id for node and add it to the structure object
-    var id = ast[0].op + '_' + uuid().split('-').join('_');
-    structure[id] = Object.create(Object.prototype);
+    var id;
+
+    (function createID(){
+      id = ast[0].op + '_' + uuid().split('-')[0];
+      if (structure[id]){
+        createID();
+      } else {
+        structure[id] = Object.create(Object.prototype);
+      }
+    })();
 
     // call the appropriate generation function on child exp
     nodes[ast[0].op](id, ast[0].exp, parent); 
@@ -248,8 +254,6 @@ function chomper(ast){
 
   function generate(ast, parent){
 
-    // console.log('gen ast:', util.inspect(ast, false, null));
-
     var parent = parent || undefined;
 
     // Have we consumed everything?
@@ -266,8 +270,7 @@ function chomper(ast){
     if (ast[0].hasOwnProperty('op') && (nodes[ast[0].op])) {
       createNode(ast, parent);
 
-    // is it special (tooltips, axis) -> variables will be stored as their own object and replaced in
-    // interpretation step 2; a list is in the data-struct-ref,js file
+    // is it special?
 
     } else if (ast[0].hasOwnProperty('op') && (special[ast[0].op])) {
       special[ast[0].op](ast, parent);
