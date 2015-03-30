@@ -338,8 +338,10 @@ function buildString(structure){
     var str     = "",
         obk     = choms[key],
         obl     = Object.create(Object.prototype),
-        margins = obk.margins.short_params;
+        margins;
 
+  if (obk.margins){
+    margins = obk.margins.short_params;
     // process margins
     if (margins.length === 4){
       obl.top     = +margins[0];
@@ -364,6 +366,13 @@ function buildString(structure){
     } else {
       console.log('Error: Incorrect margin arity');
     }
+  } else {
+    obl.top     = 0;
+    obl.right   = 0;
+    obl.bottom  = 0;
+    obl.left    = 0;
+  }
+    
 
     // set data width & height to calculated versions for use in eatVars 
     
