@@ -1,0 +1,8 @@
+/* Add these styles to your CSS files for default axis styling */
+
+.axis path,
+.axis line {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
+}

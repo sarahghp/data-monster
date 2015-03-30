@@ -95,6 +95,9 @@ function compile(){
       fs.createReadStream(__dirname + '/lib/tt.html').pipe(fs.createWriteStream(outDir + '/tt.html'));
       fs.createReadStream(__dirname + '/lib/tt.css').pipe(fs.createWriteStream(outDir + '/tt.css'));
     }
+    if(flags.axisBool){
+      fs.createReadStream(__dirname + '/lib/axis.css').pipe(fs.createWriteStream(outDir + '/axis.css'));
+    }
   })
 
 }
