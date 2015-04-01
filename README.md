@@ -189,22 +189,22 @@ Eventually this will be up on NPM, but till then there are a few steps.
 2. Manually add them to node_modules directory
 3. Require data-monster in your package.json
 
-```
-“dependencies”: {
-    “data-monster”: “0.0.1” }
-```
+  ```
+  “dependencies”: {
+      “data-monster”: “0.0.1” }
+  ```
 
 4. Data Monster can be installed locally or globally. If you install it globally, it is a little easier to call, but whatever makes you happy.
 
-Global
-```
-npm install -g node_modules/data-monster
-```
+  ###### Global
+  ``` 
+  npm install -g node_modules/data-monster
+  ```
 
-Local 
-```
-npm install node_modules/data-monster
-```
+  ###### Local 
+  ```
+  npm install node_modules/data-monster
+  ```
 
 Now you’re ready to go!
 
