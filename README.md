@@ -3,7 +3,7 @@
 data-monster
 ============
 
-*  What is Data Monster?
+*  [What is Data Monster?](/what-is-data-monster)
 *  Why would I use this?
 *  Okay, I’m convinced. How do I monster?
   - Installing
@@ -13,7 +13,7 @@ data-monster
 *  Feedback, the Future + Contributing
 *  License
 
-### What is Data Monster?
+### [What is Data Monster?](#what-is-data-monster)
 
 Data Monster is a domain-specific language that transpiles to d3.js files (plus some helper HTML and CSS files, if necessary).
 
