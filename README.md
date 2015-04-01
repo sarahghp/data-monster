@@ -13,7 +13,7 @@ data-monster
 *  Feedback, the Future + Contributing
 *  License
 
-### [What is Data Monster?](#what-is-data-monster)
+### What is Data Monster?
 
 Data Monster is a domain-specific language that transpiles to d3.js files (plus some helper HTML and CSS files, if necessary).
 
