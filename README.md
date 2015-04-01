@@ -3,7 +3,7 @@
 data-monster
 ============
 
-*  [What is Data Monster?](/what-is-data-monster)
+*  [What is Data Monster?](#what-is-data-monster)
 *  Why would I use this?
 *  Okay, I’m convinced. How do I monster?
   - Installing
