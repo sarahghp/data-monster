@@ -4,14 +4,14 @@ data-monster
 ============
 
 *  [What is Data Monster?](#what-is-data-monster)
-*  Why would I use this?
-*  Okay, I’m convinced. How do I monster?
-  - Installing
-  - Chomping (aka compiling)
-  - Writing DM
-*  Why would you build this?
-*  Feedback, the Future + Contributing
-*  License
+*  [Why would I use this?](#why-would-I-use-this)
+*  [Okay, I’m convinced. How do I monster?](#how-do-i-monster)
+  - [Installing](#installing)
+  - [Chomping (aka compiling)](#chomping-aka-compiling-the-file)
+  - [Writing a Chompable (Data Monster) File](#writing-a-chompable-file)
+*  [Why would you build this?](#why-would-you-build-this)
+*  [Feedback, the Future + Contributing](#feedback-the-future-contributing)
+*  [License](#license)
 
 ### What is Data Monster?
 
