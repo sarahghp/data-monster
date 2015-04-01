@@ -179,7 +179,7 @@ queue()
 and then you can use it like any other d3.js file you have written.
 
 ## Why would I use this?
-Because you love monsters. And data. And seek to find its secrets to imbibing it.
+Because you love monsters. And data. And seek to find its secrets by imbibing it.
 
 Alternatively, you might be making some charts and not want to type a whole bunch of d3.js. You might be someone who starts chart projects by copy-pasting from an example or a previous chart. You might just want to throw up a prototype real fast to see what you can see.
 
