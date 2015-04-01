@@ -1,6 +1,6 @@
 ![data monster logo](/img/data_monster_logo.png)
 
-data-monster
+Data Monster
 ============
 
 *  [What is Data Monster?](#what-is-data-monster)
@@ -10,10 +10,10 @@ data-monster
   - [Chomping (aka compiling)](#chomping-aka-compiling-the-file)
   - [Writing a Chompable (Data Monster) File](#writing-a-chompable-file)
 *  [Why would you build this?](#why-would-you-build-this)
-*  [Feedback, the Future + Contributing](#feedback-the-future-contributing)
+*  [Feedback, the Future + Contributing](#feedback-the-future--contributing)
 *  [License](#license)
 
-### What is Data Monster?
+## What is Data Monster?
 
 Data Monster is a domain-specific language that transpiles to d3.js files (plus some helper HTML and CSS files, if necessary).
 
@@ -179,11 +179,36 @@ queue()
 and then you can use it like any other d3.js file you have written.
 
 
-### Why would I use this?
+## Why would I use this?
 
-### How do I monster?
-#### Installing
-#### Chomping (aka compiling) the file
+## How do I monster?
+### Installing
+Eventually this will be up on NPM, but till then there are a few steps.
+
+1. Clone data-monster repo or download the files in the data-monster folder
+2. Manually add them to node_modules directory
+3. Require data-monster in your package.json
+
+```
+“dependencies”: {
+    “data-monster”: “0.0.1” }
+```
+
+4. Data Monster can be installed locally or globally. If you install it globally, it is a little easier to call, but whatever makes you happy.
+
+Global
+```
+npm install -g node_modules/data-monster
+```
+
+Local 
+```
+npm install node_modules/data-monster
+```
+
+Now you’re ready to go!
+
+### Chomping (aka compiling) the file
 
 If you installed data monster globally, you can run
 
@@ -199,9 +224,9 @@ npm run chomp <.dm files>
 
 In both cases, the `-a` flag can also be used to chomp all the files in the current directory.
 
-#### Writing a Chompable File
+### Writing a Chompable File
 
-### Why would you build this?
+## Why would you build this?
 Entertainment & laziness, basically.
 
 It all started in [Radical Computer Science](http://radicalcomputerscience.tumblr.com/), a class at the [School for Poetic Computation](http://sfpc.io/) where we learned to build our own LISP interpreters with [plt.js](https://github.com/nasser/pltjs) and [peg.js](http://pegjs.org/). Now that I am at Hacker School ([recently renamed the Recurse Center](https://www.recurse.com/?redirected_from_hs=true)), I have the time to build up the Monster as my own language. Target: d3. But why d3?
@@ -212,7 +237,7 @@ At the same time, one of d3’s great virtues — it’s flexibility — means i
 
 So Data Monster was born to generate the necessary d3 with as little specification from the user as possible — but without sacrificing flexibility. 
 
-### Feedback, the Future + Contributing
+## Feedback, the Future + Contributing
 
 That is a big goal and this is a little alpha; lots of things are broken or maybe could be better implemented. 
 
@@ -221,5 +246,5 @@ I plan to continue adding functionality to the Monster for the foreseeable futur
 Please open an issue, shoot me an email at [hi@sarahgp.com](mailto:hi@sarahgp.com), or check out the [contributing doc](/contributing.md).
 
 
-### License
+## License
 MIT
