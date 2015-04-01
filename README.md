@@ -4,7 +4,7 @@ Data Monster
 ============
 
 *  [What is Data Monster?](#what-is-data-monster)
-*  [Why would I use this?](#why-would-I-use-this)
+*  [Why would I use this?](#why-would-i-use-this)
 *  [Okay, I'm convinced. How do I monster?](#how-do-i-monster)
   - [Installing](#installing)
   - [Chomping (aka compiling)](#chomping-aka-compiling-the-file)
@@ -178,8 +178,12 @@ queue()
 
 and then you can use it like any other d3.js file you have written.
 
-
 ## Why would I use this?
+Because you love monsters. And data. And seek to find its secrets to imbibing it.
+
+Alternatively, you might be making some charts and not want to type a whole bunch of d3.js. You might be someone who starts chart projects by copy-pasting from an example or a previous chart. You might just want to throw up a prototype real fast to see what you can see.
+
+While you can get a basic chart from the Data Monster without knowing d3, in general the language assumes you know something about the library. The Monster's goal is less to create a beginner-friendly interface than to create a shorthand for folks who have done d3 before and expect to do so again.
 
 ## How do I monster?
 ### Installing
