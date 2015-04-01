@@ -185,6 +185,8 @@ Alternatively, you might be making some charts and not want to type a whole bunc
 
 While you can get a basic chart from the Data Monster without knowing d3, in general the language assumes you know something about the library. The Monster's goal is less to create a beginner-friendly interface than to create a shorthand for folks who have done d3 before and expect to do so again.
 
+Data Monster is also meant to be useful to folks using the library to create SVG drawings that may not be data-driven charts. So, while there are some defaults set up to make chart generation easier, Data Monster can be used to create an SVG and deploy your own functions in a d3 framework.
+
 ## How do I monster?
 ### Installing
 Eventually this will be up on NPM, but till then there are a few steps.
@@ -229,6 +231,49 @@ npm run chomp <.dm files>
 In both cases, the `-a` flag can also be used to chomp all the files in the current directory.
 
 ### Writing a Chompable File
+The Data Monster syntax is LISP-inspired, with parentheses used to denote the scope of an expression. At the same time, it stays honest to the Javascript it will eventually become.
+
+I've roughed out the basic structure below; check out [chomp me](/docs/chompme.md) for full details or look at the [examples folder](/examples).
+
+#### A Few Basics
+
+The only essential unit of a DM file is the canvas block, specified:
+
+```
+(canvas: <width> <height> <appendToElement>)
+``` 
+
+which takes two numbers and a string used to select the DOM element to which the SVG will be attached.
+
+One or many canvases will usually be wrapped in a data element:
+
+```
+(data: <filepath> 
+	(canvas: <width> <height> <appendToElement>)
+	(canvas: <width> <height> <appendToElement>)
+	(canvas: <width> <height> <appendToElement>))
+```
+	
+A DM file can contain as many of these blocks as desired.
+
+Canvases themselves will hold elems — specifications for SVG elements, like lines, circles, etc.
+
+``` 
+(canvas: <width> <height> <appendToElement>
+	(elem: <element>: { <required attribures> }))
+```
+
+Data monster has included some special expressions for common chart elements, like axes, scales and tooltips. These too are attached to the canvas.
+
+Finally, the workhorse canvas also accepts other d3 methods you would like to call on the SVG.
+
+Both data and canvas enclosures also accept function statements, which add plain Javascript functions into the generated file. They are specified:
+
+```
+(funcs: #{<function1>} ... #{<functionN>})
+```
+
+For more, check out [chomp me](/docs/chompme.md) for full details or look at the [examples folder](/examples).
 
 ## Why would you build this?
 Entertainment & laziness, basically.
@@ -247,7 +292,7 @@ That is a big goal and this is a little alpha; lots of things are broken or mayb
 
 I plan to continue adding functionality to the Monster for the foreseeable future and am interested in both general feedback and specific requests.
 
-Please open an issue, shoot me an email at [hi@sarahgp.com](mailto:hi@sarahgp.com), or check out the [contributing doc](/contributing.md).
+Please open an issue, shoot me an email at [hi@sarahgp.com](mailto:hi@sarahgp.com), or check out the [contributing doc](/docs/contributing.md).
 
 
 ## License
