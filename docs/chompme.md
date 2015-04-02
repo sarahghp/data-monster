@@ -4,6 +4,7 @@
 - Constructing Expressions
 - Data Types
 - File Structure
+- A Note About `attr` & `style`
 - The Data Expression
 	- Clean 
 	- The Queue Library
@@ -78,6 +79,41 @@ Both data and canvas enclosures also accept function expressions:
 
 ```
 (funcs: #{<function1>} ... #{<functionN>})
+```
+
+## A Note About `attr` & `style`
+Often in d3, when we attach attributes or styles to an element we do so in a list:
+
+```
+.enter()
+      .append('circle')
+        .attr('cx', function(d){ return xScale(d.ratio)})
+        .attr('cy', function(d){ return yScale(d.Shape_Count) })
+        .attr('r', 4)
+        .attr('fill', function(d){ return color(d.Saturation_Median)})
+```
+
+However, it is also possible to pass a single hash-table with all the options listed in key-value pairs:
+
+```
+.enter()
+      .append('circle')
+        .attr({'cx': function(d){ return xScale(d.ratio) },
+							 'cy': function(d){ return yScale(d.Shape_Count) },
+								'r': 4,
+								'fill': function(d){ return color(d.Saturation_Median)}
+})
+
+```
+
+In Data Monster, you should always pass a hash of key-value pairs to a single call to these elements:
+
+```
+(.attr: {'cx': function(d){ return xScale(d.ratio) },
+							 'cy': function(d){ return yScale(d.Shape_Count) },
+								'r': 4,
+								'fill': function(d){ return color(d.Saturation_Median)}
+})
 ```
 
 ## The Data Expression
@@ -161,19 +197,39 @@ Specific scales can be specified in the following manner:
 ```
 
 **Soon**: The ability to remove scales entirely.
+
 #### `axis-*`
+The axis specification is similar to the scale specification. It will default to:
+
+```
+d3.svg.axis()
+        .scale(<xScale/yScale>)
+        .orient(<'bottom'/<'left'>);
+```
+
+with additional text options passed as:
+
+```
+axis-x: attr: { 'class': 'label', 'x': width, 'y': 50 }
+             style: { 'text-anchor': 'end' }
+             text: 'Height: Width Ratio' )
+```
+
+As you may notice, all options that would be called with a string of `.attr().attr()` in d3 are here passed as a single hash.
+
+**Soon**: The ability to enable basic axis with simply `(axis: true`).
 
 #### `tooltips`
 
 
 ### Special Arguments
-##### d3 scales
-##### browser events
+#### d3 scales
+#### browser events
 
 ## The Elem Expression
 
 ### Special Elem Constructors
-##### `tooltips`
+#### `tooltips`
 
 
 ## The Funcs Expression
