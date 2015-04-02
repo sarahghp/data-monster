@@ -17,7 +17,7 @@ Data Monster
 
 Data Monster is a domain-specific language that transpiles to d3.js files (plus some helper HTML and CSS files, if necessary).
 
-This is its alpha.'
+This is its alpha.
 
 To draw something like this:
 
@@ -169,7 +169,7 @@ queue()
     .defer(d3.tsv, 'van_gogh_additional_measurements.tsv')
     .await(function(err, data) {
         if (err) {
-            console.log(err)
+            console.log(err);
         }
         draw_data_63dc8d12(data);
     });
@@ -191,9 +191,9 @@ Data Monster is also meant to be useful to folks using the library to create SVG
 ### Installing
 Eventually this will be up on NPM, but till then there are a few steps.
 
-1. Clone data-monster repo or download the files in the data-monster folder
-2. Manually add them to node_modules directory
-3. Require data-monster in your package.json
+1. Clone data-monster repo or download the files in the `data-monster` folder
+2. Manually add them to `node_modules` directory
+3. Require data-monster in your `package.json`
 
   ```
   "dependencies": {
@@ -243,7 +243,7 @@ The only essential unit of a DM file is the canvas block, specified:
 (canvas: <width> <height> <appendToElement>)
 ``` 
 
-which takes two numbers and a string used to select the DOM element to which the SVG will be attached.
+which takes two numbers plus the string used to select the DOM element to which the SVG will be appended.
 
 One or many canvases will usually be wrapped in a data element:
 
@@ -256,14 +256,16 @@ One or many canvases will usually be wrapped in a data element:
 	
 A DM file can contain as many of these blocks as desired.
 
-Canvases themselves will hold elems — specifications for SVG elements, like lines, circles, etc.
+Canvases themselves will hold `elems` — specifications for SVG elements, like lines, circles, etc.
 
 ``` 
 (canvas: <width> <height> <appendToElement>
-	(elem: <element>: { <required attribures> }))
+	(elem: <element>: { <required attributes> }))
 ```
 
-Data monster has included some special expressions for common chart elements, like axes, scales and tooltips. These too are attached to the canvas.
+The required attributes is a hash map that contains values required by SVG to draw the element.
+
+Data monster includes some special expressions for common chart elements, like axes, scales and tooltips. These too are attached to the canvas.
 
 Finally, the workhorse canvas also accepts other d3 methods you would like to call on the SVG.
 
@@ -273,7 +275,7 @@ Both data and canvas enclosures also accept function statements, which add plain
 (funcs: #{<function1>} ... #{<functionN>})
 ```
 
-For more, check out [chomp me](/docs/chompme.md) for full details or look at the [examples folder](/examples).
+For more details, check out [chomp me](/docs/chompme.md) or look at the [examples folder](/examples).
 
 ## Why would you build this?
 Entertainment & laziness, basically.
@@ -296,4 +298,4 @@ Please open an issue, shoot me an email at [hi@sarahgp.com](mailto:hi@sarahgp.co
 
 
 ## License
-MIT
+[MIT](/docs/LICENSE-MIT.md)
