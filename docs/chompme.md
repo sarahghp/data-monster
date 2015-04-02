@@ -129,10 +129,10 @@ The canvas expression is the core of the Monster: its thorax, if you will. It ta
 (canvas: <width> <height> [ { <margins> } ] <appendToElement>)
 ``` 
 
-`width`: integer, width of the SVG element in pixels
-`height`: integer, height of the SVG element in pixels
-`{ margins} `: list of integers for SVG margins, will be applied in clockwise order like CSS margins: `{ top right bottom left }` with shorthand-by-arity allowed. (Eg, if only two arguments are passed they will be `{top-bottom left-right}`
-`appendToElement`: string, accepts all CSS selectors
+* `width`: integer, width of the SVG element in pixels  
+* `height`: integer, height of the SVG element in pixels  
+* `{ margins} `: list of integers for SVG margins, will be applied in clockwise order like CSS margins: `{ top right bottom left }` with shorthand-by-arity allowed. (Eg, if only two arguments are passed they will be  `{top-bottom left-right}`  
+* `appendToElement`: string, accepts all CSS selectors  
 
 ###### Example
 ```
