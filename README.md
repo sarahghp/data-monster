@@ -294,7 +294,7 @@ That is a big goal and this is a little alpha; lots of things are broken or mayb
 
 I plan to continue adding functionality to the Monster for the foreseeable future and am interested in both general feedback and specific requests.
 
-Please open an issue, shoot me an email at [hi@sarahgp.com](mailto:hi@sarahgp.com), or check out the [contributing doc](/docs/contributing.md).
+Please open an issue, shoot me an email at [hi@sarahgp.com](mailto:hi@sarahgp.com), or check out the [contributing doc](/docs/CONTRIBUTING.md).
 
 
 ## License
