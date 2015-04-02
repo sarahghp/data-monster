@@ -45,7 +45,9 @@ function chomper(ast){
     // this rigamarole sets the value to the actual unexecuted function
     var val;
 
-    if (wrapper){
+    if (wrapper === 'clean'){
+      val = 'var moo = function(d){ ' + toInter + ' }';
+    } else if (wrapper){
       val = 'var moo = function(d){ return ' + wrapper + '(' + toInter + ') }';
     } else {
       val = 'var moo = function(d){ return ' + toInter + ' }';
@@ -206,7 +208,7 @@ function chomper(ast){
       interStr += el;
     })
 
-    structure[parent]['clean'] = convertToDFunc(interStr);
+    structure[parent]['clean'] = convertToDFunc(interStr, 'clean');
 
     handleSiblings(ast, parent);
   }
