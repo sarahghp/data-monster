@@ -8,9 +8,10 @@
 	- Clean 
 	- The Queue Library
 - The Canvas Expression
-	- Special Constructors
+	- Special Canvas Constructors
 	- Special Arguments
 - The Elem Expression
+	- Special Elem Constructors
 - The Funcs Expression
 - Freeform Expressions
 
@@ -139,11 +140,41 @@ The canvas expression is the core of the Monster: its thorax, if you will. It ta
 (canvas: 1000 600 {20 20 60 60} '#scatterplot')
 ```
 
+### Special Canvas Constructors
+As you might expect for a language built on the notion of idiomatic charts, Data Monster has some special shorthand constructors for common chart elements:
 
-### Special Constructors
+##### `color`
+The color expressions accepts a d3 color scale or function as argument. It is optional.
+###### Example
+```
+(color: category10)
+```
+
+##### `scale-*`
+Scales for `x` and `y` are specified using the `scale-*` syntax. By default, linear scales will be generated using the access property specified as x and y values in the [`elem`'s required specs hash(). The domain will be `[0, maxX/maxY]`. The range for x is `[0, width]` and for y, `[height, 0]`.
+
+Specific scales can be specified in the following manner:
+```
+(scale-x: linear 
+              domain: { 0 maxX } 
+              range:  { 0 width } ) 
+```
+
+**Soon**: The ability to remove scales entirely.
+##### `axis-*`
+
+##### `tooltips`
+
+
 ### Special Arguments
+##### d3 scales
+##### browser events
 
 ## The Elem Expression
+
+### Special Elem Constructors
+##### `tooltips`
+
 
 ## The Funcs Expression
 
