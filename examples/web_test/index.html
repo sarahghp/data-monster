@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8">
+		<title>Data-Monster: Van Gogh Scatterplot</title>
+
+		<style>
+			@import url(http://fonts.googleapis.com/css?family=Londrina+Outline|Lekton:400,700,400italic);
+
+			body {
+			  margin: 0;
+			  padding: 20px;
+			  font-family: 'Lekton', sans-serif;
+			  font-size: 12px;
+			  background-color: white;
+			}
+
+			section {
+			  margin-top: 60px;
+			}
+
+			section:first-child {
+			  margin-top: 15px;
+			}
+
+			g {
+			  cursor: pointer;
+			}
+
+			circle {
+				opacity: .7;
+			}
+
+			#tooltip {
+			  position: absolute;
+			  width: 200px;
+			  height: auto;
+			  padding: 5px 10px;
+			  font-weight: 700;
+			  background-color: rgba(255, 255, 255, 0.7);
+			  -webkit-box-shadow: 0 0 5px rgba(0, 0, 0, 0.7);
+			  -moz-box-shadow: 0 0 5px rgba(0, 0, 0, 0.7);
+			  box-shadow: 0 0 5px rgba(0, 0, 0, 0.7);
+			  pointer-events: none;
+			}
+
+			#tooltip p {
+			  margin: 0;
+			  line-height: 20px;
+			}
+
+			.hidden {
+			  display: none;
+			}
+
+			.chart {
+			  float: left;
+			  padding-right: 5px;
+			  padding-bottom: 5px;
+			  padding-top: 0;
+			  padding-left: 0;
+			}
+
+		  .axis path,
+		  .axis line {
+		    fill: none;
+		    stroke: #000;
+		    shape-rendering: crispEdges;
+		  }
+
+		</style>
+
+	</head>
+	<body>
+		<div class="wrapper">
+			<section id="scatterplot">
+				<p>Chart 1: Scatterplot</p>
+			</section>
+	<!-- 		<section id="bar">
+				<p>Chart 2: Bar</p>
+			</section> -->
+		</div>
+		<div id="tooltip" class="hidden">
+			<p><span id="values">Values go here</span></p>
+		</div>
+			
+			<script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+			<script src="http://d3js.org/queue.v1.min.js"></script>
+			<script src="js/output.js"></script>
+	</body>
+</html>
