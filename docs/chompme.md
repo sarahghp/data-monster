@@ -143,14 +143,14 @@ The canvas expression is the core of the Monster: its thorax, if you will. It ta
 ### Special Canvas Constructors
 As you might expect for a language built on the notion of idiomatic charts, Data Monster has some special shorthand constructors for common chart elements:
 
-##### `color`
+#### `color`
 The color expressions accepts a d3 color scale or function as argument. It is optional.
 ###### Example
 ```
 (color: category10)
 ```
 
-##### `scale-*`
+#### `scale-*`
 Scales for `x` and `y` are specified using the `scale-*` syntax. By default, linear scales will be generated using the access property specified as x and y values in the [`elem`'s required specs hash(). The domain will be `[0, maxX/maxY]`. The range for x is `[0, width]` and for y, `[height, 0]`.
 
 Specific scales can be specified in the following manner:
@@ -161,9 +161,9 @@ Specific scales can be specified in the following manner:
 ```
 
 **Soon**: The ability to remove scales entirely.
-##### `axis-*`
+#### `axis-*`
 
-##### `tooltips`
+#### `tooltips`
 
 
 ### Special Arguments
