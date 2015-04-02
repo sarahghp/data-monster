@@ -8,7 +8,8 @@ Data Monster
 *  [Okay, I'm convinced. How do I monster?](#how-do-i-monster)
   - [Installing](#installing)
   - [Chomping (aka compiling)](#chomping-aka-compiling-the-file)
-  - [Writing a Chompable (Data Monster) File](#writing-a-chompable-file)
+	- [Dependencies](#dependencies)
+  - [Writing a Chompable (Data Monster) File](#writing-a-chompable-file) 
 *  [Why would you build this?](#why-would-you-build-this)
 *  [Feedback, the Future + Contributing](#feedback-the-future--contributing)
 *  [License](#license)
@@ -229,6 +230,10 @@ npm run chomp <.dm files>
 ```
 
 In both cases, the `-a` flag can also be used to chomp all the files in the current directory.
+
+### Dependencies
+Data Monster–generated files use [the queue library](https://github.com/mbostock/queue) for async file loading, so you will need to include it in your dependencies.
+
 
 ### Writing a Chompable File
 The Data Monster syntax is LISP-inspired, with parentheses used to denote the scope of an expression. At the same time, it stays honest to the Javascript it will eventually become.
