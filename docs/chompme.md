@@ -33,8 +33,11 @@ Data monster accepts four main classes of expression:
 The data types consumed by the monster mostly make use of familiar Javascript syntax:
 
 `'String'` or `"String"`
+
 `100000`
+
 `{ hash: 'table', key: 'value', 'three': 3 }`
+
 `[an, array, of, 2]`
 
 Functions are an exception. They are wrapped in braces and preceded by a hash/octothorpe:
