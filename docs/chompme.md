@@ -98,22 +98,20 @@ However, it is also possible to pass a single hash-table with all the options li
 ```
 .enter()
       .append('circle')
-        .attr({'cx': function(d){ return xScale(d.ratio) },
-							 'cy': function(d){ return yScale(d.Shape_Count) },
-								'r': 4,
-								'fill': function(d){ return color(d.Saturation_Median)}
-})
+        .attr({ 'cx': function(d){ return xScale(d.ratio) },
+		'cy': function(d){ return yScale(d.Shape_Count) },
+		'r': 4,
+		'fill': function(d){ return color(d.Saturation_Median)}})
 
 ```
 
 In Data Monster, you should always pass a hash of key-value pairs to a single call to these elements:
 
 ```
-(.attr: {'cx': function(d){ return xScale(d.ratio) },
-							 'cy': function(d){ return yScale(d.Shape_Count) },
-								'r': 4,
-								'fill': function(d){ return color(d.Saturation_Median)}
-})
+(attr: {'cx': function(d){ return xScale(d.ratio) },
+	 'cy': function(d){ return yScale(d.Shape_Count) },
+	 'r': 4,
+	 'fill': function(d){ return color(d.Saturation_Median)}})
 ```
 
 ## The Data Expression
