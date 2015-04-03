@@ -1,20 +1,28 @@
 # Chomp Me
 *A guide to the data monster language*
 
-- Constructing Expressions
-- Data Types
-- File Structure
-- A Note About `attr` & `style`
-- The Data Expression
-	- Clean 
-	- The Queue Library
-- The Canvas Expression
-	- Special Canvas Constructors
-	- Special Arguments
-- The Elem Expression
-	- Special Elem Constructors
-- The Funcs Expression
-- Freeform Expressions
+- [Constructing Expressions](#constructing-expressions)
+- [Data Types](#data-types)
+- [File Structure](#file-structure)
+- [A Note About `attr` & `style`](#a-note-about-attr--style)
+- [The Data Expression](#the-data-expression)
+	- [Clean](#clean)
+	- [The Queue Library](#the-queue-library)
+- [The Canvas Expression](#the-canvas-expression)
+	- [Special Canvas Constructors](#special-canvas-constructors)
+		-[`color`](#color)
+		-[`scale-*`](#scale-)
+		-[`axis-*`](#axis-)
+		-[`tooltips`](#tooltips)
+	- [Special Arguments](#special-arguments)
+		-[Access Values](#access-values)
+		-[d3 Scales](#d3-scales)
+		-[Mouse Events](#mouse-events)
+- [The Elem Expression](#the-elem-expression)
+	- [Special Elem Constructors](#special-elem-constructors)
+		-[`tooltips`](#tooltips-1) 
+- [The Funcs Expression](#the-funcs-expression)
+- [Freeform Expressions](#freeform-expressions)
 
 ## Constructing Expressions
 Data Monster is syntactically a LISP at its base. That means expressions are wrapped in parentheses and the first item listed is the operative function. So for instance
