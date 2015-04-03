@@ -9,17 +9,17 @@
 	- [Clean](#clean)
 	- [The Queue Library](#the-queue-library)
 - [The Canvas Expression](#the-canvas-expression)
-	- [Special Canvas Constructors](#special-canvas-constructors)
-		-[`color`](#color)
-		-[`scale-*`](#scale-)
-		-[`axis-*`](#axis-)
-		-[`tooltips`](#tooltips)
-	- [Special Arguments](#special-arguments)
-		-[Access Values](#access-values)
-		-[d3 Scales](#d3-scales)
-		-[Mouse Events](#mouse-events)
+	- [Special Canvas Constructors](#special-canvas-constructors)  
+		-[`color`](#color)  
+		-[`scale-*`](#scale-)  
+		-[`axis-*`](#axis-)  
+		-[`tooltips`](#tooltips)  
+	- [Special Arguments](#special-arguments)   
+		-[Access Values](#access-values)  
+		-[d3 Scales](#d3-scales)  
+		-[Mouse Events](#mouse-events)  
 - [The Elem Expression](#the-elem-expression)
-	- [Special Elem Constructors](#special-elem-constructors)
+	- [Special Elem Constructors](#special-elem-constructors)  
 		-[`tooltips`](#tooltips-1) 
 - [The Funcs Expression](#the-funcs-expression)
 - [Freeform Expressions](#freeform-expressions)
@@ -193,7 +193,7 @@ The color expressions accepts a d3 color scale or function as argument. It is op
 ```
 
 #### `scale-*`
-Scales for `x` and `y` are specified using the `scale-*` syntax. By default, linear scales will be generated using the access property specified as x and y values in the [`elem`'s required specs hash](). The domain will be `[0, maxX/maxY]`. The range for x is `[0, width]` and for y, `[height, 0]`.
+Scales for `x` and `y` are specified using the `scale-*` syntax. By default, linear scales will be generated using the access property specified as x and y values in the [`elem`'s required specs hash](#the-elem-expression). The domain will be `[0, maxX/maxY]`. The range for x is `[0, width]` and for y, `[height, 0]`.
 
 Specific scales can be specified in the following manner:
 ```
@@ -232,7 +232,7 @@ A simple tooltip can be enabled with
 (tooltips: true [ <access value> || <text function> ])
 ```
 
-An optional second argument takes an [access value]() or function to define the tooltip's text. Otherwise text defaults to `x-value: y-value`. 
+An optional second argument takes an [access value](#access-values) or function to define the tooltip's text. Otherwise text defaults to `x-value: y-value`. 
 
 Tooltips can be added to either the canvas as a whole or to an element.
 
@@ -307,7 +307,7 @@ A simple tooltip can be enabled with
 (tooltips: true [ <access value> || <text function> ])
 ```
 
-An optional second argument takes an [access value]() or function to define the tooltip's text. Otherwise text defaults to `x-value: y-value`. 
+An optional second argument takes an [access value](#access-values) or function to define the tooltip's text. Otherwise text defaults to `x-value: y-value`. 
 
 Tooltips can be added to either the canvas as a whole or to an element.
 
