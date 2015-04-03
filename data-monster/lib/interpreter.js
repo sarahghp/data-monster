@@ -244,8 +244,17 @@ function chomper(ast){
 
   function tooltipPop (ast, parent){
     var tooltip    = Object.create(Object.prototype);
-    tooltip.text   = ast[0][1] || 'default';
     tooltip.parent = parent;
+
+    if (ast[0][1]) {
+      if (ast[0][1].match(/\bd\./)){
+        tooltip.text = convertToDFunc(ast[0][1]);
+      } else {
+        tooltip.text = convertToFunc(ast[0][1]);
+      }
+    } else {
+       tooltip.text = 'default';
+    }
     
     structure[parent].tooltip = tooltip;
 
