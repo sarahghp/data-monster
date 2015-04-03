@@ -75,7 +75,7 @@ Canvases themselves will hold `elems` — specifications for SVG elements, like 
 	(elem: <element>: { <required attributes> }))
 ```
 
-Both data and canvas enclosures also accept function expressions:
+Both data and canvas enclosures also accept [function expressions](#the-funcs-expression):
 
 ```
 (funcs: #{<function1>} ... #{<functionN>})
@@ -209,8 +209,8 @@ with additional text options passed as:
 
 ```
 axis-x: attr: { 'class': 'label', 'x': width, 'y': 50 }
-                style: { 'text-anchor': 'end' }
-                text: 'Height: Width Ratio' )
+        style: { 'text-anchor': 'end' }
+        text: 'Height: Width Ratio' )
 ```
 
 As you may notice, all options that would be called with a string of `.attr().attr()` in d3 are here passed as a single hash.
@@ -225,6 +225,8 @@ A simple tooltip can be enabled with
 ```
 
 An optional second argument takes an [access value]() or function to define the tooltip's text. Otherwise text defaults to `x-value: y-value`. 
+
+Tooltips can be added to either the canvas as a whole or to an element.
 
 ### Special Arguments
 While Data Monster accepts a number of basic data structures as arguments, it also accepts three special arguments.
@@ -263,12 +265,61 @@ A limited set of mouse events — `click`, `mousemove`, `mouseenter`, `mouseleav
 
 If this does not work, events can always be added as [freeform expressions](#freeform-expressions).
 
+###### Example
+```
+(click: #{ function(d) { window.open('https://www.google.com/search?site=imghp&tbm=isch&q=van+gogh+'+d.Title); }})
+```
+
 ## The Elem Expression
+The `elem` expression is called from within a `canvas` expression and it specifies what is drawn into the SVG. 
+
+It takes a required expression, covering the element to draw and the necessary parameters to draw it:
+
+```
+(elem: <shape>: { <required parameters> })
+```
+
+These parameters correspond to those listed [here](https://github.com/mbostock/d3/wiki/SVG-Shapes).
+
+It also accepts a number of addition expressions: `attr`, `style`, mouse events, `tooltips` and freeform options.
+
+###### Example
+```
+(elem: circle: { cx: d.ratio, cy: d.Shape_Count, r: 4, fill: d.Year }
+           attr: { 'class': 'dot' }
+           tooltips: true
+           click: #{ function(d) { window.open('https://www.google.com/search?site=imghp&tbm=isch&q=van+gogh+'+d.Title); }})
+```
 
 ### Special Elem Constructors
 #### `tooltips`
+A simple tooltip can be enabled with
 
+```
+(tooltips: true [ <access value> || <text function> ])
+```
+
+An optional second argument takes an [access value]() or function to define the tooltip's text. Otherwise text defaults to `x-value: y-value`. 
+
+Tooltips can be added to either the canvas as a whole or to an element.
 
 ## The Funcs Expression
+Specified
+
+```
+(funcs: #{<function1>} ... #{<functionN>})
+```
+
+the funcs expression works to pass functions through to the generated file. 
+
+Funcs attached in the `data` scope are scoped globally in the generated file. Those attached to `canvas` are scoped to the draw function block in the generated file. 
 
 ## Freeform Expressions
+
+Finally, you can pass any other freeform expression to Data Monster and it will be added into the method chain. For instance, the click function in [Mouse Events](#mouse-events) could also be specified:
+
+```
+(on: 'click' #{ function(d) { window.open('https://www.google.com/search?site=imghp&tbm=isch&q=van+gogh+'+d.Title); }}
+```
+
+*That's it so far. But more to come!*
