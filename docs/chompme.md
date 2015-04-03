@@ -185,13 +185,13 @@ The color expressions accepts a d3 color scale or function as argument. It is op
 ```
 
 #### `scale-*`
-Scales for `x` and `y` are specified using the `scale-*` syntax. By default, linear scales will be generated using the access property specified as x and y values in the [`elem`'s required specs hash(). The domain will be `[0, maxX/maxY]`. The range for x is `[0, width]` and for y, `[height, 0]`.
+Scales for `x` and `y` are specified using the `scale-*` syntax. By default, linear scales will be generated using the access property specified as x and y values in the [`elem`'s required specs hash](). The domain will be `[0, maxX/maxY]`. The range for x is `[0, width]` and for y, `[height, 0]`.
 
 Specific scales can be specified in the following manner:
 ```
 (scale-x: linear 
-              domain: { 0 maxX } 
-              range:  { 0 width } ) 
+          domain: { 0 maxX } 
+          range:  { 0 width } ) 
 ```
 
 **Soon**: The ability to remove scales entirely.
@@ -201,28 +201,67 @@ The axis specification is similar to the scale specification. It will default to
 
 ```
 d3.svg.axis()
-        .scale(<xScale/yScale>)
-        .orient(<'bottom'/<'left'>);
+    .scale(<xScale/yScale>)
+    .orient(<'bottom'/<'left'>);
 ```
 
 with additional text options passed as:
 
 ```
 axis-x: attr: { 'class': 'label', 'x': width, 'y': 50 }
-             style: { 'text-anchor': 'end' }
-             text: 'Height: Width Ratio' )
+                style: { 'text-anchor': 'end' }
+                text: 'Height: Width Ratio' )
 ```
 
 As you may notice, all options that would be called with a string of `.attr().attr()` in d3 are here passed as a single hash.
 
-**Soon**: The ability to enable basic axis with simply `(axis: true`).
+**Soon**: The ability to enable basic axis with simply `(axis: true)`.
 
 #### `tooltips`
+A simple tooltip can be enabled with
 
+```
+(tooltips: true [ <access value> || <text function> ])
+```
+
+An optional second argument takes an [access value]() or function to define the tooltip's text. Otherwise text defaults to `x-value: y-value`. 
 
 ### Special Arguments
-#### d3 scales
-#### browser events
+While Data Monster accepts a number of basic data structures as arguments, it also accepts three special arguments.
+
+#### Access Values
+Access values are references to values in the data accessed by their keys. They are the values returned when we write the common d3-ism:
+
+```
+function(d) { return d.value }
+```
+
+In Data Monster you can write these arguments with the shorthand:
+
+```
+(<constructor>: d.value)
+```
+
+#### d3 Scales
+
+[Color and axis scales](https://github.com/mbostock/d3/wiki/Scales) can also be passed by shorthand:
+
+```
+(color: category20b)
+(scale-y: log)
+```
+
++ This is an area ripe for further development. More d3 shorthand will be added in the future.
+
+#### Mouse Events
+
+A limited set of mouse events — `click`, `mousemove`, `mouseenter`, `mouseleave`, `hover` — can be specified with shorthand:
+
+```
+(click: #{ <function> })
+```
+
+If this does not work, events can always be added as [freeform expressions](#freeform-expressions).
 
 ## The Elem Expression
 
