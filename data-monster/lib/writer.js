@@ -23,9 +23,17 @@ function buildString(structure){
     'category20b' : 'pre',
     'category20c' : 'pre',
 
-    //axes
+    // axes
     'linear'      : 'pre',
-    'log'         : 'pre',  
+    'log'         : 'pre',
+    'identity'    : 'pre',
+    'sqrt'        : 'pre',
+    'pow'         : 'pre',
+    'quantize'    : 'pre',
+    'quantile'    : 'pre',
+    'threshold'   : 'pre'
+    'time'        : 'post'
+
   };
 
 
