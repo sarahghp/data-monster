@@ -20,7 +20,9 @@
     (axis-y: attr: { 'class': 'label', 'y': -10 }
              style: { 'text-anchor': 'end' }
              text: 'Num Shapes' )
+    (xAxis.ticks: 10)
+    (.tickFormat: '%d')
     (elem: line: { x1: 0, y1: 100, x2: width, y2: 100})
-    (append: 'g')
+    (svg.append: 'g')
   )
 )

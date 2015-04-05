@@ -31,7 +31,7 @@ function buildString(structure){
     'pow'         : 'pre',
     'quantize'    : 'pre',
     'quantile'    : 'pre',
-    'threshold'   : 'pre'
+    'threshold'   : 'pre',
     'time'        : 'post'
 
   };
@@ -47,7 +47,7 @@ function buildString(structure){
     if(noms[biteName]){
       str += noms[biteName](bite, contents.parent);
     } else {
-      str += defaultBite(bite, biteName);
+      str += defaultBite(bite, biteName) + "\n";
     }
 
     if (toc.length) { 
@@ -159,7 +159,7 @@ function buildString(structure){
   }
 
   function defaultBite(bite, biteName){
-    return "." + biteName + "(" + eatVars(bite) + ")";
+    return biteName + "(" + eatVars(bite) + ")";
   }
 
   function eventBite(bite){
@@ -257,7 +257,7 @@ function buildString(structure){
     var ministr = "";
     ministr+= "var maxY = d3.max(data, function(d){return " +  itself.yPrim + " }),";
     ministr+= "maxX = d3.max(data, function(d){return " + itself.xPrim + "});"; 
-    ministr+= "maxY = maxY + (maxY * .25) // Make it a little taller \n";
+    ministr+= "maxY = maxY + (maxY * .25); // Make it a little taller \n";
 
     return ministr;
   }
@@ -318,7 +318,7 @@ function buildString(structure){
 
   function assembleRestAtoms(keyArray){
     var str = "",
-        arr = _.drop(keyArray);
+        arr = _.drop(keyArray); // drop original child atom already consumed by assembleFirstAtom
 
     _.forEach(arr, function(el){
       var obk = choms[el],
@@ -424,6 +424,10 @@ function buildString(structure){
     str += obk.hasOwnProperty('yScale') ? assembleScale('user', 'y', obk) : assembleScale('default', 'y');
     str += obk.hasOwnProperty('color') ? (", \n color = " + eatVars(obk.color) + "();") : ";";
 
+    // add in axes, if they exist
+    (obk.hasOwnProperty('xAxis')) && (str += assembleAxes('xAxis', obk));
+    (obk.hasOwnProperty('yAxis')) && (str += assembleAxes('yAxis', obk));  
+
     // add in svg
     str += "var svg = d3.select('" + obk.selector + "')";
     str += ".append('svg')";
@@ -441,10 +445,6 @@ function buildString(structure){
     // bite anything not taken care of
     inkey = _.pull(inkey, 'parent','width','height','margins','selector','color','funcs','xScale', 'yScale', 'children','xPrim','yPrim','xAxis','yAxis');  
     inkey.length && (str += biteBiteBite(inkey, obk));
-
-    // add in axes, if they exist
-    (obk.hasOwnProperty('xAxis')) && (str += assembleAxes('xAxis', obk));
-    (obk.hasOwnProperty('yAxis')) && (str += assembleAxes('yAxis', obk));  
 
     // close it up!
     str += "};"
