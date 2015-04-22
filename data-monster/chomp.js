@@ -19,7 +19,7 @@ function compile(){
 
   // Checks if last arg passed is a directory
 
-  function createDirectory(check){ 
+  function createDirectory(check){
     if (path.extname(check) === '' && path.basename(check) !== '-a') {
       outDir = check;
       files.pop();

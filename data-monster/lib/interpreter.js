@@ -79,7 +79,7 @@ function chomper(ast){
 
   function handleSiblings(ast, parent){
     var consumed = _.drop(ast);
-    (consumed.length) && generate(consumed, parent); 
+    (consumed.length) && generate(consumed, parent); // Q: Do I really need to check for length here, since there is a chack in generated?
   }
 
 
@@ -130,7 +130,7 @@ function chomper(ast){
     }
 
     // call generate on rest of the expression; doesn't use handleSiblings 
-    // since the drop is brancing / handled internally 
+    // since the drop is branching / handled internally 
     generate(newExp, id); 
 
   }
@@ -144,6 +144,7 @@ function chomper(ast){
     leaf['type']      = exp[0].op;
     leaf['req_specs'] = Object.create(Object.prototype);
 
+    // Drills into particular element type and then consumes the associated expressions / values
     _.forEach(exp[0].exp, function(el){
       // return array pairs to hash pairs
       var val = el[1];
@@ -159,8 +160,7 @@ function chomper(ast){
           leaf['req_specs'][el[0]] = convertToDFunc(val.variable, 'color');
         } else {
           leaf['req_specs'][el[0]] = convertToDFunc(val.variable);
-        }
- 
+        } 
 
       } else {
         leaf['req_specs'][el[0]] = val;
@@ -290,7 +290,7 @@ function chomper(ast){
 
     } else {
       assign(ast, parent);
-    } 
+    }
   }
 
 
