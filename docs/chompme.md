@@ -147,8 +147,8 @@ becomes
 ```javascript
 function draw_data_63dc8d12(rawData) {
     rawData.forEach(function(d) {
-        d.Shape_Count = +d.Shape_Count, 
-				d.ratio = +d["Image_Height/Image_Width "]
+        d.Shape_Count = +d.Shape_Count; 
+		d.ratio = +d["Image_Height/Image_Width "];
     });
     draw_canvas_2e16a1dd(rawData);
 }
