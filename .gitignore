@@ -4,3 +4,4 @@ node_modules
 upfiles/*
 output.*
 __archive/*
+npm-debug.log
