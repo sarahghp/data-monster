@@ -41,14 +41,16 @@ function compile(){
 
   // Checks for -a flag and generates files array if necessary
 
+
+  // Review with Alan — this is confusing
   function buildFileArray(filter, list, arr){
     var arr     = arr || [],
         file    = list.pop();
 
-    (path.extname(file) === filter) && arr.push(file);
+    (path.extname(file) === filter) && arr.push(file); // just use lodash filter, silly
 
     if (list.length > 0){
-      return buildFileArray('.dm', list, arr);
+      return buildFileArray(filter, list, arr);
     } else {
       return arr;
     }

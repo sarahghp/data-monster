@@ -11,10 +11,7 @@ function buildString(structure){
  
  var choms      = structure,
      output     = "",                   // this is the string that will be built
-     keys       = Object.keys(choms),  // these are the keys we need to build it
-     dataKeys   = [],
-     canvasKeys = [],
-     elemKeys   = [];
+     keys       = Object.keys(choms);  // these are the keys we need to build it
 
   var d3things = {
     // colors
@@ -58,14 +55,16 @@ function buildString(structure){
     }
   }
 
-  function eatVars(collection, parent){
-    var collect = collection;
+  function eatVars(collection, parent){ // this is super confusing & wtf am I doing to collect
+    var collect;
 
-    if (_.isArray(collect) && _.isString(collect[0])){
-      return '"' +  collect[0] + '"';
+   if (_.isString(collection) || _.isNumber(collection)) {
+      return collection;
+    } else if (_.isArray(collection) && _.isString(collection[0])){
+      return '"' +  collection[0] + '"';
     }
 
-    _.forEach(collect, function(val, key){
+    _.forEach(collection, function(val, key){
       // iterate on collection and if a val is an object with property variable, replace that with the value in variable
       if(key === 'variable'){
         if (d3things[val]){
@@ -74,6 +73,7 @@ function buildString(structure){
           collect = lookup(val, parent);
         }
       } else if (typeof val === 'object' && val.hasOwnProperty('variable')){
+        collect = Object.create(Object.prototype);
         if (d3things[val.variable]) {
           collect[key] = assembled3things(d3things[val.variable], val.variable); // passes pre or post as arg
         } else {
@@ -82,12 +82,6 @@ function buildString(structure){
       }
     });
     return collect;
-  }
-
-  function filterArr(type){
-    return _.filter(keys, function(el){
-      return el.match('' + type + '');
-    });
   }
 
   function lookup(toFind, scope){
@@ -104,12 +98,6 @@ function buildString(structure){
 
   }
 
-  // let's make more tables of contents over which to iterate!
-  function popArrs(){
-    dataKeys = filterArr('data');
-    canvasKeys = filterArr('canvas');
-    elemKeys = filterArr('elem');
-  }
 
   function stringifyList(list, prepend, append, punc){
     var ministr = "";
@@ -175,7 +163,6 @@ function buildString(structure){
     var pobj    = choms[parent],
         ministr = "";
 
-
     ministr+= ".on('mouseover', function(d){";
     ministr+= "var xPosition = event.clientX + scrollX < width - 200 ? event.clientX + scrollX : event.clientX + scrollX - 200,";
     ministr+= "yPosition = event.clientY + scrollY + 100 > height ? event.clientY + scrollY - 25 : event.clientY + scrollY + 5,";
@@ -199,8 +186,6 @@ function buildString(structure){
 
     return ministr;
   }
-
- 
 
   // Mini Assemblers (listed alpha)
 
@@ -475,9 +460,16 @@ function buildString(structure){
 
   }
 
-  // populate output in the right order
+  // populate output in the right order > does this need to be wrapped? probably not
   (function metaAssemble(){
-      popArrs();
+
+      var canvasKeys = _.filter(keys, function(el){
+        return el.match('canvas');
+      });
+
+      var dataKeys = _.filter(keys, function(el){
+        return el.match('data');
+      });
 
       _.forEach(canvasKeys, function(el){
         output += assembleDrawFuncs(el);
