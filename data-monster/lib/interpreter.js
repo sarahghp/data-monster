@@ -46,7 +46,7 @@ function chomper(ast){
     var val;
 
     if (wrapper === 'clean'){
-      val = 'var moo = function(d){ ' + toInter + ' }';
+      val = 'var moo = function(d){ ' + toInter + '; }';
     } else if (wrapper){
       val = 'var moo = function(d){ return ' + wrapper + '(' + toInter + ') }';
     } else {
@@ -197,18 +197,22 @@ function chomper(ast){
     handleSiblings(ast, parent);
   }
 
-  function cleanPop(ast, parent){
-    var interStr    = "";
+  function cleanPop(ast, parent){ // Q: Do I really need to put them all in a string instead of returning an array?
+    // var interStr    = "";
     var assignments = ast[0].exp[0].exp
-                      .split("\n")
+                      .split(",\n")
                       .map(function(el){
+                        console.log(el);
                         return el.trim();
-                      });
-    _.forEach(assignments, function(el){
-      interStr += el;
-    })
+                      })
+                      .join(';');
 
-    structure[parent]['clean'] = convertToDFunc(interStr, 'clean');
+    console.log(assignments);
+    // _.forEach(assignments, function(el){
+    //   interStr += el;
+    // })
+
+    structure[parent]['clean'] = convertToDFunc(assignments, 'clean');
 
     handleSiblings(ast, parent);
   }
