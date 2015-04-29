@@ -1,4 +1,4 @@
-  start             = entry+
+  start             = e:entry+ { return [].concat.apply([], e)}
 
   entry             = space '(' space p:program+ space ')' space 
                     { return p; }

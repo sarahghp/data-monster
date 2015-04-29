@@ -1,6 +1,6 @@
 // produced IV, function change, bug
 
-[ [ { op: 'data',
+[ { op: 'data',
       exp:
        [ 'van_gogh_additional_measurements.tsv',
          { op: 'clean',
@@ -72,7 +72,7 @@
                         [ 'r', 4 ],
                         [ 'fill', 'year' ] ] },
                    { op: 'color',
-                     exp: { op: 'function', exp: 'own_func' } } ] } ] } ] } ] ]
+                     exp: { op: 'function', exp: 'own_func' } } ] } ] } ] } ]
 
 
 // produced III
