@@ -74,12 +74,7 @@ function chomper(ast){
     nodes[ast[0].op](id, ast[0].exp, parent); 
 
     // and also call sibling generate
-    handleSiblings(ast, parent);
-  }
-
-  function handleSiblings(ast, parent){
-    var consumed = _.drop(ast);
-    (consumed.length) && generate(consumed, parent); // Q: Do I really need to check for length here, since there is a chack in generated?
+    generate(_.drop(ast), parent);
   }
 
 
@@ -105,7 +100,7 @@ function chomper(ast){
     // call generate on the rest of the expression, with data as new parent
     // here we move into the data expression list and the outside object is sloughed
 
-    handleSiblings(exp, id);   
+    generate(_.drop(exp), id);  
   }
 
   function canvasGen(id, exp, parent){
@@ -129,8 +124,7 @@ function chomper(ast){
       newExp = _.drop(exp, 3);
     }
 
-    // call generate on rest of the expression; doesn't use handleSiblings 
-    // since the drop is branching / handled internally 
+    // no drop here since the drop is branching / handled internally 
     generate(newExp, id); 
 
   }
@@ -167,7 +161,7 @@ function chomper(ast){
       }
     });
 
-    handleSiblings(exp, id);
+    generate(_.drop(exp), id);
   }
 
   // Population Functions
@@ -178,7 +172,7 @@ function chomper(ast){
       funcPop(ast, parent);
     } else {
       structure[parent][ast[0].op] = ast[0].exp;
-      handleSiblings(ast, parent);
+      generate(_.drop(ast), parent);
     }
   }
 
@@ -194,7 +188,7 @@ function chomper(ast){
 
         });
 
-    handleSiblings(ast, parent);
+    generate(_.drop(ast), parent);
   }
 
   function cleanPop(ast, parent){ // Q: Do I really need to put them all in a string instead of returning an array?
@@ -202,19 +196,13 @@ function chomper(ast){
     var assignments = ast[0].exp[0].exp
                       .split(",\n")
                       .map(function(el){
-                        console.log(el);
                         return el.trim();
                       })
                       .join(';');
 
-    console.log(assignments);
-    // _.forEach(assignments, function(el){
-    //   interStr += el;
-    // })
-
     structure[parent]['clean'] = convertToDFunc(assignments, 'clean');
 
-    handleSiblings(ast, parent);
+    generate(_.drop(ast), parent);
   }
 
   function funcPop(ast, parent){
@@ -228,7 +216,7 @@ function chomper(ast){
       structure[parent][ast[0].op] = convertToFunc(ast[0].exp[0].exp);
      }
 
-     handleSiblings(ast, parent);
+     generate(_.drop(ast), parent);
   }
 
   function scalePop(ast, parent){
@@ -243,7 +231,7 @@ function chomper(ast){
       }
     })
 
-    handleSiblings(ast, parent);
+    generate(_.drop(ast), parent);
   }
 
   function tooltipPop (ast, parent){
@@ -261,8 +249,7 @@ function chomper(ast){
     }
     
     structure[parent].tooltip = tooltip;
-
-    handleSiblings(ast, parent);
+    generate(_.drop(ast), parent);
   }
 
   // GENERATE FUNC — BEST FUNC
