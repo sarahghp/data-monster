@@ -5,9 +5,9 @@ var util = require('util'),
 
 function chomper(ast){
 
-  var structure = { 
+  // var structure = { 
 
-  }; 
+  // }; 
 
   var nodes = {
     'data':     dataGen, 
@@ -16,23 +16,25 @@ function chomper(ast){
   };
 
   var special = {
-    'tooltips': tooltipPop,
-    'axis-x':   axisPop,
-    'axis-y':   axisPop,
-    'scale-x':  scalePop,
-    'scale-y':  scalePop,
-    'clean':    cleanPop,
-    'function': funcPop
+    // 'tooltips': tooltipPop,
+    // 'axis-x':   axisPop,
+    // 'axis-y':   axisPop,
+    // 'scale-x':  scalePop,
+    // 'scale-y':  scalePop,
+    // 'clean':    cleanPop,
+    // 'function': funcPop
   };
 
   // Utility functions
 
-  function addChildren(parent, child){
-    // if child array exists, push to it, otherwise create
+  function addChildren(parent, child, structure){
+    var parentIndex = _.findIndex(structure, { name: parent});
 
-    structure[parent]['children'] ? 
-      structure[parent]['children'].push(child) :
-      (structure[parent]['children'] = [child]) ;
+    structure[parentIndex]['children'] ? 
+      structure[parentIndex]['children'].push(child) :
+      (structure[parentIndex]['children'] = [child]) ;
+
+    return structure;
   }
 
   function convertToFunc(func){
@@ -57,32 +59,35 @@ function chomper(ast){
     return moo;
   }
 
-  function createNode(ast, parent){
+  function createNode(ast, structure){
+    // console.log('ast in node', ast);
 
-    var id;
-
-    (function createID(){
-      id = ast[0].op + '_' + uuid().split('-')[0];
-      if (structure[id]){
-        createID();
+    var id = (function createID(){
+      var check = ast.op + '_' + uuid().split('-')[0];
+      if (_.includes(structure, check)){
+        return createID();
       } else {
-        structure[id] = Object.create(Object.prototype);
+        return check;
       }
     })();
 
-    // call the appropriate generation function on child exp
-    nodes[ast[0].op](id, ast[0].exp, parent); 
+    return id;
 
-    // and also call sibling generate
-    generate(_.drop(ast), parent);
+    // // call the appropriate generation function to create a node
+    // nodes[ast[0].op](id, ast[0].exp, parent); 
+
+    // // then call generate with new structure
+    // generate(_.drop(ast), parent, structure);
   }
 
 
   // Generative functions
 
-  function dataGen(id, exp){ 
-    var leaf      = structure[id],
-        file      = exp[0],                 // the first argument to a data call is the data itself or filename
+  function dataGen(ast, parent, structure){
+  // console.log('ast in data', ast); 
+    var id        = createNode(ast, structure),
+        leaf      = { name: id },
+        file      = ast.exp[0],                 // the first argument to a data call is the data itself or filename
         extension = path.extname(file);
     
     leaf['file'] = file;
@@ -97,18 +102,26 @@ function chomper(ast){
       leaf['filetype'] = extension;
     }
 
+    structure.push(leaf)
+
     // call generate on the rest of the expression, with data as new parent
     // here we move into the data expression list and the outside object is sloughed
+    
+    return _.forEach(_.drop(ast.exp), function(el){
+      return generate(el, id, structure);
+    })
 
-    generate(_.drop(exp), id);  
+    // generate(_.drop(exp), id, structure.push(leaf));
   }
 
-  function canvasGen(id, exp, parent){
+  function canvasGen(ast, parent, structure){
 
-    parent && addChildren(parent, id);  // add canvas id to parent's list of children
-
-    var leaf = structure[id],
+    var id   = createNode(ast, structure),
+        leaf = { name: id },
+        exp  = ast.exp,
         newExp;
+
+    parent && addChildren(parent, id, structure);  // add canvas id to parent's list of children
     
     leaf['parent'] = parent;
     leaf['width']  = exp[0];
@@ -124,15 +137,24 @@ function chomper(ast){
       newExp = _.drop(exp, 3);
     }
 
-    // no drop here since the drop is branching / handled internally 
-    generate(newExp, id); 
+    structure.push(leaf)
+    
+    return _.forEach(_.drop(newExp), function(el){
+      return generate(el, id, structure);
+    })
+
+
+    // no drop here since the drop is handled above 
+    // generate(newExp, id, structure.push(leaf)); 
 
   }
 
-  function elemGen(id, exp, parent){
-    addChildren(parent, id);
+  function elemGen(ast, parent, structure){
+    var id   = createNode(ast, structure),
+        leaf = { name: id },
+        exp  = ast.exp;
 
-    var leaf = structure[id];
+    addChildren(parent, id, structure);
     
     leaf['parent']    = parent;
     leaf['type']      = exp[0].op;
@@ -161,19 +183,29 @@ function chomper(ast){
       }
     });
 
-    generate(_.drop(exp), id);
+    structure.push(leaf);
+    // generate(_.drop(exp), id, structure.push(leaf));
+
+    return _.forEach(_.drop(exp), function(el){
+      return generate(el, id, structure);
+    })
   }
 
   // Population Functions
 
-  function assign(ast, parent){
-    // find functions and dispatch them 
-    if (typeof ast[0].exp[0] === 'object' && !(ast[0].exp[0] instanceof Array) && ast[0].exp[0].op === 'function'){
-      funcPop(ast, parent);
-    } else {
-      structure[parent][ast[0].op] = ast[0].exp;
-      generate(_.drop(ast), parent);
-    }
+  function assign(ast, parent, structure){ //Q: Just add inline to generate?
+      console.log('ast in assign', ast);
+      
+      var obj = Object.create(Object.prototype);
+      obj[ast.op]  = ast.exp;
+      obj['parent'] = parent;
+      structure.push(obj);
+      
+      console.log('structure in assign', structure);
+
+      return _.forEach(_.drop(ast.exp), function(el){
+        return generate(el, structure);
+      })
   }
 
   function axisPop(ast, parent){
@@ -191,8 +223,7 @@ function chomper(ast){
     generate(_.drop(ast), parent);
   }
 
-  function cleanPop(ast, parent){ // Q: Do I really need to put them all in a string instead of returning an array?
-    // var interStr    = "";
+  function cleanPop(ast, parent){
     var assignments = ast[0].exp[0].exp
                       .split(",\n")
                       .map(function(el){
@@ -254,49 +285,64 @@ function chomper(ast){
 
   // GENERATE FUNC — BEST FUNC
 
-  function generate(ast, parent){
+  function generate(ast, parent, structure){
 
-    var parent = parent || undefined;
+    var parent    = parent || undefined,
+        structure = structure || [];
 
     // Have we consumed everything?
 
-    if(!ast.length){
-      // console.log('structure finished!');
-      return;
-    }
+    // if(!ast.length){
+    //   console.log('structure finished!');
+    //   return structure;
+    // }
 
     // if no, check if it is 'data', 'canvas', or 'elem' for the svg shapes [excepting text]: 
     // (rect, circle, ellipse, line, polyline, polygon, path)
     // if yes, call a parent creator
+    // 
+    
+    var current = ast;
+    // console.log(current);
 
-    if (ast[0].hasOwnProperty('op') && (nodes[ast[0].op])) {
-      createNode(ast, parent);
+    if (current.hasOwnProperty('op') && (nodes[current.op])) {
+      nodes[current.op](ast, parent, structure);
 
     // is it special?
 
-    } else if (ast[0].hasOwnProperty('op') && (special[ast[0].op])) {
-      special[ast[0].op](ast, parent);
+    } else if (current.hasOwnProperty('op') && (special[current.op])) {
+      special[current.op](ast, parent, structure);
 
     // default: call assigner
 
     } else {
-      assign(ast, parent);
+      assign(ast, parent, structure);
     }
   }
 
 
   // NOW LET'S GET DOWN TO BUSINESS
 
-  // ast comes as an array of arrays, each inner array mapping to a full spec expression,
+  // ast comes as an array of objects, each object mapping to a full spec expression,
   // therefore we must apply the assignment function to each
 
-  _.forEach(ast, function(el){
+  // return _.forEach(ast, function(el){
+  //   return generate(el);
+  // }).join("\n\n");
+
+
+  // var log = _.forEach(ast, function(el){
+  //   console.log(el);
+  //   return generate(el);
+  // }).join("\n\n");
+  // console.log('final', util.inspect(log, false, null));
+  // 
+  
+  var log = _.forEach(ast, function(el){
+    // console.log(el);
     return generate(el);
   });
-
-  // console.log('final', util.inspect(structure, false, null));
-
-  return structure;
+  console.log('final', util.inspect(log, false, null));
 
 }
 
