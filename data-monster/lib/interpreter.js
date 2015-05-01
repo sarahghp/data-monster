@@ -107,9 +107,13 @@ function chomper(ast){
     // call generate on the rest of the expression, with data as new parent
     // here we move into the data expression list and the outside object is sloughed
     
+    console.log('log _forEach in dataGen', _.forEach(_.drop(ast.exp), function(el){
+      return generate(el, id, structure);
+    }));
+
     return _.forEach(_.drop(ast.exp), function(el){
       return generate(el, id, structure);
-    })
+    });
 
     // generate(_.drop(exp), id, structure.push(leaf));
   }
@@ -141,7 +145,7 @@ function chomper(ast){
     
     return _.forEach(_.drop(newExp), function(el){
       return generate(el, id, structure);
-    })
+    });
 
 
     // no drop here since the drop is handled above 
@@ -150,9 +154,10 @@ function chomper(ast){
   }
 
   function elemGen(ast, parent, structure){
-    var id   = createNode(ast, structure),
-        leaf = { name: id },
-        exp  = ast.exp;
+    var id          = createNode(ast, structure),
+        leaf        = { name: id },
+        parentIndex = _.findIndex(structure, { name: parent }),
+        exp         = ast.exp;
 
     addChildren(parent, id, structure);
     
@@ -167,10 +172,10 @@ function chomper(ast){
       if ((typeof val === 'object') && val.hasOwnProperty('variable') && val.variable.match(/fill|\bd\./)){
         
         if (el[0].match(/x/)) { 
-          structure[parent]['xPrim'] = val.variable;
+          structure[parentIndex]['xPrim'] = val.variable;
           leaf['req_specs'][el[0]] = convertToDFunc(val.variable, 'xScale');
         } else if (el[0].match(/y/)){
-          structure[parent]['yPrim'] = val.variable;
+          structure[parentIndex]['yPrim'] = val.variable;
           leaf['req_specs'][el[0]] = convertToDFunc(val.variable, 'yScale');
         } else if (el[0].match(/fill/)){
           leaf['req_specs'][el[0]] = convertToDFunc(val.variable, 'color');
@@ -194,18 +199,19 @@ function chomper(ast){
   // Population Functions
 
   function assign(ast, parent, structure){ //Q: Just add inline to generate?
-      console.log('ast in assign', ast);
+      // console.log('ast in assign', ast, 'parent in assign', parent);
+      // console.log('ast in assign', ast);
       
       var obj = Object.create(Object.prototype);
       obj[ast.op]  = ast.exp;
       obj['parent'] = parent;
       structure.push(obj);
       
-      console.log('structure in assign', structure);
+      // console.log('structure in assign', structure);
 
       return _.forEach(_.drop(ast.exp), function(el){
-        return generate(el, structure);
-      })
+        return generate(el, parent, structure);
+      });
   }
 
   function axisPop(ast, parent){
@@ -288,7 +294,13 @@ function chomper(ast){
   function generate(ast, parent, structure){
 
     var parent    = parent || undefined,
-        structure = structure || [];
+        structure = structure || [],
+        current   = ast;
+
+        // console.log('CURRENT', current);
+        // 
+    
+    // console.log('structure', structure);
 
     // Have we consumed everything?
 
@@ -302,21 +314,23 @@ function chomper(ast){
     // if yes, call a parent creator
     // 
     
-    var current = ast;
+    // var current = ast;
     // console.log(current);
+    // 
+    
 
     if (current.hasOwnProperty('op') && (nodes[current.op])) {
-      nodes[current.op](ast, parent, structure);
+      return nodes[current.op](ast, parent, structure);
 
     // is it special?
 
     } else if (current.hasOwnProperty('op') && (special[current.op])) {
-      special[current.op](ast, parent, structure);
+      return special[current.op](ast, parent, structure);
 
     // default: call assigner
 
     } else {
-      assign(ast, parent, structure);
+      return assign(ast, parent, structure);
     }
   }
 
@@ -342,7 +356,7 @@ function chomper(ast){
     // console.log(el);
     return generate(el);
   });
-  console.log('final', util.inspect(log, false, null));
+  console.log('finalest confusion', util.inspect(log, false, null));
 
 }
 
