@@ -89,9 +89,9 @@ function chomper(ast){
       leaf['filetype'] = extension;
     }
 
-    structure.push(leaf)
+    structure.push(leaf);
 
-    return _.forEach(_.drop(ast.exp), function(el){
+    return _.map(_.drop(ast.exp), function(el){
       return generate(el, id, structure);
     });
   }
@@ -122,7 +122,7 @@ function chomper(ast){
     structure.push(leaf)
     
     // no drop here since the drop is handled above 
-    return _.forEach(newExp, function(el){
+    return _.map(newExp, function(el){
       return generate(el, id, structure);
     });
   }
@@ -163,7 +163,7 @@ function chomper(ast){
 
     structure.push(leaf);
 
-    return _.forEach(_.drop(exp), function(el){
+    return _.map(_.drop(exp), function(el){
       return generate(el, id, structure);
     })
   }
@@ -180,8 +180,11 @@ function chomper(ast){
       structure.push(obj);
       
       // console.log('structure in assign', structure);
+      
+      // console.log('ast?', _.drop(ast.exp));
 
-      return _.forEach(_.drop(ast.exp), function(el){
+      return _.map(_.drop(ast.exp), function(el){
+        // console.log(el);
         return generate(el, parent, structure);
       });
   }
@@ -269,13 +272,17 @@ function chomper(ast){
         structure = structure || [],
         current   = ast;    
 
+    // console.log('***AST LENGTH***', _.keys(ast).length);
+
     if (current.hasOwnProperty('op') && (nodes[current.op])) {
+      // console.log('nodes called');
       return nodes[current.op](ast, parent, structure);
 
     } else if (current.hasOwnProperty('op') && (special[current.op])) {
       return special[current.op](ast, parent, structure);
 
     } else {
+      // console.log('assign called');
       return assign(ast, parent, structure);
     }
   }
@@ -283,11 +290,11 @@ function chomper(ast){
 
   // NOW LET'S GET DOWN TO BUSINESS
   
-  var log = _.forEach(ast, function(el){
-    // console.log(el);
+
+  var log = _.map(ast, function(el){
     return generate(el);
   });
-  // console.log('finalest confusion', util.inspect(log, false, null));
+  console.log('finalest confusion', util.inspect(log, false, null));
 
 }
 
