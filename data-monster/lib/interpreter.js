@@ -5,10 +5,6 @@ var util = require('util'),
 
 function chomper(ast){
 
-  // var structure = { 
-
-  // }; 
-
   var nodes = {
     'data':     dataGen, 
     'canvas':   canvasGen,
@@ -60,8 +56,6 @@ function chomper(ast){
   }
 
   function createNode(ast, structure){
-    // console.log('ast in node', ast);
-
     var id = (function createID(){
       var check = ast.op + '_' + uuid().split('-')[0];
       if (_.includes(structure, check)){
@@ -72,19 +66,12 @@ function chomper(ast){
     })();
 
     return id;
-
-    // // call the appropriate generation function to create a node
-    // nodes[ast[0].op](id, ast[0].exp, parent); 
-
-    // // then call generate with new structure
-    // generate(_.drop(ast), parent, structure);
   }
 
 
   // Generative functions
 
   function dataGen(ast, parent, structure){
-  // console.log('ast in data', ast); 
     var id        = createNode(ast, structure),
         leaf      = { name: id },
         file      = ast.exp[0],                 // the first argument to a data call is the data itself or filename
@@ -104,18 +91,9 @@ function chomper(ast){
 
     structure.push(leaf)
 
-    // call generate on the rest of the expression, with data as new parent
-    // here we move into the data expression list and the outside object is sloughed
-    
-    console.log('log _forEach in dataGen', _.forEach(_.drop(ast.exp), function(el){
-      return generate(el, id, structure);
-    }));
-
     return _.forEach(_.drop(ast.exp), function(el){
       return generate(el, id, structure);
     });
-
-    // generate(_.drop(exp), id, structure.push(leaf));
   }
 
   function canvasGen(ast, parent, structure){
@@ -143,14 +121,10 @@ function chomper(ast){
 
     structure.push(leaf)
     
-    return _.forEach(_.drop(newExp), function(el){
+    // no drop here since the drop is handled above 
+    return _.forEach(newExp, function(el){
       return generate(el, id, structure);
     });
-
-
-    // no drop here since the drop is handled above 
-    // generate(newExp, id, structure.push(leaf)); 
-
   }
 
   function elemGen(ast, parent, structure){
@@ -165,7 +139,6 @@ function chomper(ast){
     leaf['type']      = exp[0].op;
     leaf['req_specs'] = Object.create(Object.prototype);
 
-    // Drills into particular element type and then consumes the associated expressions / values
     _.forEach(exp[0].exp, function(el){
       // return array pairs to hash pairs
       var val = el[1];
@@ -189,7 +162,6 @@ function chomper(ast){
     });
 
     structure.push(leaf);
-    // generate(_.drop(exp), id, structure.push(leaf));
 
     return _.forEach(_.drop(exp), function(el){
       return generate(el, id, structure);
@@ -295,39 +267,13 @@ function chomper(ast){
 
     var parent    = parent || undefined,
         structure = structure || [],
-        current   = ast;
-
-        // console.log('CURRENT', current);
-        // 
-    
-    // console.log('structure', structure);
-
-    // Have we consumed everything?
-
-    // if(!ast.length){
-    //   console.log('structure finished!');
-    //   return structure;
-    // }
-
-    // if no, check if it is 'data', 'canvas', or 'elem' for the svg shapes [excepting text]: 
-    // (rect, circle, ellipse, line, polyline, polygon, path)
-    // if yes, call a parent creator
-    // 
-    
-    // var current = ast;
-    // console.log(current);
-    // 
-    
+        current   = ast;    
 
     if (current.hasOwnProperty('op') && (nodes[current.op])) {
       return nodes[current.op](ast, parent, structure);
 
-    // is it special?
-
     } else if (current.hasOwnProperty('op') && (special[current.op])) {
       return special[current.op](ast, parent, structure);
-
-    // default: call assigner
 
     } else {
       return assign(ast, parent, structure);
@@ -336,27 +282,12 @@ function chomper(ast){
 
 
   // NOW LET'S GET DOWN TO BUSINESS
-
-  // ast comes as an array of objects, each object mapping to a full spec expression,
-  // therefore we must apply the assignment function to each
-
-  // return _.forEach(ast, function(el){
-  //   return generate(el);
-  // }).join("\n\n");
-
-
-  // var log = _.forEach(ast, function(el){
-  //   console.log(el);
-  //   return generate(el);
-  // }).join("\n\n");
-  // console.log('final', util.inspect(log, false, null));
-  // 
   
   var log = _.forEach(ast, function(el){
     // console.log(el);
     return generate(el);
   });
-  console.log('finalest confusion', util.inspect(log, false, null));
+  // console.log('finalest confusion', util.inspect(log, false, null));
 
 }
 
