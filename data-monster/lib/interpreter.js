@@ -179,12 +179,11 @@ function chomper(ast){
       obj['parent'] = parent;
       structure.push(obj);
       
-      // console.log('structure in assign', structure);
+      console.log('structure in assign', structure);
       
       // console.log('ast?', _.drop(ast.exp));
 
       return _.map(_.drop(ast.exp), function(el){
-        // console.log(el);
         return generate(el, parent, structure);
       });
   }
@@ -272,7 +271,6 @@ function chomper(ast){
         structure = structure || [],
         current   = ast;    
 
-    // console.log('***AST LENGTH***', _.keys(ast).length);
 
     if (current.hasOwnProperty('op') && (nodes[current.op])) {
       // console.log('nodes called');
@@ -281,9 +279,13 @@ function chomper(ast){
     } else if (current.hasOwnProperty('op') && (special[current.op])) {
       return special[current.op](ast, parent, structure);
 
-    } else {
+    } else if (current.hasOwnProperty('op')) {
       // console.log('assign called');
       return assign(ast, parent, structure);
+
+    } else {
+      // console.log('end called');
+      return structure;
     }
   }
 
@@ -294,7 +296,7 @@ function chomper(ast){
   var log = _.map(ast, function(el){
     return generate(el);
   });
-  console.log('finalest confusion', util.inspect(log, false, null));
+  // console.log('finalest confusion', util.inspect(log, false, null));
 
 }
 
