@@ -91,9 +91,15 @@ function chomper(ast){
 
     structure.push(leaf);
 
-    return _.map(_.drop(ast.exp), function(el){
-      return generate(el, id, structure);
-    });
+    // return _.map(_.drop(ast.exp), function(el){
+    //   return generate(el, id, structure);
+    // });
+    if (_.drop(ast.exp).length){
+      _.invoke(_.drop(ast.exp), function(){
+         generate(this, id, structure);
+      });
+    }
+    return structure;
   }
 
   function canvasGen(ast, parent, structure){
@@ -122,9 +128,18 @@ function chomper(ast){
     structure.push(leaf)
     
     // no drop here since the drop is handled above 
-    return _.map(newExp, function(el){
-      return generate(el, id, structure);
-    });
+    // return _.map(newExp, function(el){
+    //   return generate(el, id, structure);
+    // });
+    // 
+    
+    if (_.drop(newExp).length){
+      _.invoke(_.drop(newExp), function(){
+         generate(this, id, structure);
+      });
+    }
+
+    return structure;
   }
 
   function elemGen(ast, parent, structure){
@@ -163,9 +178,18 @@ function chomper(ast){
 
     structure.push(leaf);
 
-    return _.map(_.drop(exp), function(el){
-      return generate(el, id, structure);
-    })
+
+    if (_.drop(exp).length){
+      _.invoke(_.drop(exp), function(){
+         generate(this, parent, structure);
+      });
+    }
+
+    return structure;
+
+    // return _.map(_.drop(exp), function(el){
+    //   return generate(el, id, structure);
+    // });
   }
 
   // Population Functions
@@ -179,13 +203,26 @@ function chomper(ast){
       obj['parent'] = parent;
       structure.push(obj);
       
-      console.log('structure in assign', structure);
+      // console.log('structure in assign', structure);
       
       // console.log('ast?', _.drop(ast.exp));
+      // 
+      
+      // console.log('*** MAP ***', _.map(_.drop(ast.exp), function(el){
+      //   return generate(el, parent, structure);
+      // }))
+    
+      if (_.drop(ast.exp).length){
+        _.invoke(_.drop(ast.exp), function(){
+           generate(this, parent, structure);
+        });
+      }
 
-      return _.map(_.drop(ast.exp), function(el){
-        return generate(el, parent, structure);
-      });
+      return structure;
+
+      // return _.map(_.drop(ast.exp), function(el){
+      //   return generate(el, parent, structure);
+      // });
   }
 
   function axisPop(ast, parent){
@@ -273,20 +310,17 @@ function chomper(ast){
 
 
     if (current.hasOwnProperty('op') && (nodes[current.op])) {
-      // console.log('nodes called');
+      console.log('nodes called');
       return nodes[current.op](ast, parent, structure);
 
     } else if (current.hasOwnProperty('op') && (special[current.op])) {
       return special[current.op](ast, parent, structure);
 
-    } else if (current.hasOwnProperty('op')) {
-      // console.log('assign called');
+    } else {
+      console.log('assign called');
       return assign(ast, parent, structure);
 
-    } else {
-      // console.log('end called');
-      return structure;
-    }
+    } 
   }
 
 
@@ -296,7 +330,8 @@ function chomper(ast){
   var log = _.map(ast, function(el){
     return generate(el);
   });
-  // console.log('finalest confusion', util.inspect(log, false, null));
+  // console.log('final', util.inspect(log, false, null));
+  console.log('final', log);
 
 }
 
