@@ -91,11 +91,8 @@ function chomper(ast){
 
     structure.push(leaf);
 
-    // return _.map(_.drop(ast.exp), function(el){
-    //   return generate(el, id, structure);
-    // });
-    if (_.drop(ast.exp).length){
-      _.invoke(_.drop(ast.exp), function(){
+    if (_.rest(ast.exp).length){
+      _.invoke(_.rest(ast.exp), function(){
          generate(this, id, structure);
       });
     }
@@ -127,14 +124,8 @@ function chomper(ast){
 
     structure.push(leaf)
     
-    // no drop here since the drop is handled above 
-    // return _.map(newExp, function(el){
-    //   return generate(el, id, structure);
-    // });
-    // 
-    
-    if (_.drop(newExp).length){
-      _.invoke(_.drop(newExp), function(){
+    if (newExp.length){
+      _.invoke(newExp, function(){
          generate(this, id, structure);
       });
     }
@@ -179,50 +170,31 @@ function chomper(ast){
     structure.push(leaf);
 
 
-    if (_.drop(exp).length){
-      _.invoke(_.drop(exp), function(){
+    if (_.rest(exp).length){
+      _.invoke(_.rest(exp), function(){
          generate(this, parent, structure);
       });
     }
 
     return structure;
-
-    // return _.map(_.drop(exp), function(el){
-    //   return generate(el, id, structure);
-    // });
   }
 
   // Population Functions
 
   function assign(ast, parent, structure){ //Q: Just add inline to generate?
-      // console.log('ast in assign', ast, 'parent in assign', parent);
-      // console.log('ast in assign', ast);
       
       var obj = Object.create(Object.prototype);
       obj[ast.op]  = ast.exp;
       obj['parent'] = parent;
       structure.push(obj);
-      
-      // console.log('structure in assign', structure);
-      
-      // console.log('ast?', _.drop(ast.exp));
-      // 
-      
-      // console.log('*** MAP ***', _.map(_.drop(ast.exp), function(el){
-      //   return generate(el, parent, structure);
-      // }))
     
-      if (_.drop(ast.exp).length){
-        _.invoke(_.drop(ast.exp), function(){
+      if (_.rest(ast.exp).length){
+        _.invoke(_.rest(ast.exp), function(){
            generate(this, parent, structure);
         });
       }
 
       return structure;
-
-      // return _.map(_.drop(ast.exp), function(el){
-      //   return generate(el, parent, structure);
-      // });
   }
 
   function axisPop(ast, parent){
@@ -237,7 +209,7 @@ function chomper(ast){
 
         });
 
-    generate(_.drop(ast), parent);
+    generate(_.rest(ast), parent);
   }
 
   function cleanPop(ast, parent){
@@ -250,7 +222,7 @@ function chomper(ast){
 
     structure[parent]['clean'] = convertToDFunc(assignments, 'clean');
 
-    generate(_.drop(ast), parent);
+    generate(_.rest(ast), parent);
   }
 
   function funcPop(ast, parent){
@@ -264,7 +236,7 @@ function chomper(ast){
       structure[parent][ast[0].op] = convertToFunc(ast[0].exp[0].exp);
      }
 
-     generate(_.drop(ast), parent);
+     generate(_.rest(ast), parent);
   }
 
   function scalePop(ast, parent){
@@ -279,7 +251,7 @@ function chomper(ast){
       }
     })
 
-    generate(_.drop(ast), parent);
+    generate(_.rest(ast), parent);
   }
 
   function tooltipPop (ast, parent){
@@ -297,7 +269,7 @@ function chomper(ast){
     }
     
     structure[parent].tooltip = tooltip;
-    generate(_.drop(ast), parent);
+    generate(_.rest(ast), parent);
   }
 
   // GENERATE FUNC — BEST FUNC
@@ -310,14 +282,14 @@ function chomper(ast){
 
 
     if (current.hasOwnProperty('op') && (nodes[current.op])) {
-      console.log('nodes called');
+      // console.log('nodes called');
       return nodes[current.op](ast, parent, structure);
 
     } else if (current.hasOwnProperty('op') && (special[current.op])) {
       return special[current.op](ast, parent, structure);
 
     } else {
-      console.log('assign called');
+      // console.log('assign called');
       return assign(ast, parent, structure);
 
     } 
@@ -330,8 +302,8 @@ function chomper(ast){
   var log = _.map(ast, function(el){
     return generate(el);
   });
-  // console.log('final', util.inspect(log, false, null));
-  console.log('final', log);
+  console.log('final', util.inspect(log, false, null));
+  // console.log('final', log);
 
 }
 
