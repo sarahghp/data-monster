@@ -277,16 +277,15 @@ function chomper(ast){
   function generate(ast, parent, structure){
 
     var parent    = parent || undefined,
-        structure = structure || [],
-        current   = ast;    
+        structure = structure || [];    
 
 
-    if (current.hasOwnProperty('op') && (nodes[current.op])) {
+    if (ast.hasOwnProperty('op') && (nodes[ast.op])) {
       // console.log('nodes called');
-      return nodes[current.op](ast, parent, structure);
+      return nodes[ast.op](ast, parent, structure);
 
-    } else if (current.hasOwnProperty('op') && (special[current.op])) {
-      return special[current.op](ast, parent, structure);
+    } else if (ast.hasOwnProperty('op') && (special[ast.op])) {
+      return special[ast.op](ast, parent, structure);
 
     } else {
       // console.log('assign called');
