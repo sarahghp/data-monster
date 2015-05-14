@@ -5,3 +5,4 @@ upfiles/*
 output.*
 __archive/*
 npm-debug.log
+**/convert-notes.js

@@ -9,7 +9,11 @@
                       { return { op: w, exp:[].concat.apply([], ind) } }
 
   clean_spec        = ('clean' colon)? cf:function space
-                      { return { op: 'clean', exp: [ cf ] } }
+                      { return { op: 'clean', exp: {function: cf.function.split(",\n")
+                                        .map(function(el){
+                                          return el.trim();
+                                        })
+                                        .join('; ') }} }
 
   func_spec         = sign:signifier space func:function+ { return { op: sign, exp: func } }
 
@@ -27,7 +31,7 @@
   letter            = [^"' \n]
 
 
-  function          = space '#' space cu:curly space { return { op: 'function', exp: cu.join('').trim() } }
+  function          = space '#' space cu:curly space { return { 'function': cu.join('').trim() } }
   curly             = '{' c:([^{}]/ic)* '}' { return [].concat.apply([], c) }
   ic                = ic:('{' [^{}]* '}') { return [].concat.apply([], ic) }
 

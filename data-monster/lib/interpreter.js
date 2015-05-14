@@ -12,12 +12,10 @@ function chomper(ast){
   };
 
   var special = {
-    // 'tooltips': tooltipPop,
     // 'axis-x':   axisPop,
     // 'axis-y':   axisPop,
     // 'scale-x':  scalePop,
     // 'scale-y':  scalePop,
-    // 'clean':    cleanPop,
     // 'function': funcPop
   };
 
@@ -33,11 +31,11 @@ function chomper(ast){
     return structure;
   }
 
-  function convertToFunc(func){
-    var val = 'var moo = ' + func;
-    eval(val);
-    return moo;
-  }
+  // function convertToFunc(func){
+  //   var val = 'var moo = ' + func;
+  //   eval(val);
+  //   return moo;
+  // }
 
   function convertToDFunc(toInter, wrapper){
     // this rigamarole sets the value to the actual unexecuted function
@@ -212,33 +210,6 @@ function chomper(ast){
     generate(_.rest(ast), parent);
   }
 
-  function cleanPop(ast, parent){
-    var assignments = ast[0].exp[0].exp
-                      .split(",\n")
-                      .map(function(el){
-                        return el.trim();
-                      })
-                      .join(';');
-
-    structure[parent]['clean'] = convertToDFunc(assignments, 'clean');
-
-    generate(_.rest(ast), parent);
-  }
-
-  function funcPop(ast, parent){
-     if (ast[0].op === 'funcs'){
-      _.forEach(ast[0].exp, function(el){
-        structure[parent]['funcs'] ? 
-          structure[parent]['funcs'].push(convertToFunc(el.exp)) :
-          (structure[parent]['funcs'] = [convertToFunc(el.exp)]) ;
-      } )
-     } else {
-      structure[parent][ast[0].op] = convertToFunc(ast[0].exp[0].exp);
-     }
-
-     generate(_.rest(ast), parent);
-  }
-
   function scalePop(ast, parent){
     var type    = ast[0].op.split('-')[1],
         scaleObj = (structure[parent][(type + 'Scale')] = Object.create(Object.prototype));
@@ -254,23 +225,23 @@ function chomper(ast){
     generate(_.rest(ast), parent);
   }
 
-  function tooltipPop (ast, parent){
-    var tooltip    = Object.create(Object.prototype);
-    tooltip.parent = parent;
 
-    if (ast[0][1]) {
-      if (ast[0][1].match(/\bd\./)){
-        tooltip.text = convertToDFunc(ast[0][1]);
-      } else {
-        tooltip.text = convertToFunc(ast[0][1]);
-      }
-    } else {
-       tooltip.text = 'default';
-    }
-    
-    structure[parent].tooltip = tooltip;
-    generate(_.rest(ast), parent);
+  function funcPop(ast, parent){
+    // Basically right now this function is just checking for an array and is then otherwise
+    // dispatching a single function
+     if (ast[0].op === 'funcs'){
+      _.forEach(ast[0].exp, function(el){
+        structure[parent]['funcs'] ? 
+          structure[parent]['funcs'].push(convertToFunc(el.exp)) :
+          (structure[parent]['funcs'] = [convertToFunc(el.exp)]) ;
+      } )
+     } else {
+      structure[parent][ast[0].op] = convertToFunc(ast[0].exp[0].exp); // Q: what is the case for this?
+     }
+
+     generate(_.rest(ast), parent);
   }
+
 
   // GENERATE FUNC — BEST FUNC
 
