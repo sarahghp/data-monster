@@ -16,7 +16,6 @@ function chomper(ast){
     // 'axis-y':   axisPop,
     // 'scale-x':  scalePop,
     // 'scale-y':  scalePop,
-    // 'function': funcPop
   };
 
   // Utility functions
@@ -223,23 +222,6 @@ function chomper(ast){
     })
 
     generate(_.rest(ast), parent);
-  }
-
-
-  function funcPop(ast, parent){
-    // Basically right now this function is just checking for an array and is then otherwise
-    // dispatching a single function
-     if (ast[0].op === 'funcs'){
-      _.forEach(ast[0].exp, function(el){
-        structure[parent]['funcs'] ? 
-          structure[parent]['funcs'].push(convertToFunc(el.exp)) :
-          (structure[parent]['funcs'] = [convertToFunc(el.exp)]) ;
-      } )
-     } else {
-      structure[parent][ast[0].op] = convertToFunc(ast[0].exp[0].exp); // Q: what is the case for this?
-     }
-
-     generate(_.rest(ast), parent);
   }
 
 
