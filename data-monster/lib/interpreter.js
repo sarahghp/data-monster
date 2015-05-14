@@ -30,28 +30,6 @@ function chomper(ast){
     return structure;
   }
 
-  // function convertToFunc(func){
-  //   var val = 'var moo = ' + func;
-  //   eval(val);
-  //   return moo;
-  // }
-
-  function convertToDFunc(toInter, wrapper){
-    // this rigamarole sets the value to the actual unexecuted function
-    var val;
-
-    if (wrapper === 'clean'){
-      val = 'var moo = function(d){ ' + toInter + '; }';
-    } else if (wrapper){
-      val = 'var moo = function(d){ return ' + wrapper + '(' + toInter + ') }';
-    } else {
-      val = 'var moo = function(d){ return ' + toInter + ' }';
-    }
-    
-    eval(val);
-    return moo;
-  }
-
   function createNode(ast, structure){
     var id = (function createID(){
       var check = ast.op + '_' + uuid().split('-')[0];
@@ -103,7 +81,8 @@ function chomper(ast){
         exp  = ast.exp,
         newExp;
 
-    parent && addChildren(parent, id, structure);  // add canvas id to parent's list of children
+    // add canvas id to parent's list of children
+    parent && addChildren(parent, id, structure);  
     
     leaf['parent'] = parent;
     leaf['width']  = exp[0];
@@ -143,29 +122,20 @@ function chomper(ast){
     leaf['req_specs'] = Object.create(Object.prototype);
 
     _.forEach(exp[0].exp, function(el){
-      // return array pairs to hash pairs
+      // return array pairs to hash pairs & add in xPrim & yPrim
       var val = el[1];
-      if ((typeof val === 'object') && val.hasOwnProperty('variable') && val.variable.match(/fill|\bd\./)){
-        
+      leaf['req_specs'][el[0]] = val;
+      
+      if (val.variable && val.variable.match(/\bd\./)){
         if (el[0].match(/x/)) { 
           structure[parentIndex]['xPrim'] = val.variable;
-          leaf['req_specs'][el[0]] = convertToDFunc(val.variable, 'xScale');
         } else if (el[0].match(/y/)){
           structure[parentIndex]['yPrim'] = val.variable;
-          leaf['req_specs'][el[0]] = convertToDFunc(val.variable, 'yScale');
-        } else if (el[0].match(/fill/)){
-          leaf['req_specs'][el[0]] = convertToDFunc(val.variable, 'color');
-        } else {
-          leaf['req_specs'][el[0]] = convertToDFunc(val.variable);
         } 
-
-      } else {
-        leaf['req_specs'][el[0]] = val;
       }
     });
 
     structure.push(leaf);
-
 
     if (_.rest(exp).length){
       _.invoke(_.rest(exp), function(){
