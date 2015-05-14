@@ -12,10 +12,10 @@ function chomper(ast){
   };
 
   var special = {
-    // 'axis-x':   axisPop,
-    // 'axis-y':   axisPop,
-    // 'scale-x':  scalePop,
-    // 'scale-y':  scalePop,
+    'axis-x':   scaleAndAxisPop,
+    'axis-y':   scaleAndAxisPop,
+    'scale-x':  scaleAndAxisPop,
+    'scale-y':  scaleAndAxisPop,
   };
 
   // Utility functions
@@ -30,6 +30,14 @@ function chomper(ast){
     return structure;
   }
 
+  function addInto(pairs, obj){
+    var obj = obj || {};
+    _.forEach(pairs, function(val, key){
+      obj[key] = val;
+    });
+    return obj;
+  }
+
   function createNode(ast, structure){
     var id = (function createID(){
       var check = ast.op + '_' + uuid().split('-')[0];
@@ -41,6 +49,28 @@ function chomper(ast){
     })();
 
     return id;
+  }
+
+  function objectify (pairArrays, toObj, defaultKey){
+    _.forEach(pairArrays, function(pair){
+      if (pair.length < 2) {
+        toObj[defaultKey] = pair[0];
+      } else {
+        toObj[pair[0]] = pair[1];
+      }
+    });
+    return toObj;
+  }
+
+  function setOpToExp(objArray, toObj, defaultKey){
+    _.forEach(objArray, function(obj){
+      if (!obj.op){
+        toObj[defaultKey] = obj;
+      } else {
+        toObj[obj.op] = obj.exp;
+      }
+    });
+    return toObj;
   }
 
 
@@ -164,34 +194,14 @@ function chomper(ast){
       return structure;
   }
 
-  function axisPop(ast, parent){
-    var type    = ast[0].op.split('-')[1],
-        axisObj = (structure[parent][(type + 'Axis')] = Object.create(Object.prototype));
+  function scaleAndAxisPop(ast, parent, structure){
+    var breakOp = ast.op.split('-'),
+        label   = breakOp[1] + _.capitalize(breakOp[0]),
+        outer   = objectify([[label, {}]], {}),
+        inner   = addInto({'parent': parent}, outer[label]);
 
-        axisObj.parent = parent;
-
-        _.forEach(ast[0].exp, function(el){
-
-          axisObj[el.op] = el.exp;
-
-        });
-
-    generate(_.rest(ast), parent);
-  }
-
-  function scalePop(ast, parent){
-    var type    = ast[0].op.split('-')[1],
-        scaleObj = (structure[parent][(type + 'Scale')] = Object.create(Object.prototype));
-
-    _.forEach(ast[0].exp, function(el){
-      if (el.hasOwnProperty('variable')){
-        scaleObj['scale'] = el;
-      } else {
-        scaleObj[el.op] = el.exp[0];
-      }
-    })
-
-    generate(_.rest(ast), parent);
+        setOpToExp(ast.exp, inner);        
+        return structure.push(outer);
   }
 
 
@@ -202,16 +212,13 @@ function chomper(ast){
     var parent    = parent || undefined,
         structure = structure || [];    
 
-
     if (ast.hasOwnProperty('op') && (nodes[ast.op])) {
-      // console.log('nodes called');
       return nodes[ast.op](ast, parent, structure);
 
     } else if (ast.hasOwnProperty('op') && (special[ast.op])) {
       return special[ast.op](ast, parent, structure);
 
     } else {
-      // console.log('assign called');
       return assign(ast, parent, structure);
 
     } 
@@ -225,8 +232,6 @@ function chomper(ast){
     return generate(el);
   });
   console.log('final', util.inspect(log, false, null));
-  // console.log('final', log);
-
 }
 
 exports.chomper = chomper;
