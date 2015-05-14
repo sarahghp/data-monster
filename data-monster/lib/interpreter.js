@@ -78,23 +78,14 @@ function chomper(ast){
 
   function dataGen(ast, parent, structure){
     var id        = createNode(ast, structure),
-        leaf      = { name: id },
         file      = ast.exp[0],                 // the first argument to a data call is the data itself or filename
-        extension = path.extname(file);
-    
-    leaf['file'] = file;
+        extension = path.extname(file),
+        additions = { name: id,
+                      file: file,
+                      filetype: extension,
+                    };
 
-    if(extension === ''){
-      if(file instanceof Array){
-        leaf['filetype'] = 'array';
-      } else {
-        console.log('Error: Invalid data type');
-      }
-    } else {
-      leaf['filetype'] = extension;
-    }
-
-    structure.push(leaf);
+    structure.push(addInto(additions,{}));
 
     if (_.rest(ast.exp).length){
       _.invoke(_.rest(ast.exp), function(){
@@ -105,30 +96,29 @@ function chomper(ast){
   }
 
   function canvasGen(ast, parent, structure){
-
     var id   = createNode(ast, structure),
-        leaf = { name: id },
         exp  = ast.exp,
-        newExp;
+        newExp,
+        additions = { name: id, 
+                      parent: parent,
+                      width: exp[0],
+                      height: exp[1]
+                    };
 
     // add canvas id to parent's list of children
-    parent && addChildren(parent, id, structure);  
-    
-    leaf['parent'] = parent;
-    leaf['width']  = exp[0];
-    leaf['height'] = exp[1];
+    parent && addChildren(parent, id, structure);
 
     // check for optional margins and assign selector & margins based on result
-    if (typeof exp[2] === 'object' && exp[2]) {
-      leaf['margins'] = exp[2];
-      leaf['selector'] = exp[3];
+    if (_.isObject(exp[2])) {
+      additions['margins'] = exp[2];
+      additions['selector'] = exp[3];
       newExp = _.drop(exp, 4);
     } else {
-      leaf['selector'] = exp[2];
+      additions['selector'] = exp[2];
       newExp = _.drop(exp, 3);
     }
 
-    structure.push(leaf)
+    structure.push(addInto(additions, {}))
     
     if (newExp.length){
       _.invoke(newExp, function(){
@@ -141,31 +131,25 @@ function chomper(ast){
 
   function elemGen(ast, parent, structure){
     var id          = createNode(ast, structure),
-        leaf        = { name: id },
         parentIndex = _.findIndex(structure, { name: parent }),
-        exp         = ast.exp;
+        exp         = ast.exp,
+        innerExp    = exp[0].exp,
+        additions   = { name: id, 
+                        parent: parent,
+                        type: exp[0].op,
+                        req_specs: objectify(innerExp, {}, 'oops')
+                      };
 
     addChildren(parent, id, structure);
-    
-    leaf['parent']    = parent;
-    leaf['type']      = exp[0].op;
-    leaf['req_specs'] = Object.create(Object.prototype);
 
-    _.forEach(exp[0].exp, function(el){
-      // return array pairs to hash pairs & add in xPrim & yPrim
-      var val = el[1];
-      leaf['req_specs'][el[0]] = val;
-      
-      if (val.variable && val.variable.match(/\bd\./)){
-        if (el[0].match(/x/)) { 
-          structure[parentIndex]['xPrim'] = val.variable;
-        } else if (el[0].match(/y/)){
-          structure[parentIndex]['yPrim'] = val.variable;
-        } 
-      }
-    });
+    additions.xPrim = _.result(_.find(additions.req_specs, function(val, key){
+          return _.has(val, 'variable') && val.variable.match(/\bd\./) && key.match(/x/);
+        }), 'variable');
+    additions.yPrim = _.result(_.find(additions.req_specs, function(val, key){
+          return _.has(val, 'variable') && val.variable.match(/\bd\./) && key.match(/y/);
+        }), 'variable');
 
-    structure.push(leaf);
+    structure.push(addInto(additions, {}));
 
     if (_.rest(exp).length){
       _.invoke(_.rest(exp), function(){
@@ -178,12 +162,9 @@ function chomper(ast){
 
   // Population Functions
 
-  function assign(ast, parent, structure){ //Q: Just add inline to generate?
-      
-      var obj = Object.create(Object.prototype);
-      obj[ast.op]  = ast.exp;
-      obj['parent'] = parent;
-      structure.push(obj);
+  function assign(ast, parent, structure){ 
+    var additions = objectify([[ast.op, ast.exp],['parent', parent]],{});
+    structure.push(addInto(additions, {}));
     
       if (_.rest(ast.exp).length){
         _.invoke(_.rest(ast.exp), function(){
