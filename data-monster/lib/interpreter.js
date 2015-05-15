@@ -1,7 +1,8 @@
 var util = require('util'),
     _    = require('lodash'),
     path = require('path'),
-    uuid = require('uuid-v4');
+    uuid = require('uuid-v4'),
+    guts = require('./guts.js');
 
 function chomper(ast){
 
@@ -51,6 +52,7 @@ function chomper(ast){
     return id;
   }
 
+  // TODO: Consider moving to guts
   function objectify (pairArrays, toObj, defaultKey){
     _.forEach(pairArrays, function(pair){
       if (pair.length < 2) {
@@ -140,14 +142,20 @@ function chomper(ast){
                         req_specs: objectify(innerExp, {}, 'oops')
                       };
 
-    addChildren(parent, id, structure);
+    addChildren(parent, id, structure);    
+    
 
-    additions.xPrim = _.result(_.find(additions.req_specs, function(val, key){
-          return _.has(val, 'variable') && val.variable.match(/\bd\./) && key.match(/x/);
-        }), 'variable');
-    additions.yPrim = _.result(_.find(additions.req_specs, function(val, key){
-          return _.has(val, 'variable') && val.variable.match(/\bd\./) && key.match(/y/);
-        }), 'variable');
+    var tests =  function(personalizer){
+        return function(val, key) {
+          return _.has(val, 'variable') && val.variable.match(/\bd\./) && _.includes(key, personalizer);
+        }
+      };
+
+    var primPartial = _.partial(guts.finder, additions.req_specs, _, 'variable');
+
+    // TODO: add to grandparent
+    additions.xPrim = primPartial(tests('x'));
+    additions.yPrim = primPartial(tests('y'));
 
     structure.push(addInto(additions, {}));
 
