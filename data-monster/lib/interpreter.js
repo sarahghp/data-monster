@@ -2,7 +2,7 @@ var util = require('util'),
     _    = require('lodash'),
     path = require('path'),
     uuid = require('uuid-v4'),
-    guts = require('./guts.js');
+    guts = require('./guts.js'); // guts is the dm-specific utils file
 
 function chomper(ast){
 
@@ -31,14 +31,6 @@ function chomper(ast){
     return structure;
   }
 
-  function addInto(pairs, obj){
-    var obj = obj || {};
-    _.forEach(pairs, function(val, key){
-      obj[key] = val;
-    });
-    return obj;
-  }
-
   function createNode(ast, structure){
     var id = (function createID(){
       var check = ast.op + '_' + uuid().split('-')[0];
@@ -52,30 +44,6 @@ function chomper(ast){
     return id;
   }
 
-  // TODO: Consider moving to guts
-  function objectify (pairArrays, toObj, defaultKey){
-    _.forEach(pairArrays, function(pair){
-      if (pair.length < 2) {
-        toObj[defaultKey] = pair[0];
-      } else {
-        toObj[pair[0]] = pair[1];
-      }
-    });
-    return toObj;
-  }
-
-  function setOpToExp(objArray, toObj, defaultKey){
-    _.forEach(objArray, function(obj){
-      if (!obj.op){
-        toObj[defaultKey] = obj;
-      } else {
-        toObj[obj.op] = obj.exp;
-      }
-    });
-    return toObj;
-  }
-
-
   // Generative functions
 
   function dataGen(ast, parent, structure){
@@ -87,7 +55,7 @@ function chomper(ast){
                       filetype: extension,
                     };
 
-    structure.push(addInto(additions,{}));
+    structure.push(guts.addInto(additions,{}));
 
     if (_.rest(ast.exp).length){
       _.invoke(_.rest(ast.exp), function(){
@@ -120,7 +88,7 @@ function chomper(ast){
       newExp = _.drop(exp, 3);
     }
 
-    structure.push(addInto(additions, {}))
+    structure.push(guts.addInto(additions, {}))
     
     if (newExp.length){
       _.invoke(newExp, function(){
@@ -139,7 +107,7 @@ function chomper(ast){
         additions   = { name: id, 
                         parent: parent,
                         type: exp[0].op,
-                        req_specs: objectify(innerExp, {}, 'oops')
+                        req_specs: guts.objectify(innerExp, {}, 'oops')
                       };
 
     addChildren(parent, id, structure);    
@@ -153,11 +121,10 @@ function chomper(ast){
 
     var primPartial = _.partial(guts.finder, additions.req_specs, _, 'variable');
 
-    // TODO: add to grandparent
     additions.xPrim = primPartial(tests('x'));
     additions.yPrim = primPartial(tests('y'));
 
-    structure.push(addInto(additions, {}));
+    structure.push(guts.addInto(additions, {}));
 
     if (_.rest(exp).length){
       _.invoke(_.rest(exp), function(){
@@ -171,8 +138,8 @@ function chomper(ast){
   // Population Functions
 
   function assign(ast, parent, structure){ 
-    var additions = objectify([[ast.op, ast.exp],['parent', parent]],{});
-    structure.push(addInto(additions, {}));
+    var additions = guts.objectify([[ast.op, ast.exp],['parent', parent]],{});
+    structure.push(guts.addInto(additions, {}));
     
       if (_.rest(ast.exp).length){
         _.invoke(_.rest(ast.exp), function(){
@@ -186,10 +153,10 @@ function chomper(ast){
   function scaleAndAxisPop(ast, parent, structure){
     var breakOp = ast.op.split('-'),
         label   = breakOp[1] + _.capitalize(breakOp[0]),
-        outer   = objectify([[label, {}]], {}),
-        inner   = addInto({'parent': parent}, outer[label]);
+        outer   = guts.objectify([[label, {}]], {}),
+        inner   = guts.addInto({'parent': parent}, outer[label]);
 
-        setOpToExp(ast.exp, inner);        
+        guts.setAtoB('op', 'exp')(ast.exp, inner);        
         return structure.push(outer);
   }
 
