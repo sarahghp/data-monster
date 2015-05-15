@@ -1,6 +1,10 @@
 var _    = require('lodash');
 
-
+/**
+ * Add any number of key value pairs into a new or existent object
+ * @param {obj} pairs to be added in
+ * @param {obj} obj   object to add them to
+ */
 exports.addInto = function addInto(pairs, obj){
   var obj = obj || {};
   _.forEach(pairs, function(val, key){
@@ -9,6 +13,14 @@ exports.addInto = function addInto(pairs, obj){
   return obj;
 }
 
+/**
+ * Uses find and a series of tests to select an item from a collection
+ * Can be used with result to find a value from a key-value pair
+ * @param  {obj or array} collection collection to inspect
+ * @param  {fn}           tests      function that returns the tests; what you wuld pass to find
+ * @param  {str}          label      optional key if you want only value returned
+ * @return {obj or string}           first matching value
+ */
 exports.finder = function finder (collection, tests, label){
   if (label) {
     return _.result(_.find(collection, tests), label);
@@ -17,6 +29,13 @@ exports.finder = function finder (collection, tests, label){
   }
 }
 
+/**
+ * Concatenate a pair of arrays into an object
+ * @param  {arr} pairArrays 2D array of pairs
+ * @param  {obj} toObj      object to add them into
+ * @param  {str} defaultKey string to use for key if none is a available
+ * @return {obj}            created or mutated object
+ */
 exports.objectify = function objectify (pairArrays, toObj, defaultKey){
   _.forEach(pairArrays, function(pair){
     if (pair.length < 2) {
@@ -28,6 +47,12 @@ exports.objectify = function objectify (pairArrays, toObj, defaultKey){
   return toObj;
 }
 
+/**
+ * Way to iterate over AST-like structures where the value of one known 
+ * key should be set to the value of another
+ * @param {str} A new key
+ * @param {str} B new value
+ */
 exports.setAtoB = function setAtoB(A, B){
   return function (objArray, toObj, defaultKey){
     _.forEach(objArray, function(obj){
