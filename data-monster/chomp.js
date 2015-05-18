@@ -8,23 +8,22 @@ var fs       = require('fs'),
     flags    = writer.flags;
 
 
-function compile(){
+function compiler(){
 
   var inputs      = process.argv,
       iL          = inputs.length,
       files       = inputs.slice(2, iL),
       lastFile    = inputs[iL - 1],
-      calledFrom  = process.cwd(),
       outDir;
 
-  // Checks if last arg passed is a directory
+  // Checks if last arg passed is a directory <-- CHANGE TO FLAG `-d /path/to/files`
 
   function createDirectory(check){
     if (path.extname(check) === '' && path.basename(check) !== '-a') {
       outDir = check;
       files.pop();
     } else {
-      outDir = calledFrom + '/monster-files';
+      outDir = __dirname + '/monster-files';
     }
 
     // Create destination, using recommended handling of ignoring 'EEXIST' error  
@@ -39,7 +38,7 @@ function compile(){
     });
   }
 
-  // Checks for -a flag and generates files array if necessary
+  // Checks for -a flag and generates files array if necessary <-- use minimst
 
 
   // Review with Alan — this is confusing
@@ -47,7 +46,7 @@ function compile(){
     var arr     = arr || [],
         file    = list.pop();
 
-    (path.extname(file) === filter) && arr.push(file); // just use lodash filter, silly
+    (path.extname(file) === filter) && arr.push(file); // just use lodash filter, silly; take in files, filter, return
 
     if (list.length > 0){
       return buildFileArray(filter, list, arr);
@@ -58,7 +57,7 @@ function compile(){
 
   function genFileCollection(dir){
     if (files[0] === '-a'){
-      return buildFileArray('.dm', fs.readdirSync(dir));
+      return buildFileArray('.dm', fs.readdirSync(dir)); // <-- why is filter hardcoded here?
     } else {
       return files;
     }
@@ -66,14 +65,14 @@ function compile(){
 
   // What it is we want to do to the files
 
-  var changes =  function(files){
+  var compile =  function(files){  // <-- this is kind of a stupid function name
     // call grammar gen once, then 
     parser.build();
 
     _.forEach(files, function interpret(file){
-      var structure   = parser.structure(calledFrom + '/' + file),
+      var structure   = parser.structure(__dirname + '/' + file),
           output      = writer.string(structure),
-          title       = file.slice(0, -3),
+          title       = file.slice(0, -3), // because we know the extname is .dm
           outputTitle = title + '.js';
 
         // Then write out js file(s) to output directory
@@ -91,7 +90,7 @@ function compile(){
   // Call all the processes, including final compilation once the event loop has cleared
 
   createDirectory(lastFile);
-  _.defer(changes, genFileCollection(calledFrom));
+  _.defer(compile, genFileCollection(__dirname));
 
   // Finally add in HTML & CSS helper files if necessary
   _.defer(function(){
@@ -107,4 +106,4 @@ function compile(){
 }
 
 
-module.exports = compile();
+module.exports = compiler();
