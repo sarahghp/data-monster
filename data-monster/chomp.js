@@ -3,6 +3,7 @@
 var fs       = require('fs'),
     path     = require('path'),
     _        = require('lodash'),
+    program  = require('commander'),
     parser   = require('./lib/parser.js'),
     writer   = require('./lib/writer.js'),
     flags    = writer.flags;
@@ -10,24 +11,21 @@ var fs       = require('fs'),
 
 function compiler(){
 
-  var inputs      = process.argv,
-      iL          = inputs.length,
-      files       = inputs.slice(2, iL),
-      lastFile    = inputs[iL - 1],
-      outDir;
+  // Parse arguments
 
-  // Checks if last arg passed is a directory <-- CHANGE TO FLAG `-d /path/to/files`
+  program
+    .version('0.0.1')
+    .option('-a, --all', 'Chomp all .dm files')
+    .option('-d, --directory [dir]', 'Write out to this directory')
+    .parse(process.argv);
 
-  function createDirectory(check){
-    if (path.extname(check) === '' && path.basename(check) !== '-a') {
-      outDir = check;
-      files.pop();
-    } else {
-      outDir = __dirname + '/monster-files';
-    }
+  function createDirectory(directory){
 
     // Create destination, using recommended handling of ignoring 'EEXIST' error  
     // since fs.exists() will be deprecated
+    // 
+    
+    var outDir = directory ||  __dirname + '/monster-files';
 
     fs.mkdir(outDir, function(err){
       if (err && err.code == 'EEXIST'){
@@ -38,28 +36,13 @@ function compiler(){
     });
   }
 
-  // Checks for -a flag and generates files array if necessary <-- use minimst
-
-
-  // Review with Alan — this is confusing
-  function buildFileArray(filter, list, arr){
-    var arr     = arr || [],
-        file    = list.pop();
-
-    (path.extname(file) === filter) && arr.push(file); // just use lodash filter, silly; take in files, filter, return
-
-    if (list.length > 0){
-      return buildFileArray(filter, list, arr);
-    } else {
-      return arr;
-    }
-  }
-
+  // Checks for -a flag and generates files array if necessary 
   function genFileCollection(dir){
-    if (files[0] === '-a'){
-      return buildFileArray('.dm', fs.readdirSync(dir)); // <-- why is filter hardcoded here?
+    if (program.all){
+      return _.filter(fs.readdirSync(dir), function(f){
+        return path.extname(f) === '.dm'});
     } else {
-      return files;
+      return program.args;
     }
   }
 
@@ -89,7 +72,7 @@ function compiler(){
 
   // Call all the processes, including final compilation once the event loop has cleared
 
-  createDirectory(lastFile);
+  createDirectory(program.directory);
   _.defer(compile, genFileCollection(__dirname));
 
   // Finally add in HTML & CSS helper files if necessary
