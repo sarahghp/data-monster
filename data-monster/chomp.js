@@ -15,6 +15,7 @@ function compiler(){
 
   program
     .version('0.0.1')
+    .description('Compile your data monster files')
     .option('-a, --all', 'Chomp all .dm files')
     .option('-d, --directory [dir]', 'Write out to this directory')
     .parse(process.argv);
