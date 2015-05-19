@@ -4,6 +4,7 @@ var fs       = require('fs'),
     path     = require('path'),
     _        = require('lodash'),
     program  = require('commander'),
+    RSVP     = require('rsvp'),
     parser   = require('./lib/parser.js'),
     writer   = require('./lib/writer.js'),
     flags    = writer.flags;
@@ -12,7 +13,6 @@ var fs       = require('fs'),
 function compiler(){
 
   // Parse arguments
-
   program
     .version('0.0.1')
     .description('Compile your data monster files')
@@ -23,18 +23,20 @@ function compiler(){
   function createDirectory(directory){
 
     // Create destination, using recommended handling of ignoring 'EEXIST' error  
-    // since fs.exists() will be deprecated
-    // 
+    // since fs.exists() will be deprecated 
     
-    var outDir = directory ||  __dirname + '/monster-files';
+    return new RSVP.Promise(function(resolve, reject){
 
-    fs.mkdir(outDir, function(err){
-      if (err && err.code == 'EEXIST'){
-        return;
-      } else if (err) {
-        console.log(err);
-      }
-    });
+      var outDir = program.directory ||  __dirname + '/monster-files';
+      
+      fs.mkdir(outDir, function(err){
+        if (err && err.code !== 'EEXIST'){
+          reject(err);
+        } else {
+          resolve(outDir);
+        }
+      });
+    })
   }
 
   // Checks for -a flag and generates files array if necessary 
@@ -49,19 +51,14 @@ function compiler(){
 
   // What it is we want to do to the files
 
-  var compile =  function(files){  // <-- this is kind of a stupid function name
-    // call grammar gen once, then 
+  var compile =  function(files, outDir){
+    // gen grammer & make sure we are in the right folder
     parser.build();
+    path.basename(__dirname) !== outDir && process.chdir(outDir);
 
     _.forEach(files, function interpret(file){
-      var structure   = parser.structure(__dirname + '/' + file),
-          output      = writer.string(structure),
-          title       = file.slice(0, -3), // because we know the extname is .dm
-          outputTitle = title + '.js';
-
-        // Then write out js file(s) to output directory
-
-        path.basename(process.cwd()) !== outDir && process.chdir(outDir);
+      var output      = writer.string(parser.structure(__dirname + '/' + file)),
+          outputTitle = path.basename(file, '.dm') + '.js';        
 
         fs.writeFile(outputTitle, output, function(err){
           if(err) throw err;
@@ -73,20 +70,23 @@ function compiler(){
 
   // Call all the processes, including final compilation once the event loop has cleared
 
-  createDirectory(program.directory);
-  _.defer(compile, genFileCollection(__dirname));
-
-  // Finally add in HTML & CSS helper files if necessary
-  _.defer(function(){
-    if (flags.ttBool){
-      fs.createReadStream(__dirname + '/lib/tt.html').pipe(fs.createWriteStream(outDir + '/tt.html'));
-      fs.createReadStream(__dirname + '/lib/tt.css').pipe(fs.createWriteStream(outDir + '/tt.css'));
-    }
-    if(flags.axisBool){
-      fs.createReadStream(__dirname + '/lib/axis.css').pipe(fs.createWriteStream(outDir + '/axis.css'));
-    }
-  })
-
+  createDirectory(program.directory)
+    .then(function(outDir){
+      console.log('Promise worked');
+      compile(genFileCollection(__dirname), outDir);
+    })
+    .then(function(){
+      if (flags.ttBool){
+        fs.createReadStream(__dirname + '/lib/tt.html').pipe(fs.createWriteStream(outDir + '/tt.html'));
+        fs.createReadStream(__dirname + '/lib/tt.css').pipe(fs.createWriteStream(outDir + '/tt.css'));
+      }
+      if(flags.axisBool){
+        fs.createReadStream(__dirname + '/lib/axis.css').pipe(fs.createWriteStream(outDir + '/axis.css'));
+      }
+    })
+    .catch(function(err){
+        console.log("Error: ", err);
+    });
 }
 
 
