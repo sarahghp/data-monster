@@ -68,7 +68,7 @@ function compiler(){
   }
 
 
-  // Call all the processes, including final compilation once the event loop has cleared
+  // Call all the processes
 
   createDirectory(program.directory)
     .then(function(outDir){
