@@ -176,7 +176,6 @@ function chomper(ast){
 
     } else {
       return assign(ast, parent, structure);
-
     } 
   }
 
@@ -188,6 +187,10 @@ function chomper(ast){
     return generate(el);
   });
   console.log('final', util.inspect(log, false, null));
+
+  return _.map(ast, function(el){
+    return generate(el);
+  });
 }
 
 exports.chomper = chomper;
