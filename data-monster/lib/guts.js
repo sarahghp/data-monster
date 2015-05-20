@@ -48,6 +48,21 @@ exports.objectify = function objectify (pairArrays, toObj, defaultKey){
 }
 
 /**
+ * Read from one directory, check for file type, pipe to another
+ * @param  {str} inputBase  originating directory
+ * @param  {str} outputBase target directory
+ * @param  {str} key        file basename
+ * @param  {str} extension  file extension
+ * @return {fn}             pip call
+ */
+exports.readWrite = function readWrite(inputBase, outputBase, key, extension){
+  if (_.includes(fs.readdirSync(inputBase), [key, extension].join(''))){
+    return fs.createReadStream([inputBase, key, extension].join(''))
+           .pipe(fs.createWriteStream([outputBase, key, extension].join('')));
+  }
+}
+
+/**
  * Way to iterate over AST-like structures where the value of one known 
  * key should be set to the value of another
  * @param {str} A new key

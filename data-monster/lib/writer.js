@@ -4,8 +4,8 @@ var fs      = require('fs'),
     pretty  = require('js-object-pretty-print').pretty, // unpacks objects
     beautify = require('js-beautify').js_beautify;      // formats output
 
-var flags = { ttBool  : false,
-              axisBool: false  }; // is set to true by tooltips/axes, to output companion files
+var flags = { tt   : false,
+              axis : false  }; // is set to true by tooltips/axes, to output companion files
 
 function buildString(structure){
  
@@ -158,7 +158,7 @@ function buildString(structure){
 
   function ttBite (bite, parent){
 
-    flags.ttBool = true;
+    flags.tt = true;
 
     var pobj    = choms[parent],
         ministr = "";
@@ -190,7 +190,7 @@ function buildString(structure){
   // Mini Assemblers (listed alpha)
 
   function assembleAxes(type, itself){
-    flags.axisBool = true;
+    flags.axis = true;
 
     var ministr   = "",
         minitype  = type.slice(0,1),  

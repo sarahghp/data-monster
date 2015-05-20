@@ -7,6 +7,7 @@ var fs       = require('fs'),
     RSVP     = require('rsvp'),
     parser   = require('./lib/parser.js'),
     writer   = require('./lib/writer.js'),
+    guts     = require('./lib/guts.js'),
     flags    = writer.flags;
 
 
@@ -36,6 +37,16 @@ function compiler(){
           resolve(outDir);
         }
       });
+    })
+  }
+
+  function createSupportFiles(flags, extArr, inputBase, outputBase){  
+    _.forEach(_.keys(flags), function(val, key){
+      if (val) {
+        _.forEach(extArr, function(ext){
+          guts.readWrite(inputBase, outputBase, key, ext);
+        })
+      }
     })
   }
 
@@ -72,17 +83,10 @@ function compiler(){
 
   createDirectory(program.directory)
     .then(function(outDir){
-      console.log('Promise worked');
       compile(genFileCollection(__dirname), outDir);
     })
     .then(function(){
-      if (flags.ttBool){
-        fs.createReadStream(__dirname + '/lib/tt.html').pipe(fs.createWriteStream(outDir + '/tt.html'));
-        fs.createReadStream(__dirname + '/lib/tt.css').pipe(fs.createWriteStream(outDir + '/tt.css'));
-      }
-      if(flags.axisBool){
-        fs.createReadStream(__dirname + '/lib/axis.css').pipe(fs.createWriteStream(outDir + '/axis.css'));
-      }
+      createSupportFiles(flags, ['.html', '.css'], [__dirname, '/lib/support/'].join(''), [outDir, '/'].join(''));
     })
     .catch(function(err){
         console.log("Error: ", err);
