@@ -49,8 +49,7 @@ function compiler(){
       }
     })
   }
-
-  // Checks for -a flag and generates files array if necessary 
+ 
   function genFileCollection(dir){
     if (program.all){
       return _.filter(fs.readdirSync(dir), function(f){
@@ -60,9 +59,8 @@ function compiler(){
     }
   }
 
-  // What it is we want to do to the files
 
-  var compile =  function(files, outDir){
+  function compile(files, outDir){
     // gen grammer & make sure we are in the right folder
     parser.build();
     path.basename(__dirname) !== outDir && process.chdir(outDir);
