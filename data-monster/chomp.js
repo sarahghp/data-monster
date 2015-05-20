@@ -82,8 +82,9 @@ function compiler(){
   createDirectory(program.directory)
     .then(function(outDir){
       compile(genFileCollection(__dirname), outDir);
+      return outDir;
     })
-    .then(function(){
+    .then(function(outDir){
       createSupportFiles(flags, ['.html', '.css'], [__dirname, '/lib/support/'].join(''), [outDir, '/'].join(''));
     })
     .catch(function(err){

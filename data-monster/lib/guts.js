@@ -1,4 +1,5 @@
-var _    = require('lodash');
+var _    = require('lodash'),
+    fs       = require('fs');
 
 /**
  * Add any number of key value pairs into a new or existent object
