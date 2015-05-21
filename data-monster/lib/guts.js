@@ -1,6 +1,7 @@
 var _    = require('lodash'),
     fs       = require('fs');
 
+var defaultKeyMsg = 'No default key passed but default key needed!';
 /**
  * Add any number of key value pairs into a new or existent object
  * @param {obj} pairs to be added in
@@ -30,6 +31,10 @@ exports.finder = function finder (collection, tests, label){
   }
 }
 
+exports.isHashMap = function isHashMap(check){
+  return _.isObject(check) && !(_.isArray(check)); // don't have to check for null, since _.isObject filters that out
+}
+
 /**
  * Concatenate a pair of arrays into an object
  * @param  {arr} pairArrays 2D array of pairs
@@ -40,6 +45,7 @@ exports.finder = function finder (collection, tests, label){
 exports.objectify = function objectify (pairArrays, toObj, defaultKey){
   _.forEach(pairArrays, function(pair){
     if (pair.length < 2) {
+      if (!defaultKey) throw new Error(defaultKeyMsg);
       toObj[defaultKey] = pair[0];
     } else {
       toObj[pair[0]] = pair[1];
@@ -73,6 +79,7 @@ exports.setAtoB = function setAtoB(A, B){
   return function (objArray, toObj, defaultKey){
     _.forEach(objArray, function(obj){
       if (!obj[A]){
+        if (!defaultKey) throw new Error(defaultKeyMsg);
         toObj[defaultKey] = obj;
       } else {
         toObj[obj[A]] = obj[B];
@@ -80,4 +87,8 @@ exports.setAtoB = function setAtoB(A, B){
     });
     return toObj;
   }
+}
+
+exports.thereIsMore = function thereIsMore(check){
+  return _.isArray(check) && _.rest(check).length;
 }

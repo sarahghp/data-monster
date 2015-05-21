@@ -57,7 +57,7 @@ function chomper(ast){
 
     structure.push(guts.addInto(additions,{}));
 
-    if (_.rest(ast.exp).length){
+    if (guts.thereIsMore(ast.exp)){
       _.invoke(_.rest(ast.exp), function(){
          generate(this, id, structure);
       });
@@ -103,10 +103,10 @@ function chomper(ast){
     var id          = createNode(ast, structure),
         parentIndex = _.findIndex(structure, { name: parent }),
         exp         = ast.exp,
-        innerExp    = exp[0].exp,
+        innerExp    = exp.exp || exp[0].exp,
         additions   = { name: id, 
                         parent: parent,
-                        type: exp[0].op,
+                        type: exp.exp || exp[0].op,
                         req_specs: guts.objectify(innerExp, {}, 'oops')
                       };
 
@@ -126,7 +126,7 @@ function chomper(ast){
 
     structure.push(guts.addInto(additions, {}));
 
-    if (_.rest(exp).length){
+    if (guts.thereIsMore(exp)){
       _.invoke(_.rest(exp), function(){
          generate(this, parent, structure);
       });
@@ -141,7 +141,7 @@ function chomper(ast){
     var additions = guts.objectify([[ast.op, ast.exp],['parent', parent]],{});
     structure.push(guts.addInto(additions, {}));
     
-      if (_.rest(ast.exp).length){
+      if (guts.thereIsMore(ast.exp)){
         _.invoke(_.rest(ast.exp), function(){
            generate(this, parent, structure);
         });
@@ -156,7 +156,7 @@ function chomper(ast){
         outer   = guts.objectify([[label, {}]], {}),
         inner   = guts.addInto({'parent': parent}, outer[label]);
 
-        guts.setAtoB('op', 'exp')(ast.exp, inner);        
+        guts.setAtoB('op', 'exp')(ast.exp, inner, breakOp[0]);    
         return structure.push(outer);
   }
 
@@ -183,10 +183,10 @@ function chomper(ast){
   // NOW LET'S GET DOWN TO BUSINESS
   
 
-  // var log = _.map(ast, function(el){
-  //   return generate(el);
-  // });
-  // console.log('final', util.inspect(log, false, null));
+  var log = _.map(ast, function(el){
+    return generate(el);
+  });
+  console.log('final', util.inspect(log, false, null));
 
   return _.map(ast, function(el){
     return generate(el);

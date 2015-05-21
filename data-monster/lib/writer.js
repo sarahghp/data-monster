@@ -14,8 +14,10 @@ function buildString(structure){
     data   : '',
     canvas : '',
     elem   : '',
-    axis   : '',
-    scale  : '',
+    xAxis  : '',
+    yAxis  : '',
+    xScale : '',
+    yScale : '',
    //  attr   : attrBite,
    //  style  : styleBite,
    //  tooltip: ttBite,
@@ -56,12 +58,18 @@ function buildString(structure){
   }
 
   function build(expressions){
-    // similar to generate: check if element is in noms otherwise output string key(process(value)) 
     return _.map(expressions, function(exp){
-      var key = _.first(_.keys(_.omit(exp, 'parent')));
-      return key + "(" + exp[key] + ")";
+      if (guts.isHashMap(exp)){
+        var key = _.first(_.keys(_.omit(exp, 'parent')));
+        return _.includes(_.keys(exp), 'name') ? 
+             noms[exp.name.split('_')[0]]
+           : _.includes(_.keys(noms), key) ?
+             noms[key]
+           : key + "(" + exp[key] + ")"
+      } else {
+        throw new Error('Invalid input:' + exp);
+      }
     }).join('');
-     // return expressions;
   }
 
   // _.map(structure, build);

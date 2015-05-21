@@ -6,7 +6,7 @@
   program           = entry / clean_spec / func_spec / spec / signifier
 
   spec              = w:signifier space ind:(entry/func_spec/spec/signified/variable)+ space
-                      { return { op: w, exp:[].concat.apply([], ind) } }
+                      { return { op: w, exp: ind.length > 1 ? [].concat.apply([], ind) : ind[0] } }
 
   clean_spec        = ('clean' colon)? cf:function space
                       { return { op: 'clean', exp: {function: cf.function.split(",\n")
