@@ -15,7 +15,7 @@
                                         })
                                         .join('; ') }} }
 
-  func_spec         = sign:signifier space func:function+ { return { op: sign, exp: func } }
+  func_spec         = sign:signifier space func:function+ { return { op: sign, exp: func.length > 1 ? func : func[0] } }
 
   signifier         = si:(string/bare_word) space colon space { return si }
   signified         = sd:(param_hash/short_hash/array/boolean/string/number) { return sd }
