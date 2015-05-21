@@ -88,7 +88,7 @@ function compiler(){
       createSupportFiles(flags, ['.html', '.css'], [__dirname, '/lib/support/'].join(''), [outDir, '/'].join(''));
     })
     .catch(function(err){
-        console.log("Error: ", err);
+        console.log(err.stack);
     });
 }
 

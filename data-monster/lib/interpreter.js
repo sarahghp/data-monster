@@ -183,10 +183,10 @@ function chomper(ast){
   // NOW LET'S GET DOWN TO BUSINESS
   
 
-  var log = _.map(ast, function(el){
-    return generate(el);
-  });
-  console.log('final', util.inspect(log, false, null));
+  // var log = _.map(ast, function(el){
+  //   return generate(el);
+  // });
+  // console.log('final', util.inspect(log, false, null));
 
   return _.map(ast, function(el){
     return generate(el);
