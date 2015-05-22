@@ -68,6 +68,10 @@ function buildString(structure){
     }
   }
 
+  function dExpand(toExpand){
+    return function(d) { return toExpand }
+  }
+
   function lookup(toFind, scope){
     console.log('lookup called', toFind, scope);
     var lookat = _.filter(structure, function(f){
@@ -95,6 +99,8 @@ function buildString(structure){
   function eatVars(varObj, parent){
     return _.includes(_.keys(d3things), varObj.variable) ?
       d3things[varObj.variable](varObj.variable)
+      : varObj.variable.match(/\bd\./) ?
+        dExpand(varObj.variable)
       : lookup(varObj.variable, parent);
   }
 
