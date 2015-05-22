@@ -71,7 +71,7 @@ function buildString(structure){
   function lookup(toFind, scope){
     console.log('lookup called', toFind, scope);
     var lookat = _.filter(structure, function(f){
-      return _.includes(_.keys(f), 'parent') && f.parent === 'scope';
+      return _.includes(_.keys(f), 'parent') && f.parent === scope;
     });
 
     var val = _.findLast(lookat, function(n){
@@ -79,7 +79,11 @@ function buildString(structure){
     });
 
     if (val) return val;
-    return lookup(toFind, _.findWhere(structure, { name: scope }));
+
+    var grandparent =  _.result(_.findWhere(structure, { name: scope }), 'parent');
+    if (grandparent) return lookup(toFind, grandparent);
+
+    throw new Error('ReferenceError: ' + toFind + ' is not defined.')
     // find everything with the same parent
     // do any contain what you are looking for in the keys? if yes, return val
     // if not, call again, passing grandparent as scope
@@ -96,6 +100,7 @@ function buildString(structure){
 
   function eatFuncs(funcObj, parent){
     // console.log('eatFuncs', funcObj, parent);
+    return ['eatFuncs', funcObj];
   }
 
   // WORKHORSE FUNCS
@@ -114,6 +119,7 @@ function buildString(structure){
              noms[exp.name.split('_')[0]]
            : _.includes(_.keys(noms), key) ?
              noms[key]
+             // noms[key](exp.key) <-- eventual call
            : key + "(" + process(exp[key], exp.parent) + ")"
       } else {
         throw new Error('Invalid input:' + exp);
