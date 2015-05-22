@@ -45,7 +45,7 @@ exports.isHashMap = function isHashMap(check){
 exports.objectify = function objectify (pairArrays, toObj, defaultKey){
   _.forEach(pairArrays, function(pair){
     if (pair.length < 2) {
-      if (!defaultKey) throw new Error(defaultKeyMsg);
+      if (!defaultKey) throw new Error(defaultKeyMsg + 'Offender:' + pair[0]);
       toObj[defaultKey] = pair[0];
     } else {
       toObj[pair[0]] = pair[1];

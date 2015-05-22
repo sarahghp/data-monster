@@ -12,28 +12,32 @@ function buildString(structure){
   // Lists
   var noms = {
     // special assemblies
-    data   : '',
-    canvas : '',
-    elem   : '',
-    xAxis  : '',
-    yAxis  : '',
-    xScale : '',
-    yScale : '',
-   // // special processes 
-   //  attr   : attrBite,
-   //  style  : styleBite,
+    data   : function(arg) { /* console.log('data', arg); */ return util.inspect(arg, false, null)},
+    canvas : function(arg) { /* console.log('canvas', arg); */ return util.inspect(arg, false, null)},
+    elem   : function(arg) { /* console.log('elem', arg); */ return util.inspect(arg, false, null)},
+    xAxis  : function(arg) { /* console.log('xAxis', arg); */ return util.inspect(arg, false, null)},
+    yAxis  : function(arg) { /* console.log('yAxis', arg); */ return util.inspect(arg, false, null)},
+    xScale : function(arg) { /* console.log('xScale', arg); */ return util.inspect(arg, false, null)},
+    yScale : function(arg) { /* console.log('yScale', arg); */ return util.inspect(arg, false, null)},
+   
+   // special processes 
+    attr   : _.partial(prettyBite,".attr"),
+    style  : _.partial(prettyBite,".style"),
+   
    //  tooltip: ttBite,
+    clean  : cleanBite,
+    funcs  : funcsBite,
 
-   // // shorthand events
-   //  click     :   function(args){ return eventBite(args)('click')},
-   //  mouseover :   function(args){ return eventBite(args)('mouseover')},
-   //  mouseenter:   function(args){ return eventBite(args)('mouseenter')},
-   //  mouseleave:   function(args){ return eventBite(args)('mouseleave')},
-   //  hover     :   function(args){ return eventBite(args)('hover')},
-   //  
+   // shorthand events
+    click     :   _.partial(eventBite, "click"),
+    mouseover :   _.partial(eventBite, "mouseover"),
+    mouseenter:   _.partial(eventBite, "mouseenter"),
+    mouseleave:   _.partial(eventBite, "mouseleave"),
+    hover     :   _.partial(eventBite, "hover"),
+     
    //  process functions
-   variable   : eatVars,
-   'function' : eatFuncs
+   variable     : eatVars,
+   'function'   : eatFuncs,
   },
 
   d3things = {
@@ -57,6 +61,26 @@ function buildString(structure){
   };
 
   // SMALL FUNCS
+  function atomicBite(meth, arg){
+    return meth + "(" + arg + ")"
+  }
+
+  function cleanBite(val){
+    eval('var moo = function(d){ ' + val['function'] + '; }');
+    return 'rawData.forEach(' + moo + ');';
+  }
+
+  function eventBite(type, bite){
+    return atomicBite(".on", stringWrap(type) + ", " + bite['function']);
+  }
+
+  function funcsBite(val){
+    return val['function'];
+  }
+
+  function prettyBite(prefix, bite){
+    return atomicBite(prefix, pretty(guts.objectify(bite, {}) , 4, "JSON"));
+  }
   
   function assembled3things(director, label, itself){
     if(director === 'pre'){
@@ -68,8 +92,32 @@ function buildString(structure){
     }
   }
 
+  function parensWrap(wrapper, val){
+    return wrapper + '(' + val + ')';
+  }
+
+  function stringWrap(check){
+    return _.isString(check) ? '"' + check + '"' : check;
+  }
+
   function dExpand(toExpand){
     return function(d) { return toExpand }
+  }
+
+
+  // PROCESS FUNCS
+   
+  function eatVars(varObj, parent){
+    return _.includes(_.keys(d3things), varObj.variable) ?
+        d3things[varObj.variable](varObj.variable)
+      : varObj.variable.match(/\bd\./) ?
+        dExpand(varObj.variable)
+      : lookup(varObj.variable, parent);
+  }
+
+  function eatFuncs(funcObj){
+    eval('var moo = ' + funcObj['function']);
+    return moo;
   }
 
   function lookup(toFind, scope){
@@ -94,43 +142,29 @@ function buildString(structure){
     // if no grandparent, error
   }
 
-  // PROCESS FUNCS
-  
-  function eatVars(varObj, parent){
-    return _.includes(_.keys(d3things), varObj.variable) ?
-      d3things[varObj.variable](varObj.variable)
-      : varObj.variable.match(/\bd\./) ?
-        dExpand(varObj.variable)
-      : lookup(varObj.variable, parent);
-  }
-
-  function eatFuncs(funcObj, parent){
-    // console.log('eatFuncs', funcObj, parent);
-    return ['eatFuncs', funcObj];
-  }
-
   // WORKHORSE FUNCS
   
   function process(value, parent){
-    guts.isHashMap(value) ?
-        console.log(noms[_.keys(value)](value, parent))
-      : console.log(value);
+    return guts.isHashMap(value) ?
+        noms[_.keys(value)](value, parent)
+      : stringWrap(value);
   }
 
   function build(expressions){
+    // console.log('EXPS', expressions);
     return _.map(expressions, function(exp){
       if (guts.isHashMap(exp)){
         var key = _.first(_.keys(_.omit(exp, 'parent')));
-        return _.includes(_.keys(exp), 'name') ? 
-             noms[exp.name.split('_')[0]]
+        return _.includes(_.keys(exp), 'name') ?
+             noms[exp.name.split('_')[0]](exp)
            : _.includes(_.keys(noms), key) ?
-             noms[key]
-             // noms[key](exp.key) <-- eventual call
-           : key + "(" + process(exp[key], exp.parent) + ")"
+             noms[key](exp[key])
+           : atomicBite(key, process(exp[key], exp.parent));
       } else {
         throw new Error('Invalid input:' + exp);
       }
     }).join('');
+
   }
 
   // _.map(structure, build);
