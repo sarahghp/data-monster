@@ -38,6 +38,7 @@ function buildString(structure){
    //  process functions
    variable     : eatVars,
    'function'   : eatFuncs,
+   params       : eatParams,
   },
 
   d3things = {
@@ -118,6 +119,10 @@ function buildString(structure){
   function eatFuncs(funcObj){
     eval('var moo = ' + funcObj['function']);
     return moo;
+  }
+
+  function eatParams(paramsObj){
+    return paramsObj.params;
   }
 
   function lookup(toFind, scope){
