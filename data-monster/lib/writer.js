@@ -9,10 +9,10 @@ var fs        = require('fs'),
 
 function buildString(structure){
 
-  // Lists
+  // LISTS
   var noms = {
     // special assemblies
-    data   : function(arg) { /* console.log('data', arg); */ return util.inspect(arg, false, null)},
+    data   : dataBite,
     canvas : function(arg) { /* console.log('canvas', arg); */ return util.inspect(arg, false, null)},
     elem   : function(arg) { /* console.log('elem', arg); */ return util.inspect(arg, false, null)},
     xAxis  : function(arg) { /* console.log('xAxis', arg); */ return util.inspect(arg, false, null)},
@@ -105,6 +105,23 @@ function buildString(structure){
     return function(d) { return toExpand }
   }
 
+  // BIG WRITERS
+  function dataBite(bite){
+    var str = "";
+    str += "function draw_" + bite.name + "(rawData){";
+    str +=  bite.clean ? cleanBite(bite.clean) : '';
+    str += _.map(bite.children, function(c){
+        return 'draw_' + c + '(rawData);'
+    }).join('');
+    str += '} \n\n'
+    str += "queue().defer(d3" + bite.filetype + ", '";
+    str += bite.file + "')";
+    str += ".await( function(err, data) { ";
+    str += "if(err){ console.log(err) } ";
+    str += "draw_" + bite.name + "(data); } );";
+    return str;
+  }
+
 
   // PROCESS FUNCS
    
@@ -169,11 +186,18 @@ function buildString(structure){
         throw new Error('Invalid input:' + exp);
       }
     }).join('');
-
   }
 
+  function arrange(structure){
+    var dataBites = _.filter(structure, function(f){ return _.has(f, 'name') && f.name.split('_')[0] === 'data' }),
+        restBites = _.reject(structure, function(f){ return _.has(f, 'name') && f.name.split('_')[0] === 'data' });
+        // console.log(restBites.concat(dataBites));
+    return restBites.concat(dataBites);
+  }
+
+  // _.map(structure, arrange);
   // _.map(structure, build);
-  console.log(beautify(_.map(structure, build).join(''), {"break_chained_methods": true}));
+  console.log(beautify(_.map(_.map(structure, arrange), build).join(''), {"break_chained_methods": true}));
   // return beautify(_.map(structure, build).join(''), {"break_chained_methods": true});
 }
 

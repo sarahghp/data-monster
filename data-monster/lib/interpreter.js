@@ -17,6 +17,7 @@ function chomper(ast){
     'axis-y':   scaleAndAxisPop,
     'scale-x':  scaleAndAxisPop,
     'scale-y':  scaleAndAxisPop,
+    'clean'  :  cleanPop
   };
 
   // Utility functions
@@ -158,6 +159,14 @@ function chomper(ast){
 
         guts.setAtoB('op', 'exp')(ast.exp, inner, breakOp[0]);    
         return structure.push(outer);
+  }
+
+  function cleanPop(ast, parent, structure){
+    var parentIndex = _.findIndex(structure, { name: parent });
+    guts.addInto({clean: ast.exp}, structure[parentIndex]);
+
+    // console.log('Clean pop', ast);
+    return structure;
   }
 
 
