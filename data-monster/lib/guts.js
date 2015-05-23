@@ -1,5 +1,5 @@
 var _    = require('lodash'),
-    fs       = require('fs');
+    fs   = require('fs');
 
 var defaultKeyMsg = 'No default key passed but default key needed!';
 /**
