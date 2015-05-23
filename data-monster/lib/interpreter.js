@@ -153,8 +153,8 @@ function chomper(ast){
   function scaleAndAxisPop(ast, parent, structure){
     var breakOp = ast.op.split('-'),
         label   = breakOp[1] + _.capitalize(breakOp[0]),
-        outer   = guts.objectify([[label, {}]], {}),
-        inner   = guts.addInto({'parent': parent}, outer[label]);
+        outer   = guts.objectify([[label, {}]], {'parent': parent}),
+        inner   = guts.addInto({}, outer[label]);
 
         guts.setAtoB('op', 'exp')(ast.exp, inner, breakOp[0]);    
         return structure.push(outer);
