@@ -14,12 +14,12 @@ function buildString(structure){
     // special assemblies
     data   : dataBite,
     canvas : canvasBite,
-    elem   : function(arg) { /* console.log('elem', arg); */ return util.inspect(arg, false, null)},
+    elem   : elemBite,
     xAxis  : function(arg) { /* console.log('xAxis', arg); */ return util.inspect(arg, false, null)},
     yAxis  : function(arg) { /* console.log('yAxis', arg); */ return util.inspect(arg, false, null)},
     xScale : function(arg) { /* console.log('xScale', arg); */ return util.inspect(arg, false, null)},
     yScale : function(arg) { /* console.log('yScale', arg); */ return util.inspect(arg, false, null)},
-    closer : function(arg) { return arg },
+    insert : function(arg) { return arg },
    
    // special processes 
     attr   : _.partial(prettyBite,".attr"),
@@ -90,7 +90,8 @@ function buildString(structure){
   }
 
   function dExpand(toExpand){
-    return function(d) { return toExpand }
+    eval('var moo = function(d){ return ' + toExpand + ' }');
+    return moo;
   }
 
   function makeVar(v, val){
@@ -135,6 +136,17 @@ function buildString(structure){
     return str;
   }
 
+  function elemBite(bite){
+    console.log(bite.req_specs);
+    var str = "";
+    str += "svg.append('g')";
+    str += ".attr('class', ";
+    str += (bite.elemSelect || "'elements'") + ")";
+    str += ".append('" + bite.type + "')"
+    str += ".attr(" + pretty(_.zipObject(_.keys(bite.req_specs), _.map(bite.req_specs, function(el){ return process(el, bite.name)})), 4, 'PRINT', true)   + ")"; // add keys into this
+    return str;
+  }
+
   // ASSEMBLERS
   function assembled3things(director, label, itself){
     if(director === 'pre'){
@@ -144,6 +156,14 @@ function buildString(structure){
     } else {
       throw new Error('Cannot assemble d3things; unknown director.');
     }
+  }
+
+  function assembleEnter(type){
+    var str = "";
+    str += "svg.selectAll('" + type + "')"; 
+    str += ".data(data)";
+    str += ".enter()";
+    return str
   }
 
   function assembleMargins(margins){
@@ -196,24 +216,20 @@ function buildString(structure){
 
   function lookup(toFind, scope){
     console.log('lookup called', toFind, scope);
-    var lookat = _.filter(structure, function(f){
-      return _.includes(_.keys(f), 'parent') && f.parent === scope;
+    var lookat = _.filter(_.flatten(structure), function(f){
+      return  _.has(f, 'parent') && f.parent === scope;
     });
 
     var val = _.findLast(lookat, function(n){
-      return _.inclues(_.keys(n), toFind);
+      return _.includes(_.keys(n), toFind);
     });
 
-    if (val) return val;
+    if (val) return val[toFind];
 
-    var grandparent =  _.result(_.findWhere(structure, { name: scope }), 'parent');
+    var grandparent =  _.result(_.findWhere(_.flatten(structure), { name: scope }), 'parent');
     if (grandparent) return lookup(toFind, grandparent);
 
     throw new Error('ReferenceError: ' + toFind + ' is not defined.')
-    // find everything with the same parent
-    // do any contain what you are looking for in the keys? if yes, return val
-    // if not, call again, passing grandparent as scope
-    // if no grandparent, error
   }
 
   // WORKHORSE FUNCS
@@ -225,7 +241,7 @@ function buildString(structure){
   }
 
   function build(expressions){
-    // console.log('EXPS', expressions);
+    console.log('EXPS', expressions);
     return _.map(expressions, function(exp){
       if (guts.isHashMap(exp)){
         var key = _.first(_.keys(_.omit(exp, 'parent')));
@@ -240,11 +256,17 @@ function buildString(structure){
     }).join('');
   }
 
-  function arrange(structure){
-    var dataBites = _.filter(structure, function(f){ return _.has(f, 'name') && f.name.split('_')[0] === 'data' }),
-        restBites = _.reject(structure, function(f){ return _.has(f, 'name') && f.name.split('_')[0] === 'data' });
-        // console.log(restBites.concat(dataBites));
-    return restBites.concat({closer: '}'}, dataBites);
+  // Do a little shuffling so we can map & join for correct order
+  function arrange(innerStructure){
+    var dataBites = _.filter(innerStructure, function(f){ return _.has(f, 'name') && f.name.split('_')[0] === 'data'; }),
+        restBites = _.reject(innerStructure, function(f){ return _.has(f, 'name') && f.name.split('_')[0] === 'data'; });
+        
+    if (!(_.some(_.flatten(_.map(restBites, _.keys)), function(v){return v === 'enter'}))){
+      var elemIdx = _.findIndex(innerStructure, function(f){ return _.has(f, 'name') && f.name.split('_')[0] === 'elem'; });
+      restBites.splice(elemIdx, 0, {insert: assembleEnter(innerStructure[elemIdx].type)})
+    }
+
+    return restBites.concat({insert: '}'}, dataBites);
   }
 
   // _.map(structure, arrange);
