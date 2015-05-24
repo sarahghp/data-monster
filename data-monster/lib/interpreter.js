@@ -107,11 +107,13 @@ function chomper(ast){
         innerExp    = exp.exp || exp[0].exp,
         additions   = { name: id, 
                         parent: parent,
-                        type: exp.exp || exp[0].op,
+                        type: exp.op || exp[0].op,
                         req_specs: guts.objectify(innerExp, {}, 'oops')
                       };
 
-    addChildren(parent, id, structure);    
+    addChildren(parent, id, structure);
+    console.log('*** INTERPRETER ELEM ***', ast.exp.exp);
+
     
 
     var tests =  function(personalizer){
