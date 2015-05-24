@@ -31,6 +31,10 @@ exports.finder = function finder (collection, tests, label){
   }
 }
 
+exports.getIndex = function getIndex(){
+  
+}
+
 exports.isHashMap = function isHashMap(check){
   return _.isObject(check) && !(_.isArray(check)); // don't have to check for null, since _.isObject filters that out
 }

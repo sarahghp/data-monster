@@ -13,12 +13,13 @@ function buildString(structure){
   var noms = {
     // special assemblies
     data   : dataBite,
-    canvas : function(arg) { /* console.log('canvas', arg); */ return util.inspect(arg, false, null)},
+    canvas : canvasBite,
     elem   : function(arg) { /* console.log('elem', arg); */ return util.inspect(arg, false, null)},
     xAxis  : function(arg) { /* console.log('xAxis', arg); */ return util.inspect(arg, false, null)},
     yAxis  : function(arg) { /* console.log('yAxis', arg); */ return util.inspect(arg, false, null)},
     xScale : function(arg) { /* console.log('xScale', arg); */ return util.inspect(arg, false, null)},
     yScale : function(arg) { /* console.log('yScale', arg); */ return util.inspect(arg, false, null)},
+    closer : function(arg) { return arg },
    
    // special processes 
     attr   : _.partial(prettyBite,".attr"),
@@ -63,7 +64,7 @@ function buildString(structure){
 
   // SMALL FUNCS
   function atomicBite(meth, arg){
-    return meth + "(" + arg + ")"
+    return meth + "(" + arg + ")";
   }
 
   function cleanBite(val){
@@ -83,20 +84,6 @@ function buildString(structure){
     return atomicBite(prefix, pretty(guts.objectify(bite, {}) , 4, "JSON"));
   }
   
-  function assembled3things(director, label, itself){
-    if(director === 'pre'){
-      return 'd3.' + label + '.' + itself;
-    } else if (director === 'post'){
-      return 'd3.' + itself + '.' + label;
-    } else {
-      throw new Error('Cannot assemble d3things; unknown director.');
-    }
-  }
-
-  function parensWrap(wrapper, val){
-    return wrapper + '(' + val + ')';
-  }
-
   function stringWrap(check){
     return _.isString(check) ? '"' + check + '"' : check;
   }
@@ -105,7 +92,7 @@ function buildString(structure){
     return function(d) { return toExpand }
   }
 
-  // BIG WRITERS
+  // BIG BITES
   function dataBite(bite){
     var str = "";
     str += "function draw_" + bite.name + "(rawData){";
@@ -121,6 +108,66 @@ function buildString(structure){
     str += "draw_" + bite.name + "(data); } );";
     return str;
   }
+
+  function canvasBite(bite){
+    var str = "",
+        margins = bite.margins ? 
+                  assembleMargins(eatParams(bite.margins)) : 
+                  { top: 0, right: 0, bottom: 0, left: 0 };
+    
+    bite.width   = bite.width - margins.left - margins.right;
+    bite.height  = bite.height - margins.top - margins.bottom;
+
+    str += "var margin = " + pretty(margins) + ", ";
+    str += "width = " + bite.width +  ", ";
+    str += "height = " + bite.height + ";";
+    str += "var svg = d3.select('" + bite.selector + "')";
+    str += ".append('svg')";
+    str += ".attr('width', width  + margin.left + margin.right)";
+    str += ".attr('height', height + margin.top + margin.bottom)";
+    str += ".append('g')";
+    str += ".attr('transform', 'translate(' + margin.left + ', ' + margin.top + ')');";
+    return str;
+  }
+
+  // ASSEMBLERS
+  function assembled3things(director, label, itself){
+    if(director === 'pre'){
+      return 'd3.' + label + '.' + itself;
+    } else if (director === 'post'){
+      return 'd3.' + itself + '.' + label;
+    } else {
+      throw new Error('Cannot assemble d3things; unknown director.');
+    }
+  }
+
+  function assembleMargins(margins){
+    var obj = {};
+    if (margins.length === 4){
+      obj.top     = +margins[0];
+      obj.right   = +margins[1];
+      obj.bottom  = +margins[2];
+      obj.left    = +margins[3];
+    } else if (margins.length === 3){
+      obj.top     = +margins[0];
+      obj.right   = +margins[1];
+      obj.bottom  = +margins[2];
+      obj.left    = +margins[1];
+    } else if (margins.length === 2){
+      obj.top     = +margins[0];
+      obj.right   = +margins[1];
+      obj.bottom  = +margins[0];
+      obj.left    = +margins[1];
+    } else if (margins.length === 1){
+      obj.top     = +margins[0];
+      obj.right   = +margins[0];
+      obj.bottom  = +margins[0];
+      obj.left    = +margins[0];
+    } else {
+      throw new Error('Incorrect margin arity');
+    }
+    return obj;
+  } 
 
 
   // PROCESS FUNCS
@@ -192,7 +239,7 @@ function buildString(structure){
     var dataBites = _.filter(structure, function(f){ return _.has(f, 'name') && f.name.split('_')[0] === 'data' }),
         restBites = _.reject(structure, function(f){ return _.has(f, 'name') && f.name.split('_')[0] === 'data' });
         // console.log(restBites.concat(dataBites));
-    return restBites.concat(dataBites);
+    return restBites.concat({closer: '}'}, dataBites);
   }
 
   // _.map(structure, arrange);
