@@ -24,6 +24,7 @@ function buildString(structure){
    // special processes 
     attr   : _.partial(prettyBite,".attr"),
     style  : _.partial(prettyBite,".style"),
+    color  : _.partial(makeVar, "color"),
    
    //  tooltip: ttBite,
     clean  : cleanBite,
@@ -92,6 +93,10 @@ function buildString(structure){
     return function(d) { return toExpand }
   }
 
+  function makeVar(v, val){
+    return 'var ' + v + ' = ' + process(val) + ';';
+  }
+
   // BIG BITES
   function dataBite(bite){
     var str = "";
@@ -133,9 +138,9 @@ function buildString(structure){
   // ASSEMBLERS
   function assembled3things(director, label, itself){
     if(director === 'pre'){
-      return 'd3.' + label + '.' + itself;
+      return 'd3.' + label + '.' + itself + '()';
     } else if (director === 'post'){
-      return 'd3.' + itself + '.' + label;
+      return 'd3.' + itself + '.' + label + '()';
     } else {
       throw new Error('Cannot assemble d3things; unknown director.');
     }
