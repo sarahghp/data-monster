@@ -12,15 +12,16 @@ function buildString(structure){
   // LISTS
   var noms = {
     // special assemblies
-    data   : dataBite,
-    canvas : canvasBite,
-    elem   : elemBite,
-    xAxis  : function(arg) { /* console.log('xAxis', arg); */ return util.inspect(arg, false, null)},
-    yAxis  : function(arg) { /* console.log('yAxis', arg); */ return util.inspect(arg, false, null)},
-    xScale : function(arg) { /* console.log('xScale', arg); */ return util.inspect(arg, false, null)},
-    yScale : function(arg) { /* console.log('yScale', arg); */ return util.inspect(arg, false, null)},
-    insert : function(arg) { return arg },
-   
+    data    : dataBite,
+    dataList: queueBite,
+    canvas  : canvasBite,
+    elem    : elemBite,
+    xAxis   : function(arg) { /* console.log('xAxis', arg); */ return util.inspect(arg, false, null)},
+    yAxis   : function(arg) { /* console.log('yAxis', arg); */ return util.inspect(arg, false, null)},
+    xScale  : function(arg) { /* console.log('xScale', arg); */ return util.inspect(arg, false, null)},
+    yScale  : function(arg) { /* console.log('yScale', arg); */ return util.inspect(arg, false, null)},
+    insert  : function(arg) { return arg },
+
    // special processes 
     attr   : _.partial(prettyBite,".attr"),
     style  : _.partial(prettyBite,".style"),
@@ -106,12 +107,22 @@ function buildString(structure){
     str += _.map(bite.children, function(c){
         return 'draw_' + c + '(rawData);'
     }).join('');
-    str += '} \n\n'
-    str += "queue().defer(d3" + bite.filetype + ", '";
-    str += bite.file + "')";
-    str += ".await( function(err, data) { ";
+    str += '} \n\n';
+    return str;
+  }
+
+  function queueBite(bite){
+    console.log('list BIte', bite);
+    var str = "";
+    str += "queue()"
+    str += _.map(bite, function(el){
+      return ".defer(d3" + el.filetype + ", '" + el.file + "')";
+    }).join('');    
+    str += ".awaitAll( function(err, dataArr) { ";
     str += "if(err){ console.log(err) } ";
-    str += "draw_" + bite.name + "(data); } );";
+    str += _.map(bite, function(n, idx){
+      return "draw_" + n.name + "(dataArr["+ idx + "]); } );"
+    }).join('');
     return str;
   }
 
@@ -137,7 +148,7 @@ function buildString(structure){
   }
 
   function elemBite(bite){
-    console.log(bite.req_specs);
+    // console.log(bite.req_specs);
     var str = "";
     str += "svg.append('g')";
     str += ".attr('class', ";
@@ -259,14 +270,17 @@ function buildString(structure){
   // Do a little shuffling so we can map & join for correct order
   function arrange(innerStructure){
     var dataBites = _.filter(innerStructure, function(f){ return _.has(f, 'name') && f.name.split('_')[0] === 'data'; }),
-        restBites = _.reject(innerStructure, function(f){ return _.has(f, 'name') && f.name.split('_')[0] === 'data'; });
-        
+        restBites = _.reject(innerStructure, function(f){ return _.has(f, 'name') && f.name.split('_')[0] === 'data'; }),
+        dataList  = _.map(dataBites, function(el){
+          return { name: el.name, filetype: el.filetype, file: el.file };
+        });
+
     if (!(_.some(_.flatten(_.map(restBites, _.keys)), function(v){return v === 'enter'}))){
       var elemIdx = _.findIndex(innerStructure, function(f){ return _.has(f, 'name') && f.name.split('_')[0] === 'elem'; });
       restBites.splice(elemIdx, 0, {insert: assembleEnter(innerStructure[elemIdx].type)})
     }
 
-    return restBites.concat({insert: '}'}, dataBites);
+    return restBites.concat({insert: '}'}, dataBites, { 'dataList': dataList });
   }
 
   // _.map(structure, arrange);
