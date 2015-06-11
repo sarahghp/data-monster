@@ -112,8 +112,6 @@ function chomper(ast){
                       };
 
     addChildren(parent, id, structure);
-    console.log('*** INTERPRETER ELEM ***', ast.exp.exp);
-
     
 
     var tests =  function(personalizer){
