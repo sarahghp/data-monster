@@ -120,27 +120,20 @@ function chomper(ast){
         }
       };
 
-    var primPartial = _.partial(guts.finder, additions.req_specs, _, 'variable');
+    var primPartial = _.partial(guts.finder, additions.req_specs, _, 'variable'),
+        xPrim = primPartial(tests('x')),
+        yPrim = primPartial(tests('y'));
 
-    additions.xPrim = primPartial(tests('x'));
-    additions.yPrim = primPartial(tests('y'));
+    structure[parentIndex].xPrim = structure[parentIndex].xPrim || xPrim;
+    structure[parentIndex].yPrim = structure[parentIndex].yPrim || yPrim;
 
     _.forEach(additions.req_specs, function(val, key){
-      if (_.has(val, 'variable') && val.variable === additions.xPrim) {
+      if (_.has(val, 'variable') && val.variable === xPrim) {
         additions.req_specs[key].scale = 'xScale';
-      } else if (_.has(val, 'variable') && val.variable === additions.yPrim){
+      } else if (_.has(val, 'variable') && val.variable === yPrim){
         additions.req_specs[key].scale = 'yScale';
       }
     });
-
-
-    // if additions.reqSpecs key matches _.includes(key, personalizer), then add scale: xScale pair;
-    // repeat with y & yScale
-
-    // if additions.xPrim, find that in additions.req specs within variable & then add scale: xScale pair;
-    // repeat with yPrim & yScale
-    
-
 
     structure.push(guts.addInto(additions, {}));
 

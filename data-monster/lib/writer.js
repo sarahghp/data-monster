@@ -140,6 +140,11 @@ function buildString(structure){
     str += "var margin = " + pretty(margins) + ", ";
     str += "width = " + bite.width +  ", ";
     str += "height = " + bite.height + ";";
+
+    str+= bite.yPrim ? "var maxY = d3.max(data, function(d){return " +  bite.yPrim + " })," : "";
+    str+= bite.xPrim ? "maxX = d3.max(data, function(d){return " + bite.xPrim + "});" : ""; 
+    str+= bite.yPrim ? "maxY = maxY + (maxY * .25); // Make it a little taller \n" : "";
+
     str += "var svg = d3.select('" + bite.selector + "')";
     str += ".append('svg')";
     str += ".attr('width', width  + margin.left + margin.right)";
