@@ -112,7 +112,6 @@ function buildString(structure){
   }
 
   function queueBite(bite){
-    console.log('list BIte', bite);
     var str = "";
     str += "queue()"
     str += _.map(bite, function(el){
@@ -127,7 +126,8 @@ function buildString(structure){
   }
 
   function canvasBite(bite){
-    var str = "",
+    // the func opened here is closed by the bracket inserted in arrange()
+    var str = "function draw_" + bite.name + "(data){",
         margins = bite.margins ? 
                   assembleMargins(eatParams(bite.margins)) : 
                   { top: 0, right: 0, bottom: 0, left: 0 };
@@ -226,7 +226,7 @@ function buildString(structure){
   }
 
   function lookup(toFind, scope){
-    console.log('lookup called', toFind, scope);
+    // console.log('lookup called', toFind, scope);
     var lookat = _.filter(_.flatten(structure), function(f){
       return  _.has(f, 'parent') && f.parent === scope;
     });
@@ -252,7 +252,7 @@ function buildString(structure){
   }
 
   function build(expressions){
-    console.log('EXPS', expressions);
+    // console.log('EXPS', expressions);
     return _.map(expressions, function(exp){
       if (guts.isHashMap(exp)){
         var key = _.first(_.keys(_.omit(exp, 'parent')));
