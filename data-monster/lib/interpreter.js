@@ -125,6 +125,23 @@ function chomper(ast){
     additions.xPrim = primPartial(tests('x'));
     additions.yPrim = primPartial(tests('y'));
 
+    _.forEach(additions.req_specs, function(val, key){
+      if (_.has(val, 'variable') && val.variable === additions.xPrim) {
+        additions.req_specs[key].scale = 'xScale';
+      } else if (_.has(val, 'variable') && val.variable === additions.yPrim){
+        additions.req_specs[key].scale = 'yScale';
+      }
+    });
+
+
+    // if additions.reqSpecs key matches _.includes(key, personalizer), then add scale: xScale pair;
+    // repeat with y & yScale
+
+    // if additions.xPrim, find that in additions.req specs within variable & then add scale: xScale pair;
+    // repeat with yPrim & yScale
+    
+
+
     structure.push(guts.addInto(additions, {}));
 
     if (guts.thereIsMore(exp)){

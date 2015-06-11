@@ -90,8 +90,10 @@ function buildString(structure){
     return _.isString(check) ? '"' + check + '"' : check;
   }
 
-  function dExpand(toExpand){
-    eval('var moo = function(d){ return ' + toExpand + ' }');
+  function dExpand(toExpand, scale){
+    scale ? 
+        eval('var moo = function(d){ return ' + scale + '(' + toExpand + ' )}')
+      : eval('var moo = function(d){ return ' + toExpand + ' }')
     return moo;
   }
 
@@ -150,11 +152,12 @@ function buildString(structure){
   function elemBite(bite){
     // console.log(bite.req_specs);
     var str = "";
-    str += "svg.append('g')";
+    str += bite.runIn ? "" : "svg.append('g')";
     str += ".attr('class', ";
     str += (bite.elemSelect || "'elements'") + ")";
     str += ".append('" + bite.type + "')"
-    str += ".attr(" + pretty(_.zipObject(_.keys(bite.req_specs), _.map(bite.req_specs, function(el){ return process(el, bite.name)})), 4, 'PRINT', true)   + ")"; // add keys into this
+    str += ".attr(" + pretty(_.zipObject(_.keys(bite.req_specs), _.map(bite.req_specs, function(el){ return process(el, bite.name)})), 4, 'PRINT', true)   + ");"; // add keys into this
+    str += "\n"
     return str;
   }
 
@@ -174,7 +177,7 @@ function buildString(structure){
     str += "svg.selectAll('" + type + "')"; 
     str += ".data(data)";
     str += ".enter()";
-    return str
+    return str;
   }
 
   function assembleMargins(margins){
@@ -212,7 +215,7 @@ function buildString(structure){
     return _.includes(_.keys(d3things), varObj.variable) ?
         d3things[varObj.variable](varObj.variable)
       : varObj.variable.match(/\bd\./) ?
-        dExpand(varObj.variable)
+        dExpand(varObj.variable, varObj.scale)
       : lookup(varObj.variable, parent);
   }
 
@@ -247,12 +250,12 @@ function buildString(structure){
   
   function process(value, parent){
     return guts.isHashMap(value) ?
-        noms[_.keys(value)](value, parent)
+        noms[_.keys(value)[0]](value, parent)
       : stringWrap(value);
   }
 
   function build(expressions){
-    // console.log('EXPS', expressions);
+    console.log('EXPS', expressions);
     return _.map(expressions, function(exp){
       if (guts.isHashMap(exp)){
         var key = _.first(_.keys(_.omit(exp, 'parent')));
@@ -277,7 +280,8 @@ function buildString(structure){
 
     if (!(_.some(_.flatten(_.map(restBites, _.keys)), function(v){return v === 'enter'}))){
       var elemIdx = _.findIndex(innerStructure, function(f){ return _.has(f, 'name') && f.name.split('_')[0] === 'elem'; });
-      restBites.splice(elemIdx, 0, {insert: assembleEnter(innerStructure[elemIdx].type)})
+      innerStructure[elemIdx].runIn = true;
+      restBites.splice(elemIdx - 1, 0, {insert: assembleEnter(innerStructure[elemIdx].type)});
     }
 
     return restBites.concat({insert: '}'}, dataBites, { 'dataList': dataList });
