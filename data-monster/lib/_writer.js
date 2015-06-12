@@ -250,7 +250,6 @@ function buildString(structure){
   function assembleScale(director, type, itself){
     var ministr = "";
     
-
     if(director === 'user'){
       var obn = itself[type + "Scale"];
       

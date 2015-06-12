@@ -18,8 +18,8 @@ function buildString(structure){
     elem    : elemBite,
     xAxis   : function(arg) { /* console.log('xAxis', arg); */ return util.inspect(arg, false, null)},
     yAxis   : function(arg) { /* console.log('yAxis', arg); */ return util.inspect(arg, false, null)},
-    xScale  : function(arg) { /* console.log('xScale', arg); */ return util.inspect(arg, false, null)},
-    yScale  : function(arg) { /* console.log('yScale', arg); */ return util.inspect(arg, false, null)},
+    xScale  : _.partial(assembleScales,'x'),
+    yScale  : _.partial(assembleScales,'y'),
     insert  : function(arg) { return arg },
 
    // special processes 
@@ -161,7 +161,7 @@ function buildString(structure){
     str += ".attr('class', ";
     str += (bite.elemSelect || "'elements'") + ")";
     str += ".append('" + bite.type + "')"
-    str += ".attr(" + pretty(_.zipObject(_.keys(bite.req_specs), _.map(bite.req_specs, function(el){ return process(el, bite.name)})), 4, 'PRINT', true)   + ");"; // add keys into this
+    str += ".attr(" + pretty(_.zipObject(_.keys(bite.req_specs), _.map(bite.req_specs, function(el){ return process(el, bite.name)})), 4, 'PRINT', true)   + ")"; // add keys into this
     str += "\n"
     return str;
   }
@@ -211,7 +211,33 @@ function buildString(structure){
       throw new Error('Incorrect margin arity');
     }
     return obj;
-  } 
+  }
+
+  function assembleScales(type, bite){
+    var str   = "",
+        title = type + 'Scale';
+
+    console.log('ASSSEMBLE SCALES', bite);
+
+    if (!bite) {
+      return str;
+    } else if (bite === 'default'){
+      console.log('DEFAULT CALLED');
+      str += "var " + title + " = ";
+      (type === 'x') && (str += "d3.scale.linear().domain([0, maxX]).range([0, width]);");
+      (type === 'y') && (str += "d3.scale.linear().domain([0, maxY]).range([height, 0]);");  
+    } else {
+      var domain = eatParams(bite.domain),
+          range  = eatParams(bite.range);
+      str += "var " + title + " = ";
+      str += eatVars(bite.scale);
+      str += ".domain([" + domain[0] + ", " + domain[1] + "]);";
+      str += ".range([" + range[0] + ", " + range[1] + "]);";
+    }
+    
+    return str;
+
+  }
 
 
   // PROCESS FUNCS
@@ -275,21 +301,38 @@ function buildString(structure){
     }).join('');
   }
 
-  // Do a little shuffling so we can map & join for correct order
+  // Do a little shuffling so we can map & join for correct order:
+  // - Move data to end and create list object
+  // - Create 'enter' object if not explicitly created
+  // - Create 'scales' object if not explicitly created
+  // - Add canvas enders
   function arrange(innerStructure){
-    var dataBites = _.filter(innerStructure, function(f){ return _.has(f, 'name') && f.name.split('_')[0] === 'data'; }),
-        restBites = _.reject(innerStructure, function(f){ return _.has(f, 'name') && f.name.split('_')[0] === 'data'; }),
+    var scales    = _.filter(innerStructure, function(f){ return _.has(f, 'xScale') ||  _.has(f, 'yScale') }), 
+        scaleKeys = _.flatten(_.map(scales, _.keys)),
+        canvasIdx = _.findIndex(innerStructure, function(f){ return _.has(f, 'name') && f.name.split('_')[0] === 'canvas';}),
+        dataBites = _.filter(innerStructure, function(f){ return _.has(f, 'name') && f.name.split('_')[0] === 'data'; }),
+        restBites = _.reject(innerStructure, function(f){ return (_.has(f, 'name') && f.name.split('_')[0] === 'data') || _.has(f, 'xScale') ||  _.has(f, 'yScale'); }),
         dataList  = _.map(dataBites, function(el){
           return { name: el.name, filetype: el.filetype, file: el.file };
         });
 
+    if (!(_.includes(scaleKeys, 'xScale'))){
+      scales.push({xScale: 'default'});
+    }
+
+    if (!(_.includes(scaleKeys, 'yScale'))){
+      scales.push({yScale: 'default'});
+    }
+
+    restBites.splice(canvasIdx, 0, scales);
+
     if (!(_.some(_.flatten(_.map(restBites, _.keys)), function(v){return v === 'enter'}))){
       var elemIdx = _.findIndex(innerStructure, function(f){ return _.has(f, 'name') && f.name.split('_')[0] === 'elem'; });
-      innerStructure[elemIdx].runIn = true;
+      innerStructure[elemIdx].runIn = true; // this way we don't append 'g' in the elemBite
       restBites.splice(elemIdx - 1, 0, {insert: assembleEnter(innerStructure[elemIdx].type)});
     }
 
-    return restBites.concat({insert: '}'}, dataBites, { 'dataList': dataList });
+    return _.flatten(restBites.concat({insert: '}'}, dataBites, { 'dataList': dataList }));
   }
 
   // _.map(structure, arrange);
