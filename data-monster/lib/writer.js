@@ -217,21 +217,18 @@ function buildString(structure){
     var str   = "",
         title = type + 'Scale';
 
-    console.log('ASSSEMBLE SCALES', bite);
-
     if (!bite) {
       return str;
     } else if (bite === 'default'){
-      console.log('DEFAULT CALLED');
       str += "var " + title + " = ";
-      (type === 'x') && (str += "d3.scale.linear().domain([0, maxX]).range([0, width]);");
+      (type === 'x') && (str += "d3.scale.linear().domain([0, maxX]).range([0, width])");
       (type === 'y') && (str += "d3.scale.linear().domain([0, maxY]).range([height, 0]);");  
     } else {
       var domain = eatParams(bite.domain),
           range  = eatParams(bite.range);
       str += "var " + title + " = ";
       str += eatVars(bite.scale);
-      str += ".domain([" + domain[0] + ", " + domain[1] + "]);";
+      str += ".domain([" + domain[0] + ", " + domain[1] + "])";
       str += ".range([" + range[0] + ", " + range[1] + "]);";
     }
     
