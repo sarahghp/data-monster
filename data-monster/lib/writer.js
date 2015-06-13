@@ -84,7 +84,8 @@ function buildString(structure){
   }
 
   function prettyBite(prefix, bite){
-    return atomicBite(prefix, pretty(guts.objectify(bite, {}, 'HALP ') , 4, "JSON"));
+    var bite = _.isArray(bite) ? guts.objectify(bite, {}) : bite;
+    return atomicBite(prefix, pretty(bite , 4, "JSON", true))
   }
   
   function stringWrap(check){
@@ -174,6 +175,16 @@ function buildString(structure){
     var str = "",
         orient = { x: "'bottom'", y: "'left'" };
 
+    var o = _.omit(bite, 'parent');
+    var b = _.mapValues(o, function(mb){ return _.isArray(mb) ? guts.objectify(mb, {}) : mb; });
+    var m = _.mapValues(b, function(ins){ return guts.isHashMap(ins) ? _.mapValues(ins, function(mins){ return _.has(mins, 'variable') ? process(mins, bite.parent) : mins; }): ins; })
+
+    var bbite = guts.objPairs(m);
+
+               
+    console.log(util.inspect(bbite, false, null));
+
+
     str += "var " + type + "Axis = d3.svg.axis()";
     str += atomicBite(".scale", type + 'Scale');
     str += atomicBite(".orient", orient[type]) + ';';
@@ -182,7 +193,7 @@ function buildString(structure){
     str += type === 'x' ? ".attr('transform', 'translate(0,' + height + ')')" : "";
     str += ".call(" + type + "Axis )";
     str += ".append('text')";
-    str += build(guts.objPairs(bite)) + ';';
+    str += build(bbite) + ';';
     return str;
   } 
   
@@ -302,7 +313,7 @@ function buildString(structure){
   }
 
   function build(expressions){
-    console.log('EXPS', expressions);
+    // console.log('EXPS', expressions);
     return _.map(expressions, function(exp){
       if (guts.isHashMap(exp)){
         var key = _.first(_.keys(_.omit(exp, 'parent')));
