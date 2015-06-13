@@ -174,8 +174,6 @@ function chomper(ast){
   function cleanPop(ast, parent, structure){
     var parentIndex = _.findIndex(structure, { name: parent });
     guts.addInto({clean: ast.exp}, structure[parentIndex]);
-
-    // console.log('Clean pop', ast);
     return structure;
   }
 
