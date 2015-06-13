@@ -16,8 +16,8 @@ function buildString(structure){
     dataList: queueBite,
     canvas  : canvasBite,
     elem    : elemBite,
-    xAxis   : function(arg) { /* console.log('xAxis', arg); */ return util.inspect(arg, false, null)},
-    yAxis   : function(arg) { /* console.log('yAxis', arg); */ return util.inspect(arg, false, null)},
+    xAxis   : _.partial(assembleAxes,'x'),
+    yAxis   : _.partial(assembleAxes,'y'),
     xScale  : _.partial(assembleScales,'x'),
     yScale  : _.partial(assembleScales,'y'),
     insert  : function(arg) { return arg },
@@ -25,6 +25,7 @@ function buildString(structure){
    // special processes 
     attr   : _.partial(prettyBite,".attr"),
     style  : _.partial(prettyBite,".style"),
+    text   : function(arg) { return _.partial(atomicBite, ".text")("'" + arg + "'")} ,
     color  : _.partial(makeVar, "color"),
    
    //  tooltip: ttBite,
@@ -83,7 +84,7 @@ function buildString(structure){
   }
 
   function prettyBite(prefix, bite){
-    return atomicBite(prefix, pretty(guts.objectify(bite, {}) , 4, "JSON"));
+    return atomicBite(prefix, pretty(guts.objectify(bite, {}, 'HALP ') , 4, "JSON"));
   }
   
   function stringWrap(check){
@@ -167,6 +168,24 @@ function buildString(structure){
   }
 
   // ASSEMBLERS
+  function assembleAxes(type, bite){
+    flags.axis = true;
+
+    var str = "",
+        orient = { x: "'bottom'", y: "'left'" };
+
+    str += "var " + type + "Axis = d3.svg.axis()";
+    str += atomicBite(".scale", type + 'Scale');
+    str += atomicBite(".orient", orient[type]) + ';';
+    str += "svg.append('g')";
+    str += ".attr('class','" + type + " axis')";
+    str += type === 'x' ? ".attr('transform', 'translate(0,' + height + ')')" : "";
+    str += ".call(" + type + "Axis )";
+    str += ".append('text')";
+    str += build(guts.objPairs(bite)) + ';';
+    return str;
+  } 
+  
   function assembled3things(director, label, itself){
     if(director === 'pre'){
       return 'd3.' + label + '.' + itself + '()';

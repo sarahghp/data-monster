@@ -54,6 +54,14 @@ exports.objectify = function objectify (pairArrays, toObj, defaultKey){
   return toObj;
 }
 
+exports.objPairs = function objPairs(bigObj){
+  return _.map(bigObj, function(val, key){
+      var obj = { };
+      obj[key] = val;
+      return obj;
+    });
+}
+
 /**
  * Read from one directory, check for file type, pipe to another
  * @param  {str} inputBase  originating directory
