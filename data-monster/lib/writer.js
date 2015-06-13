@@ -12,15 +12,16 @@ function buildString(structure){
   // LISTS
   var noms = {
     // special assemblies
-    data    : dataBite,
-    dataList: queueBite,
-    canvas  : canvasBite,
-    elem    : elemBite,
-    xAxis   : _.partial(assembleAxes,'x'),
-    yAxis   : _.partial(assembleAxes,'y'),
-    xScale  : _.partial(assembleScales,'x'),
-    yScale  : _.partial(assembleScales,'y'),
-    insert  : function(arg) { return arg },
+    data      : dataBite,
+    dataList  : queueBite,
+    canvas    : canvasBite,
+    elem      : elemBite,
+    xAxis     : _.partial(assembleAxes,'x'),
+    yAxis     : _.partial(assembleAxes,'y'),
+    xScale    : _.partial(assembleScales,'x'),
+    yScale    : _.partial(assembleScales,'y'),
+    insert    : function(arg) { return arg },
+    tooltips  : assembleTooltips,
 
    // special processes 
     attr   : _.partial(prettyBite,".attr"),
@@ -143,8 +144,8 @@ function buildString(structure){
     str += "width = " + bite.width +  ", ";
     str += "height = " + bite.height + ";";
 
-    str+= bite.yPrim ? "var maxY = d3.max(data, function(d){return " +  bite.yPrim + " })," : "";
-    str+= bite.xPrim ? "maxX = d3.max(data, function(d){return " + bite.xPrim + "});" : ""; 
+    str+= bite.yPrim ? "var yPrime = " +  bite.yPrim.split('.')[1] + ", maxY = d3.max(data, function(d){return " +  bite.yPrim + " });" : "";
+    str+= bite.xPrim ? "var xPrime = " +  bite.xPrim.split('.')[1] + ", maxX = d3.max(data, function(d){return " + bite.xPrim + "});" : ""; 
     str+= bite.yPrim ? "maxY = maxY + (maxY * .25); // Make it a little taller \n" : "";
 
     str += "var svg = d3.select('" + bite.selector + "')";
@@ -173,17 +174,14 @@ function buildString(structure){
     flags.axis = true;
 
     var str = "",
-        orient = { x: "'bottom'", y: "'left'" };
-
-    var o = _.omit(bite, 'parent');
-    var b = _.mapValues(o, function(mb){ return _.isArray(mb) ? guts.objectify(mb, {}) : mb; });
-    var m = _.mapValues(b, function(ins){ return guts.isHashMap(ins) ? _.mapValues(ins, function(mins){ return _.has(mins, 'variable') ? process(mins, bite.parent) : mins; }): ins; })
-
-    var bbite = guts.objPairs(m);
-
-               
-    console.log(util.inspect(bbite, false, null));
-
+        orient = { x: "'bottom'", y: "'left'" },
+        o = _.omit(bite, 'parent'),
+        b = _.mapValues(o, function(mb){ return _.isArray(mb) ? guts.objectify(mb, {}) : mb; }),
+        m = _.mapValues(b, function(ins){ return guts.isHashMap(ins) ? 
+                                                _.mapValues(ins, function(mins){ return _.has(mins, 'variable') ? 
+                                                      process(mins, bite.parent) 
+                                                    : mins; }) 
+                                                : ins; });
 
     str += "var " + type + "Axis = d3.svg.axis()";
     str += atomicBite(".scale", type + 'Scale');
@@ -193,7 +191,7 @@ function buildString(structure){
     str += type === 'x' ? ".attr('transform', 'translate(0,' + height + ')')" : "";
     str += ".call(" + type + "Axis )";
     str += ".append('text')";
-    str += build(bbite) + ';';
+    str += build(guts.objPairs(m)) + ';';
     return str;
   } 
   
@@ -261,9 +259,30 @@ function buildString(structure){
       str += ".domain([" + domain[0] + ", " + domain[1] + "])";
       str += ".range([" + range[0] + ", " + range[1] + "]);";
     }
-    
-    return str;
 
+    return str;
+  }
+
+  function assembleTooltips(bite){
+    flags.tt = true;
+
+    var str = "";
+
+    str += ".on('mouseover', function(d){";
+    str += "var xPosition = event.clientX + scrollX < width - 200 ? event.clientX + scrollX : event.clientX + scrollX - 200,";
+    str += "yPosition = event.clientY + scrollY + 100 > height ? event.clientY + scrollY - 25 : event.clientY + scrollY + 5,";
+    str += "text = ";
+    str += guts.isHashMap(bite) ? process(bite[_.keys(bite)]) :  " d[xPrime] + '; ' + d[yPrime] ";
+    str+= ";";
+    str+= "d3.select('#tooltip')";
+    str+= ".style('left', xPosition + 'px')";
+    str+= ".style('top', yPosition + 'px')";
+    str+= ".select('#values')";
+    str+= ".text(text);";
+    str+= "d3.select('#tooltip').classed('hidden', false); })";
+    str+= ".on('mouseout', function(){";
+    str+= "d3.select('#tooltip').classed('hidden', true); })";
+    return str;
   }
 
 
@@ -362,10 +381,9 @@ function buildString(structure){
     return _.flatten(restBites.concat({insert: '}'}, dataBites, { 'dataList': dataList }));
   }
 
-  // _.map(structure, arrange);
-  // _.map(structure, build);
+
   console.log(beautify(_.map(_.map(structure, arrange), build).join(''), {"break_chained_methods": true}));
-  // return beautify(_.map(structure, build).join(''), {"break_chained_methods": true});
+  return beautify(_.map(_.map(structure, arrange), build).join(''), {"break_chained_methods": true});
 }
 
 exports.string  = buildString;
