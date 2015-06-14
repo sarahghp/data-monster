@@ -132,7 +132,9 @@ function chomper(ast){
         additions.req_specs[key].scale = 'xScale';
       } else if (_.has(val, 'variable') && val.variable === yPrim){
         additions.req_specs[key].scale = 'yScale';
-      }
+      } else if (_.has(val, 'variable') && key === 'fill'){
+        additions.req_specs[key].scale = 'color';
+      } 
     });
 
     structure.push(guts.addInto(additions, {}));

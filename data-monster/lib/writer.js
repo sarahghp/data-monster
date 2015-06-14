@@ -26,7 +26,7 @@ function buildString(structure){
    // special processes 
     attr   : _.partial(prettyBite,".attr"),
     style  : _.partial(prettyBite,".style"),
-    text   : function(arg) { return _.partial(atomicBite, ".text")("'" + arg + "'")} ,
+    text   : function(arg) { return _.partial(atomicBite, ".text")(stringWrap(arg))} ,
     color  : _.partial(makeVar, "color"),
    
    //  tooltip: ttBite,
@@ -68,7 +68,7 @@ function buildString(structure){
 
   // SMALL FUNCS
   function atomicBite(meth, arg){
-    return meth + "(" + arg + ")";
+    return meth + "(" + arg + ") \n";
   }
 
   function cleanBite(val){
@@ -144,8 +144,8 @@ function buildString(structure){
     str += "width = " + bite.width +  ", ";
     str += "height = " + bite.height + ";";
 
-    str+= bite.yPrim ? "var yPrime = " +  bite.yPrim.split('.')[1] + ", maxY = d3.max(data, function(d){return " +  bite.yPrim + " });" : "";
-    str+= bite.xPrim ? "var xPrime = " +  bite.xPrim.split('.')[1] + ", maxX = d3.max(data, function(d){return " + bite.xPrim + "});" : ""; 
+    str+= bite.yPrim ? "var yPrime = " +  stringWrap(bite.yPrim.split('.')[1]) + ", maxY = d3.max(data, function(d){return " +  bite.yPrim + " });" : "";
+    str+= bite.xPrim ? "var xPrime = " +  stringWrap(bite.xPrim.split('.')[1]) + ", maxX = d3.max(data, function(d){return " + bite.xPrim + "});" : ""; 
     str+= bite.yPrim ? "maxY = maxY + (maxY * .25); // Make it a little taller \n" : "";
 
     str += "var svg = d3.select('" + bite.selector + "')";
@@ -158,9 +158,8 @@ function buildString(structure){
   }
 
   function elemBite(bite){
-    // console.log(bite.req_specs);
     var str = "";
-    str += bite.runIn ? "" : "svg.append('g')";
+    str += bite.runIn ? ".append('g')" : "svg.append('g')";
     str += ".attr('class', ";
     str += (bite.elemSelect || "'elements'") + ")";
     str += ".append('" + bite.type + "')"
@@ -182,7 +181,7 @@ function buildString(structure){
                                                       process(mins, bite.parent) 
                                                     : mins; }) 
                                                 : ins; });
-
+    str += "\n"
     str += "var " + type + "Axis = d3.svg.axis()";
     str += atomicBite(".scale", type + 'Scale');
     str += atomicBite(".orient", orient[type]) + ';';
@@ -306,7 +305,6 @@ function buildString(structure){
   }
 
   function lookup(toFind, scope){
-    // console.log('lookup called', toFind, scope);
     var lookat = _.filter(_.flatten(structure), function(f){
       return  _.has(f, 'parent') && f.parent === scope;
     });
@@ -349,11 +347,11 @@ function buildString(structure){
 
   // Do a little shuffling so we can map & join for correct order:
   // - Move data to end and create list object
-  // - Create 'enter' object if not explicitly created
-  // - Create 'scales' object if not explicitly created
+  // - Create 'enter', 'color', and 'scales' objects if not explicitly created
   // - Add canvas enders
   function arrange(innerStructure){
-    var scales    = _.filter(innerStructure, function(f){ return _.has(f, 'xScale') ||  _.has(f, 'yScale') }), 
+    var colors    = _.filter(innerStructure, function(f){ return _.has(f, 'color')}),
+        scales    = _.filter(innerStructure, function(f){ return _.has(f, 'xScale') ||  _.has(f, 'yScale') }), 
         scaleKeys = _.flatten(_.map(scales, _.keys)),
         canvasIdx = _.findIndex(innerStructure, function(f){ return _.has(f, 'name') && f.name.split('_')[0] === 'canvas';}),
         dataBites = _.filter(innerStructure, function(f){ return _.has(f, 'name') && f.name.split('_')[0] === 'data'; }),
@@ -361,6 +359,10 @@ function buildString(structure){
         dataList  = _.map(dataBites, function(el){
           return { name: el.name, filetype: el.filetype, file: el.file };
         });
+
+    if (!(colors.length)){
+      restBites.splice(canvasIdx, 0, { color: {'function': function(id){ return id; }} });
+    }
 
     if (!(_.includes(scaleKeys, 'xScale'))){
       scales.push({xScale: 'default'});
@@ -382,7 +384,7 @@ function buildString(structure){
   }
 
 
-  console.log(beautify(_.map(_.map(structure, arrange), build).join(''), {"break_chained_methods": true}));
+  // console.log(beautify(_.map(_.map(structure, arrange), build).join(''), {"break_chained_methods": true}));
   return beautify(_.map(_.map(structure, arrange), build).join(''), {"break_chained_methods": true});
 }
 
