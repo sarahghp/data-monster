@@ -1,13 +1,10 @@
 var util = require('util'),
     _    = require('lodash'),
     path = require('path'),
-    uuid = require('uuid-v4');
+    uuid = require('uuid-v4'),
+    guts = require('./guts.js'); // guts is the dm-specific utils file
 
 function chomper(ast){
-
-  var structure = { 
-
-  }; 
 
   var nodes = {
     'data':     dataGen, 
@@ -16,297 +13,203 @@ function chomper(ast){
   };
 
   var special = {
-    'tooltips': tooltipPop,
-    'axis-x':   axisPop,
-    'axis-y':   axisPop,
-    'scale-x':  scalePop,
-    'scale-y':  scalePop,
-    'clean':    cleanPop,
-    'function': funcPop
+    'axis-x':   scaleAndAxisPop,
+    'axis-y':   scaleAndAxisPop,
+    'scale-x':  scaleAndAxisPop,
+    'scale-y':  scaleAndAxisPop,
+    'clean'  :  cleanPop
   };
 
   // Utility functions
 
-  function addChildren(parent, child){
-    // if child array exists, push to it, otherwise create
+  function addChildren(parent, child, structure){
+    var parentIndex = _.findIndex(structure, { name: parent});
 
-    structure[parent]['children'] ? 
-      structure[parent]['children'].push(child) :
-      (structure[parent]['children'] = [child]) ;
+    structure[parentIndex]['children'] ? 
+      structure[parentIndex]['children'].push(child) :
+      (structure[parentIndex]['children'] = [child]) ;
+
+    return structure;
   }
 
-  function convertToFunc(func){
-    var val = 'var moo = ' + func;
-    eval(val);
-    return moo;
-  }
-
-  function convertToDFunc(toInter, wrapper){
-    // this rigamarole sets the value to the actual unexecuted function
-    var val;
-
-    if (wrapper === 'clean'){
-      val = 'var moo = function(d){ ' + toInter + ' }';
-    } else if (wrapper){
-      val = 'var moo = function(d){ return ' + wrapper + '(' + toInter + ') }';
-    } else {
-      val = 'var moo = function(d){ return ' + toInter + ' }';
-    }
-    
-    eval(val);
-    return moo;
-  }
-
-  function createNode(ast, parent){
-
-    var id;
-
-    (function createID(){
-      id = ast[0].op + '_' + uuid().split('-')[0];
-      if (structure[id]){
-        createID();
+  function createNode(ast, structure){
+    var id = (function createID(){
+      var check = ast.op + '_' + uuid().split('-')[0];
+      if (_.includes(structure, check)){
+        return createID();
       } else {
-        structure[id] = Object.create(Object.prototype);
+        return check;
       }
     })();
 
-    // call the appropriate generation function on child exp
-    nodes[ast[0].op](id, ast[0].exp, parent); 
-
-    // and also call sibling generate
-    handleSiblings(ast, parent);
+    return id;
   }
-
-  function handleSiblings(ast, parent){
-    var consumed = _.drop(ast);
-    (consumed.length) && generate(consumed, parent); 
-  }
-
 
   // Generative functions
 
-  function dataGen(id, exp){ 
-    var leaf      = structure[id],
-        file      = exp[0],                 // the first argument to a data call is the data itself or filename
-        extension = path.extname(file);
-    
-    leaf['file'] = file;
+  function dataGen(ast, parent, structure){
+    var id        = createNode(ast, structure),
+        file      = ast.exp[0],                 // the first argument to a data call is the data itself or filename
+        extension = path.extname(file),
+        additions = { name: id,
+                      file: file,
+                      filetype: extension,
+                    };
 
-    if(extension === ''){
-      if(file instanceof Array){
-        leaf['filetype'] = 'array';
-      } else {
-        console.log('Error: Invalid data type');
-      }
-    } else {
-      leaf['filetype'] = extension;
+    structure.push(guts.addInto(additions,{}));
+
+    if (guts.thereIsMore(ast.exp)){
+      _.invoke(_.rest(ast.exp), function(){
+         generate(this, id, structure);
+      });
     }
-
-    // call generate on the rest of the expression, with data as new parent
-    // here we move into the data expression list and the outside object is sloughed
-
-    handleSiblings(exp, id);   
+    return structure;
   }
 
-  function canvasGen(id, exp, parent){
+  function canvasGen(ast, parent, structure){
+    var id   = createNode(ast, structure),
+        exp  = ast.exp,
+        newExp,
+        additions = { name: id, 
+                      parent: parent,
+                      width: exp[0],
+                      height: exp[1]
+                    };
 
-    parent && addChildren(parent, id);  // add canvas id to parent's list of children
-
-    var leaf = structure[id],
-        newExp;
-    
-    leaf['parent'] = parent;
-    leaf['width']  = exp[0];
-    leaf['height'] = exp[1];
+    // add canvas id to parent's list of children
+    parent && addChildren(parent, id, structure);
 
     // check for optional margins and assign selector & margins based on result
-    if (typeof exp[2] === 'object' && exp[2]) {
-      leaf['margins'] = exp[2];
-      leaf['selector'] = exp[3];
+    if (_.isObject(exp[2])) {
+      additions['margins'] = exp[2];
+      additions['selector'] = exp[3];
       newExp = _.drop(exp, 4);
     } else {
-      leaf['selector'] = exp[2];
+      additions['selector'] = exp[2];
       newExp = _.drop(exp, 3);
     }
 
-    // call generate on rest of the expression; doesn't use handleSiblings 
-    // since the drop is brancing / handled internally 
-    generate(newExp, id); 
+    structure.push(guts.addInto(additions, {}))
+    
+    if (newExp.length){
+      _.invoke(newExp, function(){
+         generate(this, id, structure);
+      });
+    }
 
+    return structure;
   }
 
-  function elemGen(id, exp, parent){
-    addChildren(parent, id);
+  function elemGen(ast, parent, structure){
+    var id          = createNode(ast, structure),
+        parentIndex = _.findIndex(structure, { name: parent }),
+        exp         = ast.exp,
+        innerExp    = exp.exp || exp[0].exp,
+        additions   = { name: id, 
+                        parent: parent,
+                        type: exp.op || exp[0].op,
+                        req_specs: guts.objectify(innerExp, {}, 'oops')
+                      };
 
-    var leaf = structure[id];
+    addChildren(parent, id, structure);
     
-    leaf['parent']    = parent;
-    leaf['type']      = exp[0].op;
-    leaf['req_specs'] = Object.create(Object.prototype);
 
-    _.forEach(exp[0].exp, function(el){
-      // return array pairs to hash pairs
-      var val = el[1];
-      if ((typeof val === 'object') && val.hasOwnProperty('variable') && val.variable.match(/fill|\bd\./)){
-        
-        if (el[0].match(/x/)) { 
-          structure[parent]['xPrim'] = val.variable;
-          leaf['req_specs'][el[0]] = convertToDFunc(val.variable, 'xScale');
-        } else if (el[0].match(/y/)){
-          structure[parent]['yPrim'] = val.variable;
-          leaf['req_specs'][el[0]] = convertToDFunc(val.variable, 'yScale');
-        } else if (el[0].match(/fill/)){
-          leaf['req_specs'][el[0]] = convertToDFunc(val.variable, 'color');
-        } else {
-          leaf['req_specs'][el[0]] = convertToDFunc(val.variable);
+    var tests =  function(personalizer){
+        return function(val, key) {
+          return _.has(val, 'variable') && val.variable.match(/\bd\./) && _.includes(key, personalizer);
         }
- 
+      };
 
-      } else {
-        leaf['req_specs'][el[0]] = val;
-      }
+    var primPartial = _.partial(guts.finder, additions.req_specs, _, 'variable'),
+        xPrim = primPartial(tests('x')),
+        yPrim = primPartial(tests('y'));
+
+    structure[parentIndex].xPrim = structure[parentIndex].xPrim || xPrim;
+    structure[parentIndex].yPrim = structure[parentIndex].yPrim || yPrim;
+
+    _.forEach(additions.req_specs, function(val, key){
+      if (_.has(val, 'variable') && val.variable === xPrim) {
+        additions.req_specs[key].scale = 'xScale';
+      } else if (_.has(val, 'variable') && val.variable === yPrim){
+        additions.req_specs[key].scale = 'yScale';
+      } else if (_.has(val, 'variable') && key === 'fill'){
+        additions.req_specs[key].scale = 'color';
+      } 
     });
 
-    handleSiblings(exp, id);
+    structure.push(guts.addInto(additions, {}));
+
+    if (guts.thereIsMore(exp)){
+      _.invoke(_.rest(exp), function(){
+         generate(this, parent, structure);
+      });
+    }
+
+    return structure;
   }
 
   // Population Functions
 
-  function assign(ast, parent){
-    // find functions and dispatch them 
-    if (typeof ast[0].exp[0] === 'object' && !(ast[0].exp[0] instanceof Array) && ast[0].exp[0].op === 'function'){
-      funcPop(ast, parent);
-    } else {
-      structure[parent][ast[0].op] = ast[0].exp;
-      handleSiblings(ast, parent);
-    }
-  }
-
-  function axisPop(ast, parent){
-    var type    = ast[0].op.split('-')[1],
-        axisObj = (structure[parent][(type + 'Axis')] = Object.create(Object.prototype));
-
-        axisObj.parent = parent;
-
-        _.forEach(ast[0].exp, function(el){
-
-          axisObj[el.op] = el.exp;
-
-        });
-
-    handleSiblings(ast, parent);
-  }
-
-  function cleanPop(ast, parent){
-    var interStr    = "";
-    var assignments = ast[0].exp[0].exp
-                      .split("\n")
-                      .map(function(el){
-                        return el.trim();
-                      });
-    _.forEach(assignments, function(el){
-      interStr += el;
-    })
-
-    structure[parent]['clean'] = convertToDFunc(interStr, 'clean');
-
-    handleSiblings(ast, parent);
-  }
-
-  function funcPop(ast, parent){
-     if (ast[0].op === 'funcs'){
-      _.forEach(ast[0].exp, function(el){
-        structure[parent]['funcs'] ? 
-          structure[parent]['funcs'].push(convertToFunc(el.exp)) :
-          (structure[parent]['funcs'] = [convertToFunc(el.exp)]) ;
-      } )
-     } else {
-      structure[parent][ast[0].op] = convertToFunc(ast[0].exp[0].exp);
-     }
-
-     handleSiblings(ast, parent);
-  }
-
-  function scalePop(ast, parent){
-    var type    = ast[0].op.split('-')[1],
-        scaleObj = (structure[parent][(type + 'Scale')] = Object.create(Object.prototype));
-
-    _.forEach(ast[0].exp, function(el){
-      if (el.hasOwnProperty('variable')){
-        scaleObj['scale'] = el;
-      } else {
-        scaleObj[el.op] = el.exp[0];
-      }
-    })
-
-    handleSiblings(ast, parent);
-  }
-
-  function tooltipPop (ast, parent){
-    var tooltip    = Object.create(Object.prototype);
-    tooltip.parent = parent;
-
-    if (ast[0][1]) {
-      if (ast[0][1].match(/\bd\./)){
-        tooltip.text = convertToDFunc(ast[0][1]);
-      } else {
-        tooltip.text = convertToFunc(ast[0][1]);
-      }
-    } else {
-       tooltip.text = 'default';
-    }
+  function assign(ast, parent, structure){ 
+    var additions = guts.objectify([[ast.op, ast.exp],['parent', parent]],{});
+    structure.push(guts.addInto(additions, {}));
     
-    structure[parent].tooltip = tooltip;
+      if (guts.thereIsMore(ast.exp)){
+        _.invoke(_.rest(ast.exp), function(){
+           generate(this, parent, structure);
+        });
+      }
 
-    handleSiblings(ast, parent);
+      return structure;
   }
+
+  function scaleAndAxisPop(ast, parent, structure){
+    var breakOp = ast.op.split('-'),
+        label   = breakOp[1] + _.capitalize(breakOp[0]),
+        outer   = guts.objectify([[label, {}]], {}),
+        inner   = guts.addInto({'parent': parent}, outer[label]);
+
+        guts.setAtoB('op', 'exp')(ast.exp, inner, breakOp[0]);    
+        return structure.push(outer);
+  }
+
+  function cleanPop(ast, parent, structure){
+    var parentIndex = _.findIndex(structure, { name: parent });
+    guts.addInto({clean: ast.exp}, structure[parentIndex]);
+    return structure;
+  }
+
 
   // GENERATE FUNC — BEST FUNC
 
-  function generate(ast, parent){
+  function generate(ast, parent, structure){
 
-    var parent = parent || undefined;
+    var parent    = parent || undefined,
+        structure = structure || [];    
 
-    // Have we consumed everything?
+    if (ast.hasOwnProperty('op') && (nodes[ast.op])) {
+      return nodes[ast.op](ast, parent, structure);
 
-    if(!ast.length){
-      // console.log('structure finished!');
-      return;
-    }
-
-    // if no, check if it is 'data', 'canvas', or 'elem' for the svg shapes [excepting text]: 
-    // (rect, circle, ellipse, line, polyline, polygon, path)
-    // if yes, call a parent creator
-
-    if (ast[0].hasOwnProperty('op') && (nodes[ast[0].op])) {
-      createNode(ast, parent);
-
-    // is it special?
-
-    } else if (ast[0].hasOwnProperty('op') && (special[ast[0].op])) {
-      special[ast[0].op](ast, parent);
-
-    // default: call assigner
+    } else if (ast.hasOwnProperty('op') && (special[ast.op])) {
+      return special[ast.op](ast, parent, structure);
 
     } else {
-      assign(ast, parent);
+      return assign(ast, parent, structure);
     } 
   }
 
 
   // NOW LET'S GET DOWN TO BUSINESS
+  
 
-  // ast comes as an array of arrays, each inner array mapping to a full spec expression,
-  // therefore we must apply the assignment function to each
+  // var log = _.map(ast, function(el){
+  //   return generate(el);
+  // });
+  // console.log('final', util.inspect(log, false, null));
 
-  _.forEach(ast, function(el){
+  return _.map(ast, function(el){
     return generate(el);
   });
-
-  // console.log('final', util.inspect(structure, false, null));
-
-  return structure;
-
 }
 
 exports.chomper = chomper;

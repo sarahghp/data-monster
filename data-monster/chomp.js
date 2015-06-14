@@ -3,80 +3,71 @@
 var fs       = require('fs'),
     path     = require('path'),
     _        = require('lodash'),
+    program  = require('commander'),
+    RSVP     = require('rsvp'),
     parser   = require('./lib/parser.js'),
     writer   = require('./lib/writer.js'),
+    guts     = require('./lib/guts.js'),
     flags    = writer.flags;
 
 
-function compile(){
+function compiler(){
 
-  var inputs      = process.argv,
-      iL          = inputs.length,
-      files       = inputs.slice(2, iL),
-      lastFile    = inputs[iL - 1],
-      calledFrom  = process.cwd(),
-      outDir;
+  // Parse arguments
+  program
+    .version('0.0.1')
+    .description('Compile your data monster files')
+    .option('-a, --all', 'Chomp all .dm files')
+    .option('-d, --directory [dir]', 'Write out to this directory')
+    .parse(process.argv);
 
-  // Checks if last arg passed is a directory
-
-  function createDirectory(check){ 
-    if (path.extname(check) === '' && path.basename(check) !== '-a') {
-      outDir = check;
-      files.pop();
-    } else {
-      outDir = calledFrom + '/monster-files';
-    }
+  function createDirectory(directory){
 
     // Create destination, using recommended handling of ignoring 'EEXIST' error  
-    // since fs.exists() will be deprecated
+    // since fs.exists() will be deprecated 
+    
+    return new RSVP.Promise(function(resolve, reject){
 
-    fs.mkdir(outDir, function(err){
-      if (err && err.code == 'EEXIST'){
-        return;
-      } else if (err) {
-        console.log(err);
+      var outDir = program.directory ||  __dirname + '/monster-files';
+      
+      fs.mkdir(outDir, function(err){
+        if (err && err.code !== 'EEXIST'){
+          reject(err);
+        } else {
+          resolve(outDir);
+        }
+      });
+    })
+  }
+
+  function createSupportFiles(flags, extArr, inputBase, outputBase){  
+    _.forEach(_.keys(flags), function(val, key){
+      if (val) {
+        _.forEach(extArr, function(ext){
+          guts.readWrite(inputBase, outputBase, key, ext);
+        })
       }
-    });
+    })
   }
-
-  // Checks for -a flag and generates files array if necessary
-
-  function buildFileArray(filter, list, arr){
-    var arr     = arr || [],
-        file    = list.pop();
-
-    (path.extname(file) === filter) && arr.push(file);
-
-    if (list.length > 0){
-      return buildFileArray('.dm', list, arr);
-    } else {
-      return arr;
-    }
-  }
-
+ 
   function genFileCollection(dir){
-    if (files[0] === '-a'){
-      return buildFileArray('.dm', fs.readdirSync(dir));
+    if (program.all){
+      return _.filter(fs.readdirSync(dir), function(f){
+        return path.extname(f) === '.dm'});
     } else {
-      return files;
+      return program.args;
     }
   }
 
-  // What it is we want to do to the files
 
-  var changes =  function(files){
-    // call grammar gen once, then 
+  function compile(files, outDir){
+    // gen grammer & make sure we are in the right folder
     parser.build();
+    path.basename(__dirname) !== outDir && process.chdir(outDir);
 
     _.forEach(files, function interpret(file){
-      var structure   = parser.structure(calledFrom + '/' + file),
-          output      = writer.string(structure),
-          title       = file.slice(0, -3),
-          outputTitle = title + '.js';
-
-        // Then write out js file(s) to output directory
-
-        path.basename(process.cwd()) !== outDir && process.chdir(outDir);
+      var output      = writer.string(parser.structure(__dirname + '/' + file)),
+          outputTitle = path.basename(file, '.dm') + '.js';        
 
         fs.writeFile(outputTitle, output, function(err){
           if(err) throw err;
@@ -86,23 +77,20 @@ function compile(){
   }
 
 
-  // Call all the processes, including final compilation once the event loop has cleared
+  // Call all the processes
 
-  createDirectory(lastFile);
-  _.defer(changes, genFileCollection(calledFrom));
-
-  // Finally add in HTML & CSS helper files if necessary
-  _.defer(function(){
-    if (flags.ttBool){
-      fs.createReadStream(__dirname + '/lib/tt.html').pipe(fs.createWriteStream(outDir + '/tt.html'));
-      fs.createReadStream(__dirname + '/lib/tt.css').pipe(fs.createWriteStream(outDir + '/tt.css'));
-    }
-    if(flags.axisBool){
-      fs.createReadStream(__dirname + '/lib/axis.css').pipe(fs.createWriteStream(outDir + '/axis.css'));
-    }
-  })
-
+  createDirectory(program.directory)
+    .then(function(outDir){
+      compile(genFileCollection(__dirname), outDir);
+      return outDir;
+    })
+    .then(function(outDir){
+      createSupportFiles(flags, ['.html', '.css'], [__dirname, '/lib/support/'].join(''), [outDir, '/'].join(''));
+    })
+    .catch(function(err){
+        console.log(err.stack);
+    });
 }
 
 
-module.exports = compile();
+module.exports = compiler();

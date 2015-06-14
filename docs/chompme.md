@@ -224,6 +224,13 @@ axis-x: attr: { 'class': 'label', 'x': width, 'y': 50 }
 
 As you may notice, all options that would be called with a string of `.attr().attr()` in d3 are here passed as a single hash.
 
+To override the default scale and orientation, use the [system variables](#system-variables) instead of `axis-*`
+
+```
+(xAxis.scale: otherScale)
+(xAxis.orient: 'right')
+```
+
 **Soon**: The ability to enable basic axes with simply `(axis: true)`.
 
 #### `tooltips`
